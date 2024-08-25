@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <main>
+    <main className="">
      <Button>
       Hello
       </Button>
