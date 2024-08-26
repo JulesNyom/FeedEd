@@ -1,12 +1,12 @@
-import Image from "next/image"
-import Link from "next/link"
+import Image from "next/image";
+import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="border-t">
-      <div className="flex-center wrapper flex-between flex flex-col gap-4 p-5 text-center sm:flex-row">
-        <Link href='/'>
-          <Image 
+    <footer className="flex items-center justify-center h-full">
+      <div className="flex flex-col items-center justify-center gap-4 p-5 text-center">
+        <Link href="/">
+          <Image
             src="/assets/images/feeded.png"
             alt="logo"
             width={128}
@@ -14,10 +14,10 @@ const Footer = () => {
           />
         </Link>
 
-        <p>2024 FeedEd. All Rights reserved.</p>
+        <p className="text-xs">2024 FeedEd. All Rights reserved.</p>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

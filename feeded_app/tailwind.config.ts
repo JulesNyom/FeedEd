@@ -17,6 +17,13 @@ const config = {
         "2xl": "1400px",
       },
     },
+    colors: {
+      'indigo': '#6238F1',
+      'lightblue': 'rgb(239 246 255)',
+      'yellow': '#F9D351',
+      'black': '#000000',
+      'white': '#FFFFFF',
+    },
     extend: {
       keyframes: {
         "accordion-down": {
