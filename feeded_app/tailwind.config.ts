@@ -18,11 +18,16 @@ const config = {
       },
     },
     colors: {
-      'indigo': '#6238F1',
+      'purple': '#6238F1',
       'lightblue': 'rgb(239 246 255)',
       'yellow': '#F9D351',
       'black': '#000000',
       'white': '#FFFFFF',
+      'lightgray': 'rgb(107 114 128)',
+      'lightpurple': '#ED3EF7',
+      'indigo' : 'rgb(99 102 241)',
+      'mediumpurple' : 'rgb(168 85 247)',
+      'pink' : 'rgb(236 72 153)'
     },
     extend: {
       keyframes: {

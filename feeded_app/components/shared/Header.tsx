@@ -12,26 +12,29 @@ const Header = () => {
             src="/assets/images/feeded.png"
             width={128}
             height={38}
-            alt="Evently logo"
+            alt="Feeded logo"
           />
         </Link>
         <div>
           <Button
             asChild
             className="bg-transparent text-black font-normal"
-            size="lg">
+            size="lg"
+            variant="link">
             <Link href="/sign-in">Tarifs</Link>
           </Button>
           <Button
             asChild
-            className="bg-transparent text-black font-normal"
-            size="lg">
+            className="bg-transparent text-black font-normal "
+            size="lg"
+            variant="link">
             <Link href="/sign-in">Fonctionnalités</Link>
           </Button>
           <Button
             asChild
             className="bg-transparent text-black font-normal"
-            size="lg">
+            size="lg"
+            variant="link">
             <Link href="/sign-in">A propos</Link>
           </Button>
         </div>
@@ -43,7 +46,7 @@ const Header = () => {
             <UserButton showName />
           </SignedIn>
           <SignedOut>
-            <Button asChild className="text-sm text-white font-bold bg-indigo">
+            <Button asChild className="text-sm text-white font-bold hover:bg-purple/85 bg-purple">
               <Link href="/sign-in">Démarrer gratuitement</Link>
             </Button>
           </SignedOut>

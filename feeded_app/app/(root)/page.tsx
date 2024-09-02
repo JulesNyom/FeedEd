@@ -11,12 +11,14 @@ export default function Home() {
           améliorez vos formations.
         </h1>
         <p></p>
-        <Button asChild className="bg-indigo text-white font-bold text-sm mr-6">
+        <Button asChild className="hover:bg-purple/85 bg-purple text-white font-bold text-sm mr-6">
           <Link href="/sign-in">
             Démarrer gratuitement
           </Link>
         </Button>
-        <Button className="font-bold border bg-white">Compte premium</Button>
+        <Button className="font-bold border hover:border-purple hover:text-purple bg-white">
+          Plus d'options
+          </Button>
       </div>
     </main>
   );
