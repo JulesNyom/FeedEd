@@ -1,5 +1,5 @@
-import React from 'react';
 import Sidebar from '@/components/shared/sidebar';
+import React from 'react';
 
 export default function DashboardLayout({
   children,
@@ -8,12 +8,12 @@ export default function DashboardLayout({
 }) {
   return (
     <html lang="en">
-      <body className='flex flex-row'>
-        <div>
-      <Sidebar/>
-      </div>
-        <div className="">
+      <body>
+        <div className='flex flex-row'>
+          <Sidebar />
+        <div className="flex-1">
           <main>{children}</main>
+        </div>
         </div>
       </body>
     </html>
