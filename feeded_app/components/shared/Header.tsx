@@ -4,15 +4,16 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { name: "Home", href: "/" },
+    { name: "Accueil", href: "/" },
     { name: "Features", href: "#features" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "About", href: "#about" },
+    { name: "Tarifs", href: "#pricing" },
+    { name: "À propos", href: "#about" },
   ];
 
   return (
@@ -21,7 +22,13 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0">
-              <span className="text-2xl font-bold text-primary">Logo</span>
+              <Image
+                src="/assets/images/feeded.png"
+                alt="Logo"
+                width={150}
+                height={75}
+                priority
+              />
             </Link>
           </div>
           <div className="hidden md:block">
@@ -36,11 +43,12 @@ export default function Header() {
               ))}
             </div>
           </div>
-          <div className="hidden md:block">
+          <div className="hidden md:block space-x-3">
             <Link href="/signup">
-              <Button>
-                Get Started
-              </Button>
+              <Button variant={"outline"}>Inscription</Button>
+            </Link>
+            <Link href="/login">
+              <Button>Connexion</Button>
             </Link>
           </div>
           <div className="md:hidden">
@@ -62,7 +70,12 @@ export default function Header() {
                       {item.name}
                     </Link>
                   ))}
-                  <Button className="mt-4">Get Started</Button>
+                  <Link href="/signup">
+                    <Button variant={"outline"}>Inscription</Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button>Connexion</Button>
+                  </Link>
                 </div>
               </SheetContent>
             </Sheet>

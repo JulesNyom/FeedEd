@@ -1,4 +1,8 @@
+"use client"
+
 import Link from "next/link"
+import Image from "next/image"
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -15,14 +19,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
-  CircleUser,
   Home,
   Menu,
-  Package2,
   Search,
   BookOpen,
   UserSquare2,
@@ -39,6 +42,9 @@ const navLinks = [
 ]
 
 export function Topbar () {
+
+  const [userName, setUserName] = useState("Jane Doe")
+
     return (
       <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
       <Sheet>
@@ -54,12 +60,14 @@ export function Topbar () {
         </SheetTrigger>
         <SheetContent side="left" className="flex flex-col">
           <nav className="grid gap-2 text-lg font-medium">
-            <Link
-              href="#"
-              className="flex items-center gap-2 text-lg font-semibold"
-            >
-              <Package2 className="h-6 w-6" />
-              <span className="">FeedEd</span>
+          <Link href="/" className="flex-shrink-0">
+              <Image
+                src="/assets/images/feeded.png"
+                alt="Logo"
+                width={150}
+                height={75}
+                priority
+              />
             </Link>
             {navLinks.map(({ href, icon: Icon, label }) => (
               <Link
@@ -73,16 +81,16 @@ export function Topbar () {
             ))}
           </nav>
           <div className="mt-auto">
-            <Card>
+            <Card className="">
               <CardHeader>
-                <CardTitle>Upgrade to Pro</CardTitle>
+                <CardTitle>Devenez pro</CardTitle>
                 <CardDescription>
-                  Unlock all features and get unlimited access to our support team.
+                  Débloquez toutes les fonctionnalités et obtenez un nombre illimité de formations.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button size="sm" className="w-full">
-                  Upgrade
+                  Abonnement pro
                 </Button>
               </CardContent>
             </Card>
@@ -104,7 +112,10 @@ export function Topbar () {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="secondary" size="icon" className="rounded-full">
-            <CircleUser className="h-5 w-5" />
+          <Avatar>
+              <AvatarImage src="https://github.com/shadcn.png" alt={userName} />
+              <AvatarFallback>{userName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+            </Avatar>            
             <span className="sr-only">Toggle user menu</span>
           </Button>
         </DropdownMenuTrigger>
@@ -112,7 +123,7 @@ export function Topbar () {
           <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Réglages</DropdownMenuItem>
-          <DropdownMenuItem>Support</DropdownMenuItem>
+          <DropdownMenuItem>Aide</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Déconnexion</DropdownMenuItem>
         </DropdownMenuContent>

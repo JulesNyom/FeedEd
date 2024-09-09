@@ -1,12 +1,12 @@
 import { Login } from '@/components/shared/Login'
 import React from 'react'
 
-const page = () => {
+const Page = () => {
   return (
-    <>
-    <Login/>
-    </>
+    <div className="flex items-center justify-center">
+      <Login />
+    </div>
   )
 }
 
-export default page
+export default Page
