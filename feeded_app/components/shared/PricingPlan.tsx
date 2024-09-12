@@ -25,7 +25,7 @@ const pricingPlans = [
   },
 ]
 
-export default function PricingSection() {
+export default function PricingPage() {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -33,10 +33,10 @@ export default function PricingSection() {
   }, [])
 
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
+    <section className="w-full py-12 md:py-24 lg:py-32 flex justify-center bg-background">
       <div className="container px-4 md:px-6">
         <div className="text-center mb-12">
-          <h2 className={`text-3xl font-bold tracking-tighter sm:text-5xl transition-all duration-500 ease-in-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          <h2 className={`text-3xl text-foreground font-bold tracking-tighter sm:text-5xl transition-all duration-500 ease-in-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             Choose Your Plan
           </h2>
           <p className={`mt-4 text-muted-foreground md:text-xl transition-all duration-500 ease-in-out delay-100 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>

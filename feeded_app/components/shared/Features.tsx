@@ -33,10 +33,10 @@ export default function FeaturesSection() {
   }, [])
 
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
+    <section className="w-full flex justify-center py-12 md:py-24 lg:py-32 bg-background">
       <div className="container px-4 md:px-6">
         <div className="text-center mb-12">
-          <h2 className={`text-3xl font-bold tracking-tighter sm:text-5xl transition-all duration-500 ease-in-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          <h2 className={`text-3xl font-bold text-foreground tracking-tighter sm:text-5xl transition-all duration-500 ease-in-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             Powerful Features
           </h2>
           <p className={`mt-4 text-muted-foreground md:text-xl transition-all duration-500 ease-in-out delay-100 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
@@ -53,7 +53,7 @@ export default function FeaturesSection() {
               <div className="mb-4 p-3 rounded-full bg-primary/10">
                 <feature.icon className="w-6 h-6 text-primary" aria-hidden="true" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+              <h3 className="text-xl text-foreground font-semibold mb-2">{feature.title}</h3>
               <p className="text-muted-foreground">{feature.description}</p>
             </div>
           ))}

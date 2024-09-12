@@ -32,11 +32,11 @@ export function SidebarNav () {
           Apprenants
         </Link>
         <Link
-          href="/questionnaires"
+          href="/formulaires"
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
         >
           <ClipboardList className="h-4 w-4" />
-          Questionnaires
+          Formulaires
         </Link>
         <Link
           href="/reglages"

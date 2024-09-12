@@ -1,10 +1,10 @@
-import NewForm from '@/components/shared/NewForm'
+import AccountManagement from '@/components/shared/AccountManagement'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-        <NewForm />
+        <AccountManagement />
     </div>
   )
 }

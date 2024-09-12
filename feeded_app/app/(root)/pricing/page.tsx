@@ -1,10 +1,10 @@
-import NewForm from '@/components/shared/NewForm'
+import PricingPage from '@/components/shared/PricingPage'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-        <NewForm />
+        <PricingPage />
     </div>
   )
 }

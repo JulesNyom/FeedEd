@@ -6,28 +6,28 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Link from "next/link";
 import Image from "next/image";
 
+
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
     { name: "Accueil", href: "/" },
     { name: "Features", href: "#features" },
-    { name: "Tarifs", href: "#pricing" },
-    { name: "À propos", href: "#about" },
+    { name: "Tarifs", href: "/pricing" },
   ];
 
   return (
-    <nav className="bg-background border-b">
+    <nav className="bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0">
               <Image
-                src="/assets/images/feeded.png"
+                src="/assets/icons/feeded.svg"
                 alt="Logo"
                 width={150}
                 height={75}
-                priority
+                className="text-background"
               />
             </Link>
           </div>
@@ -37,7 +37,7 @@ export default function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="text-muted-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium">
+                  className="text-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium">
                   {item.name}
                 </Link>
               ))}
@@ -45,7 +45,7 @@ export default function Header() {
           </div>
           <div className="hidden md:block space-x-3">
             <Link href="/signup">
-              <Button variant={"outline"}>Inscription</Button>
+              <Button className='bg-background text-foreground' variant={"outline"}>Inscription</Button>
             </Link>
             <Link href="/login">
               <Button>Connexion</Button>

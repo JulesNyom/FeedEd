@@ -3,7 +3,7 @@ import React from 'react'
 
 const Page = () => {
   return (
-    <div className="flex items-center justify-center">
+    <div className="bg-background flex items-center justify-center">
       <Login />
     </div>
   )
