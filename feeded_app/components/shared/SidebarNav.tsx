@@ -9,7 +9,7 @@ import {
 
 export function SidebarNav () {
     return (
-        <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+        <nav className="mt-4 grid items-start px-2 text-sm font-medium lg:px-4">
         <Link
           href="/admin"
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
@@ -37,13 +37,6 @@ export function SidebarNav () {
         >
           <ClipboardList className="h-4 w-4" />
           Formulaires
-        </Link>
-        <Link
-          href="/reglages"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-        >
-          <Settings className="h-4 w-4" />
-          Réglages
         </Link>
       </nav>
     )

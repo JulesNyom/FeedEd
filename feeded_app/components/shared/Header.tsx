@@ -1,14 +1,16 @@
 "use client";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Link from "next/link";
 import Image from "next/image";
-
+import { useAuth } from "@/context/AuthContext"; // Import the useAuth hook
+import UserButton from "@/components/shared/UserButton"; // Import the UserButton component
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const { currentUser } = useAuth(); // Use the useAuth hook to get the current user
 
   const navItems = [
     { name: "Accueil", href: "/" },
@@ -37,19 +39,26 @@ export default function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="text-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium">
+                  className="text-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium"
+                >
                   {item.name}
                 </Link>
               ))}
             </div>
           </div>
           <div className="hidden md:block space-x-3">
-            <Link href="/signup">
-              <Button className='bg-background text-foreground' variant={"outline"}>Inscription</Button>
-            </Link>
-            <Link href="/login">
-              <Button>Connexion</Button>
-            </Link>
+            {currentUser ? (
+              <UserButton />
+            ) : (
+              <>
+                <Link href="/signup">
+                  <Button className='bg-background text-foreground' variant={"outline"}>Inscription</Button>
+                </Link>
+                <Link href="/login">
+                  <Button>Connexion</Button>
+                </Link>
+              </>
+            )}
           </div>
           <div className="md:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -66,16 +75,23 @@ export default function Header() {
                       key={item.name}
                       href={item.href}
                       className="text-muted-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium"
-                      onClick={() => setIsOpen(false)}>
+                      onClick={() => setIsOpen(false)}
+                    >
                       {item.name}
                     </Link>
                   ))}
-                  <Link href="/signup">
-                    <Button variant={"outline"}>Inscription</Button>
-                  </Link>
-                  <Link href="/login">
-                    <Button>Connexion</Button>
-                  </Link>
+                  {currentUser ? (
+                    <UserButton />
+                  ) : (
+                    <>
+                      <Link href="/signup">
+                        <Button variant={"outline"}>Inscription</Button>
+                      </Link>
+                      <Link href="/login">
+                        <Button>Connexion</Button>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>

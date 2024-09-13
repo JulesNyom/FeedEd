@@ -1,61 +1,44 @@
-"use client"
-import { use, useEffect, useState } from 'react'
-import { Zap, Shield, Smartphone, Globe } from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { features } from "@/lib"
 
-const features = [
-  {
-    icon: Zap,
-    title: 'Lightning Fast',
-    description: 'Experience unparalleled speed with our optimized platform, ensuring quick load times and seamless interactions.'
-  },
-  {
-    icon: Shield,
-    title: 'Secure by Design',
-    description: 'Rest easy knowing your data is protected by state-of-the-art security measures and encryption protocols.'
-  },
-  {
-    icon: Smartphone,
-    title: 'Mobile Optimized',
-    description: 'Enjoy a fully responsive experience across all devices, from desktops to smartphones and tablets.'
-  },
-  {
-    icon: Globe,
-    title: 'Global Reach',
-    description: 'Connect with users worldwide through our distributed network, ensuring low latency no matter where you are.'
-  }
-]
-
-export default function FeaturesSection() {
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    setIsVisible(true)
-  }, [])
-
+export default function SurveyFeatures() {
   return (
-    <section className="w-full flex justify-center py-12 md:py-24 lg:py-32 bg-background">
-      <div className="container px-4 md:px-6">
-        <div className="text-center mb-12">
-          <h2 className={`text-3xl font-bold text-foreground tracking-tighter sm:text-5xl transition-all duration-500 ease-in-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            Powerful Features
+    <section className="py-24">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-5xl">
+            Fonctionnalités puissantes pour des sondages perspicaces
           </h2>
-          <p className={`mt-4 text-muted-foreground md:text-xl transition-all duration-500 ease-in-out delay-100 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            Discover what makes our platform stand out from the rest
+          <p className="mt-4 text-xl text-gray-500 max-w-3xl mx-auto">
+            Notre plateforme offre tout ce dont vous avez besoin pour créer, distribuer et analyser des sondages facilement.
           </p>
         </div>
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-12 lg:grid-cols-3">
           {features.map((feature, index) => (
-            <div 
-              key={feature.title}
-              className={`flex flex-col items-center text-center transition-all duration-500 ease-in-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
-              style={{ transitionDelay: `${(index + 1) * 100}ms` }}
-            >
-              <div className="mb-4 p-3 rounded-full bg-primary/10">
-                <feature.icon className="w-6 h-6 text-primary" aria-hidden="true" />
+            <Card key={index} className="overflow-hidden transition-all duration-300 hover:shadow-xl">
+              <div className="aspect-video relative">
+                <img
+                  src={feature.image}
+                  alt={feature.title}
+                  className="object-cover w-full h-full"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                  <Badge variant="secondary" className="text-sm font-medium">
+                    {feature.badge}
+                  </Badge>
+                </div>
               </div>
-              <h3 className="text-xl text-foreground font-semibold mb-2">{feature.title}</h3>
-              <p className="text-muted-foreground">{feature.description}</p>
-            </div>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <feature.icon className="h-6 w-6 text-primary" />
+                  {feature.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base">{feature.description}</CardDescription>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>

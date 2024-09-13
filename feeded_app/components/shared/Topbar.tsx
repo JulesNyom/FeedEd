@@ -2,17 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import UserButton from "@/components/shared/UserButton";
+
 import {
   Card,
   CardContent,
@@ -20,42 +12,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
-  Home,
   Menu,
   Search,
-  BookOpen,
-  UserSquare2,
-  ClipboardList,
-  Settings,
 } from "lucide-react";
-
-const navLinks = [
-  { href: "/", icon: Home, label: "Accueil" },
-  { href: "/formations", icon: BookOpen, label: "Formations" },
-  { href: "/apprenants", icon: UserSquare2, label: "Apprenants" },
-  { href: "/formulaires", icon: ClipboardList, label: "Formulaires" },
-  { href: "/reglages", icon: Settings, label: "Réglages" },
-];
+import { navLinks } from "@/lib";
 
 export function Topbar(): JSX.Element {
-  const [userName, setUserName] = useState("Jane Doe");
-  const { logout } = useAuth(); // Access the logout function from AuthContext
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      console.log("Logged out successfully");
-      // Redirect to login page
-    } catch (error) {
-      console.error("Logout failed:", error);
-      // Optionally, you can show an error message to the user here
-    }
-  };
-
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
       <Sheet>
@@ -104,48 +69,19 @@ export function Topbar(): JSX.Element {
           </div>
         </SheetContent>
       </Sheet>
-      <div className="w-full flex-1">
-        <form>
+      <div className="flex w-full flex-1 items-center justify-between">
+        <form className="w-full md:w-2/3 lg:w-1/3">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Rechercher une formation..."
-              className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
+              className="w-full appearance-none bg-background pl-8 shadow-none"
             />
           </div>
         </form>
+        <UserButton/>
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="secondary" size="icon" className="rounded-full">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt={userName} />
-              <AvatarFallback>
-                {userName
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
-            <span className="sr-only">Toggle user menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <Link href="/profile" className="your-styling-classes">
-              Réglages
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>Aide</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout}>
-            Déconnexion
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
     </header>
   );
 }

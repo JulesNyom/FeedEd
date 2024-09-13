@@ -43,7 +43,9 @@ export function Sidebar() {
             </CardHeader>
             <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
               <Button size="sm" className="w-full">
-                Abonnement pro
+              <Link href="/pricing" className="your-styling-classes">
+              Abonnement pro
+            </Link>
               </Button>
             </CardContent>
           </Card>

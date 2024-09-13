@@ -35,7 +35,7 @@ export function Login(): JSX.Element {
   }
 
   return (
-    <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
+    <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[600px]">
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid mb-3 text-center">
@@ -59,7 +59,7 @@ export function Login(): JSX.Element {
           )}
           <form onSubmit={handleSubmit} className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email" className="text-foreground">Email</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -102,12 +102,10 @@ export function Login(): JSX.Element {
         </div>
       </div>
       <div className="hidden lg:block w-full h-screen bg-muted relative overflow-hidden">
-      <Image
-        src="/assets/images/dome.jpg"
+      <img
+        src="https://images.pexels.com/photos/261651/pexels-photo-261651.jpeg?auto=compress&cs=tinysrgb&w=800"
         alt="Image"
-        fill
-        style={{ objectFit: 'cover' }}
-        className="dark:brightness-[0.2] dark:grayscale"
+        className="object-cover w-full h-full dark:brightness-[0.2] dark:grayscale"
       />
     </div>
     </div>
