@@ -1,5 +1,5 @@
 import React from "react";
-import TrainingTable from "@/components/shared/TrainingTable";
+import TrainingTable from "@/components/shared/training/TrainingTable";
 
 const page = () => {
   return (

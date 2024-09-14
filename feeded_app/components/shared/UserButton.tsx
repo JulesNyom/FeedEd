@@ -59,7 +59,7 @@ const UserButton = () => {
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <Link href="/admin" className="your-styling-classes">
-              Accueil
+              Dashboard
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>Aide</DropdownMenuItem>

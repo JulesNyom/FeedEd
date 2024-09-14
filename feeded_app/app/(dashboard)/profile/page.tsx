@@ -1,4 +1,4 @@
-import AccountManagement from '@/components/shared/AccountManagement'
+import AccountManagement from '@/components/shared/profileSettings/AccountManagement'
 import React from 'react'
 
 const page = () => {

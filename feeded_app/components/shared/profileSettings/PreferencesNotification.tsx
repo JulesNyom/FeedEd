@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 interface Parametres {
   notificationsEmail: boolean;
   emailsMarketing: boolean;
-  authentificationDeuxFacteurs: boolean;
 }
 
 interface PreferencesNotificationProps {
@@ -47,19 +46,6 @@ export function PreferencesNotification({ parametres, onToggle }: PreferencesNot
             id="emails-marketing"
             checked={parametres.emailsMarketing}
             onCheckedChange={() => onToggle('emailsMarketing')}
-          />
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="authentification-deux-facteurs">Authentification à deux facteurs</Label>
-            <p className="text-sm text-muted-foreground">
-              Activez l'authentification à deux facteurs pour une sécurité renforcée.
-            </p>
-          </div>
-          <Switch
-            id="authentification-deux-facteurs"
-            checked={parametres.authentificationDeuxFacteurs}
-            onCheckedChange={() => onToggle('authentificationDeuxFacteurs')}
           />
         </div>
       </CardContent>

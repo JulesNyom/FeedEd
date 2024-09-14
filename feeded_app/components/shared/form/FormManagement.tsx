@@ -140,7 +140,7 @@ export default function FormManagement() {
 
   return (
     <div className="container sm:px-6 mx-auto py-10">
-      <h1 className="text-3xl font-bold text-foreground mb-8">Gestion des Formulaires</h1>
+      <h1 className="text-3xl font-bold text-foreground mb-8">Gestion des formulaires</h1>
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-4">
           <Input

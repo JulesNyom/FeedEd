@@ -32,7 +32,7 @@ export function AvatarUpload({ utilisateur, onMiseAJour }: AvatarUploadProps) {
     try {
       const storage = getStorage();
       const storageRef = ref(storage, `profilePictures/${currentUser.uid}`);
-            
+
       // Upload the file to Firebase Storage
       await uploadBytes(storageRef, file);
       
@@ -57,7 +57,7 @@ export function AvatarUpload({ utilisateur, onMiseAJour }: AvatarUploadProps) {
 
   return (
     <div className="relative">
-      <Avatar className="h-24 w-24 cursor-pointer" onClick={handleAvatarClick}>
+      <Avatar className="h-36 w-36 cursor-pointer" onClick={handleAvatarClick}>
         <AvatarImage src={utilisateur.profilePicture} alt={`${utilisateur.firstName} ${utilisateur.lastName}`} />
         <AvatarFallback>{utilisateur.firstName[0]}{utilisateur.lastName[0]}</AvatarFallback>
       </Avatar>

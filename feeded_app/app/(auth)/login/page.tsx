@@ -1,4 +1,4 @@
-import { Login } from '@/components/shared/Login'
+import { Login } from '@/components/shared/authentication/Login'
 import React from 'react'
 
 const Page = () => {

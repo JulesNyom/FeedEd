@@ -1,9 +1,9 @@
-import CTASection from "@/components/shared/CtaSection";
-import FeaturesSection from "@/components/shared/Features";
-import Footer from "@/components/shared/Footer";
-import HeroSection from "@/components/shared/HeroSection";
-import PricingSection from "@/components/shared/PricingSection";
-import QuestionSection from "@/components/shared/QuestionSection";
+import CTASection from "@/components/shared/landing/CtaSection";
+import FeaturesSection from "@/components/shared/landing/Features";
+import Footer from "@/components/shared//landing/Footer";
+import HeroSection from "@/components/shared/landing/HeroSection";
+import PricingSection from "@/components/shared/landing/PricingSection";
+import QuestionSection from "@/components/shared/landing/QuestionSection";
 import React from "react";
 
 const Page = () => {

@@ -85,7 +85,7 @@ export default function StudentManagement () {
 
   return (
     <div className="container mx-auto sm:px-6 py-10">
-      <h1 className="text-3xl text-foreground font-bold mb-8">Gestion des Apprenants</h1>
+      <h1 className="text-3xl text-foreground font-bold mb-8">Gestion des apprenants</h1>
 
       {notification && (
         <Alert variant={notification.type === 'error' ? "destructive" : "default"} className="mb-4">

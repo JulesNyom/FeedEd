@@ -3,14 +3,13 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { PersonnalInfo } from './PersonnalInfo'
-import { Password } from './Password'
-import { PreferencesNotification } from './PreferencesNotification'
+import { PersonnalInfo } from '../profileSettings/PersonnalInfo'
+import { Password } from '../profileSettings/Password'
+import { PreferencesNotification } from '../profileSettings/PreferencesNotification'
 import { useAuth } from '@/context/AuthContext'
 import { db } from '@/firebase'
 import { doc, updateDoc } from 'firebase/firestore'
-import { AvatarUpload } from './AvatarUpload';  // Assurez-vous que le chemin est correct
-
+import { AvatarUpload } from '../AvatarUpload'
 
 interface Utilisateur {
   firstName: string;
@@ -23,7 +22,6 @@ interface Utilisateur {
 interface Parametres {
   notificationsEmail: boolean;
   emailsMarketing: boolean;
-  authentificationDeuxFacteurs: boolean;
 }
 
 export default function AccountManagement() {
@@ -40,7 +38,6 @@ export default function AccountManagement() {
   const [parametres, setParametres] = useState<Parametres>({
     notificationsEmail: true,
     emailsMarketing: false,
-    authentificationDeuxFacteurs: true,
   })
 
   useEffect(() => {
@@ -55,28 +52,42 @@ export default function AccountManagement() {
     }
   }, [currentUser, userDataObj])
 
-  const handleMiseAJourUtilisateur = (nouveauUtilisateur: Utilisateur) => {
-    setUtilisateur(nouveauUtilisateur)
-    // Mettre à jour les informations dans Firebase
-    const userRef = doc(db, 'users', currentUser.uid)
-    updateDoc(userRef, nouveauUtilisateur)
-    setUserDataObj({ ...userDataObj, ...nouveauUtilisateur })
+  const handleMiseAJourUtilisateur = async (nouveauUtilisateur: Utilisateur) => {
+    try {
+      const userRef = doc(db, 'users', currentUser.uid)
+      await updateDoc(userRef, nouveauUtilisateur)
+      setUtilisateur(nouveauUtilisateur)
+      setUserDataObj({ ...userDataObj, ...nouveauUtilisateur })
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'utilisateur:", error)
+      // Gérer l'erreur (par exemple, afficher un message à l'utilisateur)
+    }
   }
 
-  const handleChangementMotDePasse = () => {
-    console.log('Demande de changement de mot de passe')
-    // Implémentez ici la logique de changement de mot de passe avec Firebase
+  const handleMiseAJourAvatar = async (nouveauUtilisateur: { profilePicture: string }) => {
+    try {
+      const userRef = doc(db, 'users', currentUser.uid)
+      await updateDoc(userRef, { profilePicture: nouveauUtilisateur.profilePicture })
+      setUtilisateur(prev => ({ ...prev, ...nouveauUtilisateur }))
+      setUserDataObj(prev => ({ ...prev, ...nouveauUtilisateur }))
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'avatar:", error)
+      // Gérer l'erreur (par exemple, afficher un message à l'utilisateur)
+    }
   }
 
-  const handleBasculementParametre = (parametre: keyof Parametres) => {
-    setParametres(prev => ({ ...prev, [parametre]: !prev[parametre] }))
-    // Mettre à jour les paramètres dans Firebase
+  const handleBasculementParametre = async (parametre: keyof Parametres) => {
+    try {
+      const newParametres = { ...parametres, [parametre]: !parametres[parametre] }
+      const userRef = doc(db, 'users', currentUser.uid)
+      await updateDoc(userRef, { parametres: newParametres })
+      setParametres(newParametres)
+      setUserDataObj(prev => ({ ...prev, parametres: newParametres }))
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour des paramètres:", error)
+      // Gérer l'erreur (par exemple, afficher un message à l'utilisateur)
+    }
   }
-
-  const handleMiseAJourAvatar = (nouveauUtilisateur: { profilePicture: string }) => {
-    setUtilisateur(prev => ({ ...prev, ...nouveauUtilisateur }));
-    // Ici, vous pourriez également vouloir mettre à jour d'autres parties de votre application
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -85,16 +96,16 @@ export default function AccountManagement() {
 
   return (
     <div className="h-screen flex overflow-hidden">
-       <Card className="h-fit ml-6 mt-6">
+      <Card className="h-fit ml-6 mt-6">
         <CardContent className="mt-8 flex flex-col items-center">
           <AvatarUpload 
             utilisateur={utilisateur} 
             onMiseAJour={handleMiseAJourAvatar} 
           />
           <div className='space-y-1 flex flex-col items-center'>
-          <h2 className="text-xl font-semibold mt-4">{utilisateur.firstName} {utilisateur.lastName}</h2>
-          <p className="text-sm text-muted-foreground">{utilisateur.email}</p>
-          <p className="text-sm text-muted-foreground">Membre depuis le {formatDate(utilisateur.createdAt)}</p>
+            <h2 className="text-xl font-semibold mt-4">{utilisateur.firstName} {utilisateur.lastName}</h2>
+            <p className="text-sm text-muted-foreground">{utilisateur.email}</p>
+            <p className="text-sm text-muted-foreground">Membre depuis le {formatDate(utilisateur.createdAt)}</p>
           </div>
         </CardContent>
       </Card>
@@ -106,7 +117,7 @@ export default function AccountManagement() {
               utilisateur={utilisateur} 
               onMiseAJour={handleMiseAJourUtilisateur} 
             />
-            <Password onChangement={handleChangementMotDePasse} />
+            <Password />
             <PreferencesNotification 
               parametres={parametres}
               onToggle={handleBasculementParametre}

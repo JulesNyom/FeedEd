@@ -1,11 +1,11 @@
-import FormManagementPage from '@/components/shared/FormManagement'
+import FormManagement from '@/components/shared/form/FormManagement'
 import React from 'react'
 
 const page = () => {
 
   return (
     <div>
-      <FormManagementPage />
+      <FormManagement />
       </div>
   )
 }

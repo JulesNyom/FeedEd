@@ -1,5 +1,5 @@
 import React from 'react'
-import StudentManagement from '@/components/shared/StudentManagement'
+import StudentManagement from '@/components/shared/student/StudentManagement'
 
 const page = () => {
 
