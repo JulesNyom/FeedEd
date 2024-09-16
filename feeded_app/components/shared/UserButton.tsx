@@ -36,11 +36,10 @@ const UserButton = () => {
   };
 
   return (
-    <div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="secondary" size="icon" className="rounded-full">
-            <Avatar>
+            <Avatar className="transition-transform hover:scale-125">
               <AvatarImage src={profilePicture} alt={userName} />
               <AvatarFallback>
                 {userName
@@ -49,7 +48,6 @@ const UserButton = () => {
                   .join("")}
               </AvatarFallback>
             </Avatar>
-            <span className="sr-only">Toggle user menu</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -58,7 +56,7 @@ const UserButton = () => {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
-            <Link href="/admin" className="your-styling-classes">
+            <Link href="/admin">
               Dashboard
             </Link>
           </DropdownMenuItem>
@@ -69,7 +67,6 @@ const UserButton = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </div>
   );
 };
 

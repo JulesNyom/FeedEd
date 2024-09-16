@@ -1,268 +1,332 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Switch } from "@/components/ui/switch"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Pencil, Trash2, AlertCircle } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Search, Plus, Edit, Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-interface Etudiant {
-  id: string
-  prenom: string
-  nom: string
-  email: string
-  enFormation: boolean
+interface Student {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  programId: number | null;
 }
 
-interface Notification {
-  type: 'success' | 'error'
-  message: string
+interface TrainingProgram {
+  id: number;
+  name: string;
 }
 
-export default function StudentManagement () {
-  const [etudiants, setEtudiants] = useState<Etudiant[]>([
-    { id: '1', prenom: 'Jean', nom: 'Dupont', email: 'jean@exemple.com', enFormation: true },
-    { id: '2', prenom: 'Marie', nom: 'Martin', email: 'marie@exemple.com', enFormation: false },
-  ])
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [currentEtudiant, setCurrentEtudiant] = useState<Etudiant | null>(null)
-  const [notification, setNotification] = useState<Notification | null>(null)
+export default function StudentManagement() {
+  const [students, setStudents] = useState<Student[]>([]);
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
+  const [newStudent, setNewStudent] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    programId: null as number | null,
+  });
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [programs, setPrograms] = useState<TrainingProgram[]>([
+    { id: 1, name: "Web Development" },
+    { id: 2, name: "Data Science" },
+    { id: 3, name: "UX Design" },
+  ]);
+  const studentsPerPage = 5;
 
-  const [newEtudiant, setNewEtudiant] = useState<Omit<Etudiant, 'id'>>({
-    prenom: '',
-    nom: '',
-    email: '',
-    enFormation: false,
-  })
+  useEffect(() => {
+    filterStudents();
+  }, [students, searchTerm]);
 
-  const showNotification = (type: 'success' | 'error', message: string) => {
-    setNotification({ type, message })
-    setTimeout(() => setNotification(null), 3000)
-  }
-
-  const handleAddEtudiant = () => {
-    if (!newEtudiant.prenom || !newEtudiant.nom || !newEtudiant.email) {
-      showNotification('error', 'Veuillez remplir tous les champs.')
-      return
+  const filterStudents = () => {
+    let filtered = students;
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (student) =>
+          student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          student.email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
-    const id = Date.now().toString()
-    setEtudiants([...etudiants, { ...newEtudiant, id }])
-    setNewEtudiant({ prenom: '', nom: '', email: '', enFormation: false })
-    setIsAddDialogOpen(false)
-    showNotification('success', `${newEtudiant.prenom} ${newEtudiant.nom} a été ajouté avec succès.`)
-  }
+    setFilteredStudents(filtered);
+    setCurrentPage(1);
+  };
 
-  const handleEditEtudiant = () => {
-    if (currentEtudiant) {
-      if (!currentEtudiant.prenom || !currentEtudiant.nom || !currentEtudiant.email) {
-        showNotification('error', 'Veuillez remplir tous les champs.')
-        return
-      }
-      setEtudiants(etudiants.map(etudiant => 
-        etudiant.id === currentEtudiant.id ? currentEtudiant : etudiant
-      ))
-      setIsEditDialogOpen(false)
-      showNotification('success', `Les informations de ${currentEtudiant.prenom} ${currentEtudiant.nom} ont été mises à jour.`)
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (editingStudent) {
+      setEditingStudent({ ...editingStudent, [name]: value });
+    } else {
+      setNewStudent({ ...newStudent, [name]: value });
     }
-  }
+  };
 
-  const handleDeleteEtudiant = (id: string) => {
-    setEtudiants(etudiants.filter(etudiant => etudiant.id !== id))
-    showNotification('success', "L'étudiant a été supprimé du système.")
-  }
+  const handleProgramChange = (value: string) => {
+    const programId = value === "" ? null : parseInt(value, 10);
+    if (editingStudent) {
+      setEditingStudent({ ...editingStudent, programId });
+    } else {
+      setNewStudent({ ...newStudent, programId });
+    }
+  };
 
-  const handleToggleFormation = (id: string) => {
-    setEtudiants(etudiants.map(etudiant => 
-      etudiant.id === id ? { ...etudiant, enFormation: !etudiant.enFormation } : etudiant
-    ))
-  }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingStudent) {
+      setStudents(
+        students.map((s) => (s.id === editingStudent.id ? editingStudent : s))
+      );
+    } else {
+      setStudents([...students, { ...newStudent, id: students.length + 1 }]);
+    }
+    setNewStudent({ firstName: "", lastName: "", email: "", programId: null });
+    setEditingStudent(null);
+    setShowForm(false);
+  };
+
+  const handleEdit = (student: Student) => {
+    setEditingStudent(student);
+    setShowForm(true);
+  };
+
+  const handleDelete = (id: number) => {
+    setStudents(students.filter((s) => s.id !== id));
+  };
+
+  // Pagination logic
+  const indexOfLastStudent = currentPage * studentsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+  const currentStudents = filteredStudents.slice(
+    indexOfFirstStudent,
+    indexOfLastStudent
+  );
+  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
 
   return (
-    <div className="container mx-auto sm:px-6 py-10">
-      <h1 className="text-3xl text-foreground font-bold mb-8">Gestion des apprenants</h1>
+    <div className="container mx-auto p-4 relative">
+      <h1 className="text-3xl font-bold mb-6">Vos apprenants</h1>
 
-      {notification && (
-        <Alert variant={notification.type === 'error' ? "destructive" : "default"} className="mb-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>{notification.type === 'error' ? 'Erreur' : 'Succès'}</AlertTitle>
-          <AlertDescription>{notification.message}</AlertDescription>
-        </Alert>
-      )}
-
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="mb-1">Ajouter un nouvel apprenant</CardTitle>
-          <CardDescription>Entrez les détails du nouvel étudiant.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className='bg-primary border text-background'>Ajouter un Étudiant</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Ajouter un Nouvel Étudiant</DialogTitle>
-                <DialogDescription>Remplissez les informations de l'étudiant ci-dessous.</DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="prenom" className="text-right">Prénom</Label>
-                  <Input
-                    id="prenom"
-                    value={newEtudiant.prenom}
-                    onChange={(e) => setNewEtudiant({ ...newEtudiant, prenom: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="nom" className="text-right">Nom</Label>
-                  <Input
-                    id="nom"
-                    value={newEtudiant.nom}
-                    onChange={(e) => setNewEtudiant({ ...newEtudiant, nom: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={newEtudiant.email}
-                    onChange={(e) => setNewEtudiant({ ...newEtudiant, email: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="enFormation" className="text-right text-foreground">En Formation</Label>
-                  <Switch
-                    id="enFormation"
-                    checked={newEtudiant.enFormation}
-                    onCheckedChange={(checked) => setNewEtudiant({ ...newEtudiant, enFormation: checked })}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button onClick={handleAddEtudiant}>Ajouter l'Étudiant</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Rechercher des étudiants..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
+        <Button
+          onClick={() => setShowForm(true)}
+          className="bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-xl shadow-lg">
+          <Plus className="mr-2 h-5 w-5" /> Ajouter un nouvel apprenant
+        </Button>
+      </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Liste des Étudiants</CardTitle>
-          <CardDescription>Gérez et visualisez tous les étudiants.</CardDescription>
+          <CardTitle>Apprenants ({students.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Prénom</TableHead>
-                <TableHead>Nom</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Statut de Formation</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {etudiants.map((etudiant) => (
-                <TableRow key={etudiant.id}>
-                  <TableCell>{etudiant.prenom}</TableCell>
-                  <TableCell>{etudiant.nom}</TableCell>
-                  <TableCell>{etudiant.email}</TableCell>
-                  <TableCell>
-                    <Switch
-                      checked={etudiant.enFormation}
-                      onCheckedChange={() => handleToggleFormation(etudiant.id)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          setCurrentEtudiant(etudiant)
-                          setIsEditDialogOpen(true)
-                        }}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleDeleteEtudiant(etudiant.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Prénom</TableHead>
+                  <TableHead>Nom</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Programme de formation</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
+              </TableHeader>
+              <TableBody>
+                {currentStudents.map((student) => (
+                  <TableRow key={student.id}>
+                    <TableCell>{student.firstName}</TableCell>
+                    <TableCell>{student.lastName}</TableCell>
+                    <TableCell>{student.email}</TableCell>
+                    <TableCell>
+                      {student.programId
+                        ? programs.find((p) => p.id === student.programId)
+                            ?.name || "N/A"
+                        : "Non assigné"}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(student)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(student.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <Pagination className="mt-4">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  className={
+                    currentPage === 1 ? "pointer-events-none opacity-50" : ""
+                  }
+                />
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(i + 1)}
+                    isActive={currentPage === i + 1}>
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
               ))}
-            </TableBody>
-          </Table>
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  className={
+                    currentPage === totalPages
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </CardContent>
       </Card>
 
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Modifier l'Étudiant</DialogTitle>
-            <DialogDescription>Mettez à jour les informations de l'étudiant ci-dessous.</DialogDescription>
+            <DialogTitle>
+              {editingStudent
+                ? "Modifier l'étudiant"
+                : "Ajouter un nouvel étudiant"}
+            </DialogTitle>
           </DialogHeader>
-          {currentEtudiant && (
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-prenom" className="text-right">Prénom</Label>
-                <Input
-                  id="edit-prenom"
-                  value={currentEtudiant.prenom}
-                  onChange={(e) => setCurrentEtudiant({ ...currentEtudiant, prenom: e.target.value })}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-nom" className="text-right">Nom</Label>
-                <Input
-                  id="edit-nom"
-                  value={currentEtudiant.nom}
-                  onChange={(e) => setCurrentEtudiant({ ...currentEtudiant, nom: e.target.value })}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-email" className="text-right">Email</Label>
-                <Input
-                  id="edit-email"
-                  type="email"
-                  value={currentEtudiant.email}
-                  onChange={(e) => setCurrentEtudiant({ ...currentEtudiant, email: e.target.value })}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-enFormation" className="text-right">En Formation</Label>
-                <Switch
-                  id="edit-enFormation"
-                  checked={currentEtudiant.enFormation}
-                  onCheckedChange={(checked) => setCurrentEtudiant({ ...currentEtudiant, enFormation: checked })}
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-4 p-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">Prénom</Label>
+              <Input
+                id="firstName"
+                name="firstName"
+                value={
+                  editingStudent
+                    ? editingStudent.firstName
+                    : newStudent.firstName
+                }
+                onChange={handleInputChange}
+                required
+              />
             </div>
-          )}
-          <DialogFooter>
-            <Button onClick={handleEditEtudiant}>Enregistrer les Modifications</Button>
-          </DialogFooter>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Nom</Label>
+              <Input
+                id="lastName"
+                name="lastName"
+                value={
+                  editingStudent ? editingStudent.lastName : newStudent.lastName
+                }
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={editingStudent ? editingStudent.email : newStudent.email}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="program">Programme de formation</Label>
+              <Select
+                value={
+                  editingStudent
+                    ? editingStudent.programId?.toString() || ""
+                    : newStudent.programId?.toString() || ""
+                }
+                onValueChange={handleProgramChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un programme" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Not assigned">Non assigné</SelectItem>
+                  {programs.map((program) => (
+                    <SelectItem key={program.id} value={program.id.toString()}>
+                      {program.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              type="submit"
+              className="w-full rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700">
+              {editingStudent
+                ? "Mettre à jour l'apprenant"
+                : "Ajouter un apprenant"}
+            </Button>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

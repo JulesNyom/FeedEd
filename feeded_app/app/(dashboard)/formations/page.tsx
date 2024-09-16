@@ -1,10 +1,10 @@
 import React from "react";
-import TrainingTable from "@/components/shared/training/TrainingTable";
+import ProgramTable from "@/components/shared/training/ProgramTable";
 
 const page = () => {
   return (
     <div>
-      <TrainingTable />
+      <ProgramTable />
     </div>
   );
 };

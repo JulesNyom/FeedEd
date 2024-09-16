@@ -1,276 +1,214 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useState, useEffect } from 'react'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Search, Plus, Edit, Trash2, Eye } from "lucide-react"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+} from "@/components/ui/dialog"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  PlusCircle,
-  MoreHorizontal,
-  Edit,
-  Copy,
-  Trash,
-  Eye,
-} from "lucide-react";
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+import { Switch } from "@/components/ui/switch"
 
-type Form = {
-  id: string;
-  name: string;
-  createdAt: string;
-  responses: number;
-  status: "Actif" | "Inactif" | "Brouillon";
-};
+interface Survey {
+  id: number
+  name: string
+  creationDate: string
+  responseCount: number
+  programId: number | null
+}
 
-const initialForms: Form[] = [
-  {
-    id: "1",
-    name: "Retour client",
-    createdAt: "2023-05-15",
-    responses: 150,
-    status: "Actif",
-  },
-  {
-    id: "2",
-    name: "Enquête employé",
-    createdAt: "2023-06-01",
-    responses: 75,
-    status: "Actif",
-  },
-  {
-    id: "3",
-    name: "Formulaire de commande",
-    createdAt: "2023-06-10",
-    responses: 320,
-    status: "Actif",
-  },
-  {
-    id: "4",
-    name: "Inscription à l'événement",
-    createdAt: "2023-06-15",
-    responses: 0,
-    status: "Brouillon",
-  },
-  {
-    id: "5",
-    name: "Retour sur le site web",
-    createdAt: "2023-06-20",
-    responses: 45,
-    status: "Actif",
-  },
-  {
-    id: "6",
-    name: "Candidature d'emploi",
-    createdAt: "2023-06-25",
-    responses: 12,
-    status: "Inactif",
-  },
-];
+interface TrainingProgram {
+  id: number
+  name: string
+}
 
 export default function FormManagement() {
-  const [forms, setForms] = useState<Form[]>(initialForms);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<Form["status"] | "Tous">(
-    "Tous"
-  );
-  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
-  const [newFormName, setNewFormName] = useState("");
+  const [surveys, setSurveys] = useState<Survey[]>([])
+  const [filteredSurveys, setFilteredSurveys] = useState<Survey[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [showProgramDialog, setShowProgramDialog] = useState(false)
+  const [selectedSurvey, setSelectedSurvey] = useState<Survey | null>(null)
+  const [programs, setPrograms] = useState<TrainingProgram[]>([
+    { id: 1, name: 'Web Development' },
+    { id: 2, name: 'Data Science' },
+    { id: 3, name: 'UX Design' },
+  ])
+  const surveysPerPage = 5
 
-  const filteredForms = forms.filter(
-    (form) =>
-      form.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      (statusFilter === "Tous" || form.status === statusFilter)
-  );
+  useEffect(() => {
+    filterSurveys()
+  }, [surveys, searchTerm])
 
-  const handleCreateForm = () => {
-    const newForm: Form = {
-      id: (forms.length + 1).toString(),
-      name: newFormName,
-      createdAt: new Date().toISOString().split("T")[0],
-      responses: 0,
-      status: "Brouillon",
-    };
-    setForms([...forms, newForm]);
-    setIsCreateFormOpen(false);
-    setNewFormName("");
-  };
-
-  const handleDeleteForm = (id: string) => {
-    setForms(forms.filter((form) => form.id !== id));
-  };
-
-  const handleStatusChange = (id: string, newStatus: Form["status"]) => {
-    setForms(
-      forms.map((form) =>
-        form.id === id ? { ...form, status: newStatus } : form
+  const filterSurveys = () => {
+    let filtered = surveys
+    if (searchTerm) {
+      filtered = filtered.filter(survey => 
+        survey.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
-    );
-  };
+    }
+    setFilteredSurveys(filtered)
+    setCurrentPage(1)
+  }
+
+  // Pagination logic
+  const indexOfLastSurvey = currentPage * surveysPerPage
+  const indexOfFirstSurvey = indexOfLastSurvey - surveysPerPage
+  const currentSurveys = filteredSurveys.slice(indexOfFirstSurvey, indexOfLastSurvey)
+  const totalPages = Math.ceil(filteredSurveys.length / surveysPerPage)
+
+  const handleProgramView = (survey: Survey) => {
+    setSelectedSurvey(survey)
+    setShowProgramDialog(true)
+  }
+
+  const handleCreateSurvey = () => {
+    // Redirect to survey creation page
+    console.log("Redirecting to survey creation page")
+  }
+
+  const handleToggleChange = (id: number, isActive: boolean) => {
+    // Here you would typically update the survey's active status in your backend
+    console.log(`Survey ${id} active status changed to ${isActive}`)
+  }
 
   return (
-    <div className="container sm:px-6 mx-auto py-10">
-      <h1 className="text-3xl font-bold text-foreground mb-8">Gestion des formulaires</h1>
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center space-x-4">
-          <Input
-            type="search"
-            placeholder="Rechercher des formulaires..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-64"
-          />
-          <Select
-            value={statusFilter}
-            onValueChange={(value) =>
-              setStatusFilter(value as Form["status"] | "Tous")
-            }>
-            <SelectTrigger className="w-36 text-muted-foreground">
-              <SelectValue placeholder="Filtrer par statut" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Tous">Tous les statuts</SelectItem>
-              <SelectItem value="Actif">Actif</SelectItem>
-              <SelectItem value="Inactif">Inactif</SelectItem>
-              <SelectItem value="Brouillon">Brouillon</SelectItem>
-            </SelectContent>
-          </Select>
+    <div className="container mx-auto p-4 relative">
+      <h1 className="text-3xl font-bold mb-6">Survey Management</h1>
+      
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search surveys..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
-
-        <Dialog open={isCreateFormOpen} onOpenChange={setIsCreateFormOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Créer un nouveau formulaire
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Créer un nouveau formulaire</DialogTitle>
-              <DialogDescription>
-                Donnez un nom à votre nouveau formulaire pour commencer.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Nom
-                </Label>
-                <Input
-                  id="name"
-                  value={newFormName}
-                  onChange={(e) => setNewFormName(e.target.value)}
-                  className="col-span-3"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button onClick={handleCreateForm}>Créer le formulaire</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Button 
+          onClick={handleCreateSurvey}
+          className="bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-xl shadow-lg"
+        >
+          <Plus className="mr-2 h-5 w-5" /> Create New Survey
+        </Button>
       </div>
 
-      <div className="bg-background shadow-md rounded-lg overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[300px] font-semibold">Nom du formulaire</TableHead>
-              <TableHead className="font-semibold">Créé le</TableHead>
-              <TableHead className="font-semibold">Réponses</TableHead>
-              <TableHead className="font-semibold">Statut</TableHead>
-              <TableHead className="font-semibold text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredForms.map((form) => (
-              <TableRow key={form.id}>
-                <TableCell className="text-sm text-foreground">{form.name}</TableCell>
-                <TableCell className="text-foreground">{form.createdAt}</TableCell>
-                <TableCell className="text-foreground">{form.responses}</TableCell>
-                <TableCell className="text-foreground">
-                  <Select
-                    value={form.status}
-                    onValueChange={(value) =>
-                      handleStatusChange(form.id, value as Form["status"])
-                    }>
-                    <SelectTrigger className="w-24">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Actif">Actif</SelectItem>
-                      <SelectItem value="Inactif">Inactif</SelectItem>
-                      <SelectItem value="Brouillon">Brouillon</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="bg-background h-8 w-8 p-0">
-                        <span className="sr-only">Ouvrir le menu</span>
-                        <MoreHorizontal className="text-foreground h-4 w-4" />
+      <Card>
+        <CardHeader>
+          <CardTitle>Surveys ({surveys.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Creation Date</TableHead>
+                  <TableHead>Responses</TableHead>
+                  <TableHead>Program</TableHead>
+                  <TableHead>Active</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {currentSurveys.map((survey) => (
+                  <TableRow key={survey.id}>
+                    <TableCell>{survey.name}</TableCell>
+                    <TableCell>{survey.creationDate}</TableCell>
+                    <TableCell>{survey.responseCount}</TableCell>
+                    <TableCell>
+                      <Button variant="outline" size="sm" onClick={() => handleProgramView(survey)}>
+                        <Eye className="h-4 w-4 mr-2" /> View
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>
-                        <Eye className="mr-2 h-4 w-4" />
-                        <span>Voir</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Edit className="mr-2 h-4 w-4" />
-                        <span>Modifier</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Copy className="mr-2 h-4 w-4" />
-                        <span>Dupliquer</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => handleDeleteForm(form.id)}
-                        className="text-red-600">
-                        <Trash className="mr-2 h-4 w-4" />
-                        <span>Supprimer</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Switch
+                        checked={true} // You would typically get this from the survey object
+                        onCheckedChange={(checked) => handleToggleChange(survey.id, checked)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button variant="outline" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <Pagination className="mt-4">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                />
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink 
+                    onClick={() => setCurrentPage(i + 1)}
+                    isActive={currentPage === i + 1}
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </CardContent>
+      </Card>
+
+      <Dialog open={showProgramDialog} onOpenChange={setShowProgramDialog}>
+        <DialogContent className='w-80'>
+          <DialogHeader>
+            <DialogTitle>Training Program</DialogTitle>
+          </DialogHeader>
+          <div className="p-4">
+            {selectedSurvey && (
+              <p>
+                This survey is attached to the{" "}
+                <strong>
+                  {selectedSurvey.programId
+                    ? programs.find(p => p.id === selectedSurvey.programId)?.name
+                    : "No program assigned"}
+                </strong>{" "}
+                training program.
+              </p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
-  );
+  )
 }

@@ -59,7 +59,7 @@ export default function HeroSection () {
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-tr from-primary to-secondary opacity-10 rounded-2xl blur-2xl"></div>
             <img
-              src="/placeholder.svg?height=600&width=800"
+              src="https://images.pexels.com/photos/3153198/pexels-photo-3153198.jpeg?auto=compress&cs=tinysrgb&w=600"
               alt="Interface de création de sondage"
               className="relative rounded-2xl shadow-2xl"
             />

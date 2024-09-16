@@ -1,44 +1,64 @@
-import Link  from "next/link"
+'use client'
+
+import Link from "next/link"
+import { motion } from "framer-motion"
+import { usePathname } from "next/navigation"
 import {
-    Home,
-    BookOpen,
-    UserSquare2,
-    ClipboardList,
-    Settings
-  } from "lucide-react"
+  Home,
+  BookOpen,
+  UserSquare2,
+  ClipboardList,
+} from "lucide-react"
 
-export function SidebarNav () {
-    return (
-        <nav className="mt-4 grid items-start px-2 text-sm font-medium lg:px-4">
-        <Link
-          href="/admin"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-        >
-          <Home className="h-4 w-4" />
-          Dashboard
-        </Link>
-        <Link
-          href="/formations"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-        >
-          <BookOpen className="h-4 w-4" />
-          Formations
-        </Link>
-        <Link
-          href="/apprenants"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-        >
-          <UserSquare2 className="h-4 w-4" />
-          Apprenants
-        </Link>
-        <Link
-          href="/formulaires"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-        >
-          <ClipboardList className="h-4 w-4" />
-          Formulaires
-        </Link>
-      </nav>
-    )
+const navItems = [
+  { href: "/admin", icon: Home, label: "Dashboard" },
+  { href: "/formations", icon: BookOpen, label: "Formations" },
+  { href: "/apprenants", icon: UserSquare2, label: "Apprenants" },
+  { href: "/formulaires", icon: ClipboardList, label: "Questionnaires" },
+]
+
+export function SidebarNav() {
+  const pathname = usePathname()
+
+  return (
+    <nav className="mt-4 grid items-start px-2 text-sm font-medium lg:px-4">
+      {navItems.map((item) => {
+        const isActive = pathname === item.href
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`group flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 ${
+              isActive
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:bg-muted/50 hover:text-primary"
+            }`}
+          >
+            <motion.div
+              initial={{ scale: 1 }}
+              animate={{ scale: isActive ? 1.2 : 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <item.icon className={`h-4 w-4 ${isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"}`} />
+            </motion.div>
+            <motion.span
+              initial={{ x: 0 }}
+              animate={{ x: isActive ? 4 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {item.label}
+            </motion.span>
+            {isActive && (
+              <motion.div
+                className="absolute left-0 h-full w-1"
+                initial={{ scaleY: 0 }}
+                animate={{ scaleY: 1 }}
+                transition={{ duration: 0.2 }}
+              />
+            )}
+          </Link>
+        )
+      })}
+    </nav>
+  )
 }
-
