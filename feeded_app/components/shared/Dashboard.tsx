@@ -1,11 +1,8 @@
 "use client"
 
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Bell, BookOpen, Calendar, GraduationCap, Users } from 'lucide-react'
+import { BookOpen, Calendar, GraduationCap, Users } from 'lucide-react'
 
 const courses = [
   { id: 1, name: "Introduction to React", progress: 75 },

@@ -4,14 +4,14 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { usePathname } from "next/navigation"
 import {
-  Home,
   BookOpen,
   UserSquare2,
   ClipboardList,
+  LayoutDashboard,
 } from "lucide-react"
 
 const navItems = [
-  { href: "/admin", icon: Home, label: "Tableau de bord" },
+  { href: "/admin", icon: LayoutDashboard, label: "Tableau de bord" },
   { href: "/formations", icon: BookOpen, label: "Formations" },
   { href: "/apprenants", icon: UserSquare2, label: "Apprenants" },
   { href: "/formulaires", icon: ClipboardList, label: "Questionnaires" },

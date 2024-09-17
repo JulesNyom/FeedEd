@@ -22,6 +22,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Switch } from "@/components/ui/switch"
+import Link from 'next/link'
 
 interface Survey {
   id: number
@@ -107,7 +108,10 @@ export default function FormManagement() {
           onClick={handleCreateSurvey}
           className="bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-xl shadow-lg"
         >
-          <Plus className="mr-2 h-5 w-5" /> Create New Survey
+          <Plus className="mr-2 h-5 w-5" /> 
+          <Link href="/createform" >
+          Create New Survey
+          </Link>
         </Button>
       </div>
 

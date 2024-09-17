@@ -9,6 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 
 interface Student {
   id: string;
@@ -21,8 +23,8 @@ interface Student {
 interface TrainingProgram {
   id: string;
   name: string;
-  students: number;  // Maximum number of students
-  currentStudents: number;  // Current number of students
+  students: number;
+  currentStudents: number;
 }
 
 interface StudentFormProps {
@@ -31,7 +33,11 @@ interface StudentFormProps {
   onSubmit: (student: Student, programId: string) => void;
 }
 
-export default function StudentForm({ student, programs, onSubmit }: StudentFormProps) {
+export default function StudentForm({
+  student,
+  programs,
+  onSubmit,
+}: StudentFormProps) {
   const [formData, setFormData] = useState<Omit<Student, "id" | "programId">>({
     firstName: "",
     lastName: "",
@@ -65,24 +71,29 @@ export default function StudentForm({ student, programs, onSubmit }: StudentForm
 
   const handleProgramChange = (value: string) => {
     setSelectedProgramId(value);
-    setError(null);  // Clear any previous errors
+    setError(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProgramId) {
-      setError("Please select a program");
+      setError("Veuillez choisir une formation.");
       return;
     }
 
-    const selectedProgram = programs.find(p => p.id === selectedProgramId);
+    const selectedProgram = programs.find((p) => p.id === selectedProgramId);
     if (!selectedProgram) {
-      setError("Invalid program selected");
+      setError("La formation sélectionnée n'existe pas.");
       return;
     }
 
-    if (selectedProgram.currentStudents >= selectedProgram.students && !student) {
-      setError(`The program "${selectedProgram.name}" has reached its maximum number of students (${selectedProgram.students})`);
+    if (
+      selectedProgram.currentStudents >= selectedProgram.students &&
+      !student
+    ) {
+      setError(
+        `La formation "${selectedProgram.name}" a atteint son nombre maximum d'étudiants (${selectedProgram.students}).`
+      );
       return;
     }
 
@@ -132,23 +143,36 @@ export default function StudentForm({ student, programs, onSubmit }: StudentForm
         <Select
           value={selectedProgramId}
           onValueChange={handleProgramChange}
-          required>
+          required
+        >
           <SelectTrigger>
             <SelectValue placeholder="Sélectionner un programme" />
           </SelectTrigger>
           <SelectContent>
             {programs.map((program) => (
-              <SelectItem key={program.id} value={program.id}>
+              <SelectItem 
+                key={program.id} 
+                value={program.id}
+                disabled={program.currentStudents >= program.students && !student}
+              >
                 {program.name} ({program.currentStudents}/{program.students} étudiants)
+                {program.currentStudents >= program.students && " - Complet"}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
-      {error && <div className="text-red-500">{error}</div>}
+      {error && (
+        <Alert variant="destructive">
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>Erreur</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       <Button
         type="submit"
-        className="w-full rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700">
+        className="w-full rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700"
+      >
         {student ? "Mettre à jour l'apprenant" : "Ajouter un apprenant"}
       </Button>
     </form>
