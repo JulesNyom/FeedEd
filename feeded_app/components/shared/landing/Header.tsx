@@ -14,7 +14,7 @@ export default function Header() {
 
   const navItems = [
     { name: "Accueil", href: "/" },
-    { name: "Features", href: "#features" },
+    { name: "Fonctionnalités", href: "#features" },
     { name: "Tarifs", href: "/pricing" },
   ];
 
@@ -39,7 +39,7 @@ export default function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="text-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-foreground hover:text-base px-3 py-2 rounded-md text-sm font-medium"
                 >
                   {item.name}
                 </Link>

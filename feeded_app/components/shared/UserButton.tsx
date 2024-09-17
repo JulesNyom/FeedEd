@@ -57,7 +57,7 @@ const UserButton = () => {
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <Link href="/admin">
-              Dashboard
+              Tableau de bord
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>Aide</DropdownMenuItem>

@@ -24,8 +24,19 @@ interface Parametres {
   emailsMarketing: boolean;
 }
 
+// Définition du type pour userDataObj
+interface UserDataObj extends Utilisateur {
+  parametres: Parametres;
+  // Ajoutez ici d'autres propriétés si nécessaire
+}
+
 export default function AccountManagement() {
-  const { currentUser, userDataObj, setUserDataObj } = useAuth()
+  // Mise à jour du type pour userDataObj et setUserDataObj
+  const { currentUser, userDataObj, setUserDataObj } = useAuth() as {
+    currentUser: { uid: string; email: string | null };
+    userDataObj: UserDataObj;
+    setUserDataObj: React.Dispatch<React.SetStateAction<UserDataObj>>;
+  }
   
   const [utilisateur, setUtilisateur] = useState<Utilisateur>({
     firstName: '',
@@ -49,15 +60,16 @@ export default function AccountManagement() {
         profilePicture: userDataObj.profilePicture || '',
         createdAt: userDataObj.createdAt || '',
       })
+      setParametres(userDataObj.parametres)
     }
   }, [currentUser, userDataObj])
 
-  const handleMiseAJourUtilisateur = async (nouveauUtilisateur: Utilisateur) => {
+  const handleMiseAJourUtilisateur = async (nouveauUtilisateur: Partial<Utilisateur>) => {
     try {
       const userRef = doc(db, 'users', currentUser.uid)
       await updateDoc(userRef, nouveauUtilisateur)
-      setUtilisateur(nouveauUtilisateur)
-      setUserDataObj({ ...userDataObj, ...nouveauUtilisateur })
+      setUtilisateur(prevUtilisateur => ({ ...prevUtilisateur, ...nouveauUtilisateur }))
+      setUserDataObj(prevUserDataObj => ({ ...prevUserDataObj, ...nouveauUtilisateur }))
     } catch (error) {
       console.error("Erreur lors de la mise à jour de l'utilisateur:", error)
       // Gérer l'erreur (par exemple, afficher un message à l'utilisateur)
@@ -96,7 +108,7 @@ export default function AccountManagement() {
 
   return (
     <div className="h-screen flex overflow-hidden">
-      <Card className="h-fit ml-6 mt-6">
+      <Card className="h-fit w-fit ml-6 mt-6">
         <CardContent className="mt-8 flex flex-col items-center">
           <AvatarUpload 
             utilisateur={utilisateur} 

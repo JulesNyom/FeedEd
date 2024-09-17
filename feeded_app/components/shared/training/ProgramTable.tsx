@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react";
-import { db } from '@/firebase';
+import { db, auth } from '@/firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,15 +34,24 @@ export default function ProgramTable() {
   const [statusFilter, setStatusFilter] = useState<"all" | "A venir" | "En cours" | "Terminé">("all");
 
   useEffect(() => {
-    fetchPrograms();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        fetchPrograms(user.uid);
+      } else {
+        setPrograms([]);
+        setFilteredPrograms([]);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     filterPrograms();
   }, [programs, searchTerm, statusFilter]);
 
-  const fetchPrograms = async () => {
-    const programsCollection = collection(db, 'programs');
+  const fetchPrograms = async (userId: string) => {
+    const programsCollection = collection(db, `users/${userId}/programs`);
     const programSnapshot = await getDocs(programsCollection);
     const programList = programSnapshot.docs.map(doc => ({
       id: doc.id,
@@ -78,17 +87,24 @@ export default function ProgramTable() {
   };
 
   const handleSubmitProgram = async (programData: Omit<TrainingProgram, "id" | "status">) => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("No authenticated user found");
+      return;
+    }
+
     try {
       const status = determineStatus(programData.startDate, programData.endDate);
       
       if (editingProgram) {
         // Updating an existing program
-        const programRef = doc(db, 'programs', editingProgram.id);
+        const programRef = doc(db, `users/${user.uid}/programs`, editingProgram.id);
         await updateDoc(programRef, { ...programData, status });
         setPrograms(programs.map(p => p.id === editingProgram.id ? { ...programData, id: editingProgram.id, status } : p));
       } else {
         // Adding a new program
-        const docRef = await addDoc(collection(db, 'programs'), { ...programData, status });
+        const programsCollection = collection(db, `users/${user.uid}/programs`);
+        const docRef = await addDoc(programsCollection, { ...programData, status });
         const newProgram = { ...programData, id: docRef.id, status };
         setPrograms([...programs, newProgram]);
       }
@@ -100,8 +116,14 @@ export default function ProgramTable() {
   };
 
   const handleDeleteProgram = async (id: string) => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("No authenticated user found");
+      return;
+    }
+
     try {
-      await deleteDoc(doc(db, 'programs', id));
+      await deleteDoc(doc(db, `users/${user.uid}/programs`, id));
       setPrograms(programs.filter(p => p.id !== id));
     } catch (error) {
       console.error("Error deleting document: ", error);

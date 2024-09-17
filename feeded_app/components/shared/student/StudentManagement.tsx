@@ -1,77 +1,88 @@
-"use client";
+"use client"
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Plus, Edit, Trash2 } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { Search, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import StudentTable from "./StudentTable";
+import StudentForm from "./StudentForm";
+import { db, auth } from '@/firebase';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 
 interface Student {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
-  programId: number | null;
+  programId: string;
 }
 
 interface TrainingProgram {
-  id: number;
+  id: string;
   name: string;
+  students: number;
+  currentStudents: number;
 }
 
 export default function StudentManagement() {
   const [students, setStudents] = useState<Student[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
-  const [newStudent, setNewStudent] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    programId: null as number | null,
-  });
-  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [programs, setPrograms] = useState<TrainingProgram[]>([
-    { id: 1, name: "Web Development" },
-    { id: 2, name: "Data Science" },
-    { id: 3, name: "UX Design" },
-  ]);
-  const studentsPerPage = 5;
+  const [programs, setPrograms] = useState<TrainingProgram[]>([]);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        fetchPrograms(user.uid);
+      } else {
+        setStudents([]);
+        setFilteredStudents([]);
+        setPrograms([]);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     filterStudents();
   }, [students, searchTerm]);
+
+  const fetchPrograms = async (userId: string) => {
+    const programsCollection = collection(db, `users/${userId}/programs`);
+    const programSnapshot = await getDocs(programsCollection);
+    const programList = programSnapshot.docs.map(doc => ({
+      id: doc.id,
+      name: doc.data().name,
+      students: doc.data().students,
+      currentStudents: 0
+    } as TrainingProgram));
+
+    // Fetch students for each program
+    const allStudents: Student[] = [];
+    for (const program of programList) {
+      const studentsCollection = collection(db, `users/${userId}/programs/${program.id}/students`);
+      const studentSnapshot = await getDocs(studentsCollection);
+      const programStudents = studentSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        programId: program.id
+      } as Student));
+      allStudents.push(...programStudents);
+      program.currentStudents = programStudents.length;
+    }
+    setPrograms(programList);
+    setStudents(allStudents);
+  };
 
   const filterStudents = () => {
     let filtered = students;
@@ -84,39 +95,62 @@ export default function StudentManagement() {
       );
     }
     setFilteredStudents(filtered);
-    setCurrentPage(1);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (editingStudent) {
-      setEditingStudent({ ...editingStudent, [name]: value });
-    } else {
-      setNewStudent({ ...newStudent, [name]: value });
+  const handleSubmit = async (studentData: Student, programId: string) => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("No authenticated user found");
+      return;
     }
-  };
 
-  const handleProgramChange = (value: string) => {
-    const programId = value === "" ? null : parseInt(value, 10);
-    if (editingStudent) {
-      setEditingStudent({ ...editingStudent, programId });
-    } else {
-      setNewStudent({ ...newStudent, programId });
+    const programIndex = programs.findIndex(p => p.id === programId);
+    if (programIndex === -1) {
+      console.error("Program not found");
+      return;
     }
-  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingStudent) {
-      setStudents(
-        students.map((s) => (s.id === editingStudent.id ? editingStudent : s))
-      );
-    } else {
-      setStudents([...students, { ...newStudent, id: students.length + 1 }]);
+    const program = programs[programIndex];
+    if (program.currentStudents >= program.students && !editingStudent) {
+      alert(`Le programme "${program.name}" a atteint son nombre maximum d'étudiants (${program.students})`);
+      return;
     }
-    setNewStudent({ firstName: "", lastName: "", email: "", programId: null });
-    setEditingStudent(null);
-    setShowForm(false);
+
+    const firestoreData = {
+      firstName: studentData.firstName,
+      lastName: studentData.lastName,
+      email: studentData.email,
+      programId: programId
+    };
+
+    try {
+      if (editingStudent) {
+        await updateDoc(doc(db, `users/${user.uid}/programs/${programId}/students`, studentData.id), firestoreData);
+        setStudents(students.map(s => s.id === studentData.id ? {...studentData, programId} : s));
+        
+        if (editingStudent.programId !== programId) {
+          const updatedPrograms = [...programs];
+          const oldProgramIndex = updatedPrograms.findIndex(p => p.id === editingStudent.programId);
+          if (oldProgramIndex !== -1) {
+            updatedPrograms[oldProgramIndex].currentStudents--;
+          }
+          updatedPrograms[programIndex].currentStudents++;
+          setPrograms(updatedPrograms);
+        }
+      } else {
+        const docRef = await addDoc(collection(db, `users/${user.uid}/programs/${programId}/students`), firestoreData);
+        const newStudent = { ...studentData, id: docRef.id, programId };
+        setStudents([...students, newStudent]);
+        
+        const updatedPrograms = [...programs];
+        updatedPrograms[programIndex].currentStudents++;
+        setPrograms(updatedPrograms);
+      }
+      setEditingStudent(null);
+      setShowForm(false);
+    } catch (error) {
+      console.error("Erreur lors de l'ajout/mise à jour de l'étudiant : ", error);
+    }
   };
 
   const handleEdit = (student: Student) => {
@@ -124,18 +158,27 @@ export default function StudentManagement() {
     setShowForm(true);
   };
 
-  const handleDelete = (id: number) => {
-    setStudents(students.filter((s) => s.id !== id));
-  };
+  const handleDelete = async (id: string, programId: string) => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("No authenticated user found");
+      return;
+    }
 
-  // Pagination logic
-  const indexOfLastStudent = currentPage * studentsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-  const currentStudents = filteredStudents.slice(
-    indexOfFirstStudent,
-    indexOfLastStudent
-  );
-  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+    try {
+      await deleteDoc(doc(db, `users/${user.uid}/programs/${programId}/students`, id));
+      setStudents(students.filter(s => s.id !== id));
+      
+      const programIndex = programs.findIndex(p => p.id === programId);
+      if (programIndex !== -1) {
+        const updatedPrograms = [...programs];
+        updatedPrograms[programIndex].currentStudents--;
+        setPrograms(updatedPrograms);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'étudiant : ", error);
+    }
+  };
 
   return (
     <div className="container mx-auto p-4 relative">
@@ -166,85 +209,12 @@ export default function StudentManagement() {
           <CardTitle>Apprenants ({students.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Prénom</TableHead>
-                  <TableHead>Nom</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Programme de formation</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentStudents.map((student) => (
-                  <TableRow key={student.id}>
-                    <TableCell>{student.firstName}</TableCell>
-                    <TableCell>{student.lastName}</TableCell>
-                    <TableCell>{student.email}</TableCell>
-                    <TableCell>
-                      {student.programId
-                        ? programs.find((p) => p.id === student.programId)
-                            ?.name || "N/A"
-                        : "Non assigné"}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(student)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDelete(student.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-          <Pagination className="mt-4">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  className={
-                    currentPage === 1 ? "pointer-events-none opacity-50" : ""
-                  }
-                />
-              </PaginationItem>
-              {[...Array(totalPages)].map((_, i) => (
-                <PaginationItem key={i}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(i + 1)}
-                    isActive={currentPage === i + 1}>
-                    {i + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  className={
-                    currentPage === totalPages
-                      ? "pointer-events-none opacity-50"
-                      : ""
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          <StudentTable
+            students={filteredStudents}
+            programs={programs}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </CardContent>
       </Card>
 
@@ -257,74 +227,11 @@ export default function StudentManagement() {
                 : "Ajouter un nouvel étudiant"}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4 p-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">Prénom</Label>
-              <Input
-                id="firstName"
-                name="firstName"
-                value={
-                  editingStudent
-                    ? editingStudent.firstName
-                    : newStudent.firstName
-                }
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Nom</Label>
-              <Input
-                id="lastName"
-                name="lastName"
-                value={
-                  editingStudent ? editingStudent.lastName : newStudent.lastName
-                }
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={editingStudent ? editingStudent.email : newStudent.email}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="program">Programme de formation</Label>
-              <Select
-                value={
-                  editingStudent
-                    ? editingStudent.programId?.toString() || ""
-                    : newStudent.programId?.toString() || ""
-                }
-                onValueChange={handleProgramChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un programme" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Not assigned">Non assigné</SelectItem>
-                  {programs.map((program) => (
-                    <SelectItem key={program.id} value={program.id.toString()}>
-                      {program.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <Button
-              type="submit"
-              className="w-full rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700">
-              {editingStudent
-                ? "Mettre à jour l'apprenant"
-                : "Ajouter un apprenant"}
-            </Button>
-          </form>
+          <StudentForm
+            student={editingStudent}
+            programs={programs}
+            onSubmit={handleSubmit}
+          />
         </DialogContent>
       </Dialog>
     </div>
