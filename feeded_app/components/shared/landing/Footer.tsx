@@ -63,7 +63,7 @@ export default function Footer() {
                 required
                 className="bg-gray-800 border-gray-700 text-white placeholder-gray-400"
               />
-              <Button type="submit" className="w-full">Subscribe</Button>
+              <Button type="submit" className="w-full bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700">Subscribe</Button>
             </form>
           </div>
         </div>

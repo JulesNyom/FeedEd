@@ -5,28 +5,28 @@ import { PenTool, BarChart2, Zap, Home,
     Settings, } from "lucide-react"
 
 export const features = [
-    {
-      title: "Créateur de sondage intuitif",
-      description: "Créez des sondages professionnels en quelques minutes grâce à notre interface glisser-déposer et nos modèles personnalisables.",
-      icon: PenTool,
-      image: "https://images.pexels.com/photos/1015568/pexels-photo-1015568.jpeg?auto=compress&cs=tinysrgb&w=800",
-      badge: "Facile à utiliser"
-    },
-    {
-      title: "Analyses avancées",
-      description: "Obtenez des informations précieuses grâce à la visualisation des données en temps réel et des outils de reporting complets.",
-      icon: BarChart2,
-      image: "https://images.pexels.com/photos/1595385/pexels-photo-1595385.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      badge: "Basé sur les données"
-    },
-    {
-      title: "Distribution intelligente",
-      description: "Atteignez votre audience sur plusieurs canaux grâce aux campagnes e-mail automatisées et à l'intégration des médias sociaux.",
-      icon: Zap,
-      image: "https://images.pexels.com/photos/3277806/pexels-photo-3277806.jpeg?auto=compress&cs=tinysrgb&w=800",
-      badge: "Efficace"
-    }
-  ]
+  {
+    title: "Créateur d'enquêtes intuitif",
+    description: "Concevez des enquêtes de formation professionnelles en quelques minutes ou utilisez nos modèles adaptés.",
+    icon: PenTool,
+    image: "https://images.pexels.com/photos/1015568/pexels-photo-1015568.jpeg?auto=compress&cs=tinysrgb&w=800",
+    badge: "Ultra rapide"
+  },
+  {
+    title: "Analyses instantanées",
+    description: "Obtenez des insights précieux sur vos formations grâce à la visualisation des données en temps réel.",
+    icon: BarChart2,
+    image: "https://images.pexels.com/photos/1595385/pexels-photo-1595385.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    badge: "Actionnable"
+  },
+  {
+    title: "Distribution automatisée",
+    description: "Envoyez vos enquêtes au bon moment grâce aux campagnes e-mail automatisées.",
+    icon: Zap,
+    image: "https://images.pexels.com/photos/3277806/pexels-photo-3277806.jpeg?auto=compress&cs=tinysrgb&w=800",
+    badge: "Gain de temps"
+  }
+]
 
 export const navItems = [
     { name: "Accueil", href: "/" },

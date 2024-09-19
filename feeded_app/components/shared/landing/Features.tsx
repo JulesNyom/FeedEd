@@ -8,10 +8,10 @@ export default function SurveyFeatures() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-5xl">
-            Fonctionnalités puissantes pour des sondages perspicaces
+            Collectez des feedbacks formation en un éclair
           </h2>
           <p className="mt-4 text-xl text-gray-500 max-w-3xl mx-auto">
-            Notre plateforme offre tout ce dont vous avez besoin pour créer, distribuer et analyser des sondages facilement.
+            FeedEd simplifie chaque étape : de la création à l'analyse de vos enquêtes de satisfaction, en un temps record.
           </p>
         </div>
         <div className="grid gap-12 lg:grid-cols-3">

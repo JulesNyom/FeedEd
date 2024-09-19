@@ -121,7 +121,7 @@ export function SignUp(): JSX.Element {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="bg-gradient-to-r from-[#9e7eff] from-15% via-[#7b57f9]  to-[#6740f3] w-full" disabled={loading}>
             {loading ? "Création du compte..." : "Créer un compte"}
           </Button>
         </form>

@@ -1,19 +1,20 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { ArrowRight, CheckCircle, PenTool, Users } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { ArrowRight, CheckCircle, Zap, Clock } from "lucide-react";
 
-export default function HeroSection () {
-  const [email, setEmail] = useState('')
+export default function HeroSection() {
+  const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // Handle email submission here
-    console.log('Email soumis:', email)
-  }
+    console.log("Email soumis:", email);
+  };
 
   return (
     <div className="bg-gradient-to-b rounded-3xl from-primary/10 to-background">
@@ -22,37 +23,42 @@ export default function HeroSection () {
           <div>
             <Badge className="mb-4">Tout-en-un</Badge>
             <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl">
-              Des sondages qui{' '}
-              <span className="text-primary">ont un impact</span>
+              Feedbacks formation en{" "}
+              <span className="text-primary">un clic</span>
             </h1>
             <p className="mt-6 text-xl text-gray-500 max-w-3xl">
-              Concevez, distribuez et analysez des sondages en toute simplicité. Notre puissante plateforme vous aide à recueillir des insights et à prendre des décisions basées sur les données.
+              Créez, envoyez et analysez vos enquêtes de satisfaction en
+              quelques secondes. Gagnez du temps, optimisez vos formations.
+              Simple, rapide, efficace.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <form onSubmit={handleSubmit} className="flex-1 sm:max-w-md">
-                <div className="flex w-full max-w-sm items-center space-x-2">
-                  <Input
-                    type="email"
-                    placeholder="Entrez votre email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <Button type="submit">
-                    Commencer
+              <div className="flex w-full max-w-sm items-center space-x-2">
+                <Link href="/signup">
+                  <Button
+                    size="lg"
+                    className="rounded-2xl mr-2 bg-gradient-to-br from-purple-500 to-indigo-600 font-bold text-secondary text-base transition-transform hover:scale-105">
+                    Démarrez gratuitement
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-                </div>
-              </form>
+                </Link>
+                <Link href="/login">
+            <Button 
+              size="lg" 
+              className="rounded-2xl bg-card text-base font-bold text-foreground border border-foreground/15 hover:scale-105 hover:bg-card"
+            >
+              Connexion
+            </Button>
+            </Link>
+              </div>
             </div>
             <div className="mt-8 flex items-center gap-x-4 text-sm text-gray-500">
               <div className="flex items-center gap-x-1">
                 <CheckCircle className="h-4 w-4 text-primary" />
-                Démarrez gratuitement
+                Essai gratuit
               </div>
               <div className="flex items-center gap-x-1">
                 <CheckCircle className="h-4 w-4 text-primary" />
-                Pas de carte de crédit requise
+                Sans engagement
               </div>
             </div>
           </div>
@@ -60,30 +66,32 @@ export default function HeroSection () {
             <div className="absolute inset-0 bg-gradient-to-tr from-primary to-secondary opacity-10 rounded-2xl blur-2xl"></div>
             <img
               src="https://images.pexels.com/photos/3153198/pexels-photo-3153198.jpeg?auto=compress&cs=tinysrgb&w=600"
-              alt="Interface de création de sondage"
+              alt="Interface rapide FeedEd"
               className="relative rounded-2xl shadow-2xl"
             />
             <div className="absolute -bottom-8 -left-8 bg-background p-4 rounded-lg shadow-lg flex items-center gap-4">
               <div className="bg-primary/10 p-3 rounded-full">
-                <PenTool className="h-6 w-6 text-primary" />
+                <Zap className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="font-semibold text-gray-900">Facile à Utiliser</p>
-                <p className="text-sm text-gray-500">Interface intuitive de glisser-déposer</p>
+                <p className="font-semibold text-gray-900">Ultra Rapide</p>
+                <p className="text-sm text-gray-500">
+                  Enquêtes prêtes à l'emploi
+                </p>
               </div>
             </div>
             <div className="absolute -top-8 -right-8 bg-background p-4 rounded-lg shadow-lg flex items-center gap-4">
               <div className="bg-primary/10 p-3 rounded-full">
-                <Users className="h-6 w-6 text-primary" />
+                <Clock className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="font-semibold text-gray-900">1M+ Utilisateurs</p>
-                <p className="text-sm text-gray-500">Rejoignez notre communauté grandissante</p>
+                <p className="font-semibold text-gray-900">Gain de temps</p>
+                <p className="text-sm text-gray-500">Automatisation complète</p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
