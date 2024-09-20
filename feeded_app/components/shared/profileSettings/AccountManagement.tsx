@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { PersonnalInfo } from '../profileSettings/PersonnalInfo'
 import { Password } from '../profileSettings/Password'
 import { PreferencesNotification } from '../profileSettings/PreferencesNotification'
+import { motion } from 'framer-motion'
 import { useAuth } from '@/context/AuthContext'
 import { db } from '@/firebase'
 import { doc, updateDoc } from 'firebase/firestore'
@@ -108,6 +109,7 @@ export default function AccountManagement() {
 
   return (
     <div className="h-screen flex overflow-hidden">
+            <motion.div whileHover={{ scale: 1.03 }}>
       <Card className="h-fit w-fit ml-6 mt-6">
         <CardContent className="mt-8 flex flex-col items-center">
           <AvatarUpload 
@@ -121,6 +123,7 @@ export default function AccountManagement() {
           </div>
         </CardContent>
       </Card>
+      </motion.div>
 
       <main className="flex-1 overflow-hidden">
         <ScrollArea className="h-full">

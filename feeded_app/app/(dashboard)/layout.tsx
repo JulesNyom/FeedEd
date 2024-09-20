@@ -16,7 +16,7 @@ export default function DashboardLayout({
     <html lang="en">
       <body>
         <AuthWrapper>
-          <div className="bg-background grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+          <div className="bg-background overflow-hidden max-h-screen grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
             <Sidebar />
             <div className="flex flex-col">
               <Topbar />

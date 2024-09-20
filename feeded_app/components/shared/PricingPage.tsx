@@ -8,7 +8,6 @@ import { Switch } from "@/components/ui/switch"
 import { Check } from "lucide-react"
 import { pricingTiers } from '@/lib'
 
-
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(false)
   const [hoveredTier, setHoveredTier] = useState<string | null>(null)
@@ -32,58 +31,60 @@ export default function PricingPage() {
         </div>
       </div>
 
-      <div className="mt-16 space-y-12 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-x-8">
-        {pricingTiers.map((tier) => (
-          <motion.div
-            key={tier.name}
-            className={`flex ${tier.highlighted ? 'lg:-mt-8' : ''}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            onHoverStart={() => setHoveredTier(tier.name)}
-            onHoverEnd={() => setHoveredTier(null)}
-          >
-            <Card 
-              className={`flex flex-col justify-between transition-all duration-300 ${
-                tier.highlighted 
-                  ? 'border-primary shadow-lg scale-105 z-10' 
-                  : 'border-gray-200 hover:border-primary/50'
-              } ${hoveredTier === tier.name ? 'scale-105' : ''}`}
+      <div className="mt-16 flex justify-center">
+        <div className="grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8 xl:gap-x-12">
+          {pricingTiers.map((tier) => (
+            <motion.div
+              key={tier.name}
+              className={`flex ${tier.highlighted ? 'lg:-mt-8' : ''}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              onHoverStart={() => setHoveredTier(tier.name)}
+              onHoverEnd={() => setHoveredTier(null)}
             >
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold">{tier.name}</CardTitle>
-                <CardDescription className="mt-2">{tier.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="mt-4 flex items-baseline text-6xl font-extrabold">
-                  {isYearly ? tier.yearlyPrice : tier.monthlyPrice}€
-                  <span className="ml-1 text-2xl font-medium text-gray-500">/{isYearly ? 'an' : 'mois'}</span>
-                </div>
-                <ul className="mt-6 space-y-4">
-                  {tier.features.map((feature) => (
-                    <li key={feature} className="flex items-start">
-                      <div className="flex-shrink-0">
-                        <Check className="h-6 w-6 text-green-500" />
-                      </div>
-                      <p className="ml-3 text-base text-gray-700">{feature}</p>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-              <CardFooter>
-                <Button 
-                  className={`w-full ${
-                    tier.highlighted 
-                      ? 'bg-primary hover:bg-primary/90' 
-                      : 'bg-primary/10 hover:bg-primary/20 text-primary'
-                  }`}
-                >
-                  Commencer
-                </Button>
-              </CardFooter>
-            </Card>
-          </motion.div>
-        ))}
+              <Card 
+                className={`flex flex-col justify-between w-full max-w-sm transition-all duration-300 ${
+                  tier.highlighted 
+                    ? 'border-primary shadow-lg scale-105 z-10' 
+                    : 'border-gray-200 hover:border-primary/50'
+                } ${hoveredTier === tier.name ? 'scale-105' : ''}`}
+              >
+                <CardHeader>
+                  <CardTitle className="text-2xl font-bold">{tier.name}</CardTitle>
+                  <CardDescription className="mt-2">{tier.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="mt-4 flex items-baseline text-6xl font-extrabold">
+                    {isYearly ? tier.yearlyPrice : tier.monthlyPrice}€
+                    <span className="ml-1 text-2xl font-medium text-gray-500">/{isYearly ? 'an' : 'mois'}</span>
+                  </div>
+                  <ul className="mt-6 space-y-4">
+                    {tier.features.map((feature) => (
+                      <li key={feature} className="flex items-start">
+                        <div className="flex-shrink-0">
+                          <Check className="h-6 w-6 text-green-500" />
+                        </div>
+                        <p className="ml-3 text-base text-gray-700">{feature}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    className={`w-full ${
+                      tier.highlighted 
+                        ? 'bg-primary hover:bg-primary/90' 
+                        : 'bg-primary/10 hover:bg-primary/20 text-primary'
+                    }`}
+                  >
+                    Commencer
+                  </Button>
+                </CardFooter>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       <div className="mt-16 border-t border-gray-200 pt-16 max-w-2xl mx-auto">

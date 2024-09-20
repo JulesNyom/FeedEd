@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,15 @@ import {
 } from "@/components/ui/dialog";
 import StudentTable from "./StudentTable";
 import StudentForm from "./StudentForm";
-import { db, auth } from '@/firebase';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { db, auth } from "@/firebase";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 
 interface Student {
   id: string;
@@ -60,23 +67,32 @@ export default function StudentManagement() {
   const fetchPrograms = async (userId: string) => {
     const programsCollection = collection(db, `users/${userId}/programs`);
     const programSnapshot = await getDocs(programsCollection);
-    const programList = programSnapshot.docs.map(doc => ({
-      id: doc.id,
-      name: doc.data().name,
-      students: doc.data().students,
-      currentStudents: 0
-    } as TrainingProgram));
+    const programList = programSnapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          name: doc.data().name,
+          students: doc.data().students,
+          currentStudents: 0,
+        } as TrainingProgram)
+    );
 
     // Fetch students for each program
     const allStudents: Student[] = [];
     for (const program of programList) {
-      const studentsCollection = collection(db, `users/${userId}/programs/${program.id}/students`);
+      const studentsCollection = collection(
+        db,
+        `users/${userId}/programs/${program.id}/students`
+      );
       const studentSnapshot = await getDocs(studentsCollection);
-      const programStudents = studentSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        programId: program.id
-      } as Student));
+      const programStudents = studentSnapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+            programId: program.id,
+          } as Student)
+      );
       allStudents.push(...programStudents);
       program.currentStudents = programStudents.length;
     }
@@ -104,7 +120,7 @@ export default function StudentManagement() {
       return;
     }
 
-    const programIndex = programs.findIndex(p => p.id === programId);
+    const programIndex = programs.findIndex((p) => p.id === programId);
     if (programIndex === -1) {
       console.error("Program not found");
       return;
@@ -112,7 +128,9 @@ export default function StudentManagement() {
 
     const program = programs[programIndex];
     if (program.currentStudents >= program.students && !editingStudent) {
-      alert(`Le programme "${program.name}" a atteint son nombre maximum d'étudiants (${program.students})`);
+      alert(
+        `Le programme "${program.name}" a atteint son nombre maximum d'étudiants (${program.students})`
+      );
       return;
     }
 
@@ -120,17 +138,30 @@ export default function StudentManagement() {
       firstName: studentData.firstName,
       lastName: studentData.lastName,
       email: studentData.email,
-      programId: programId
+      programId: programId,
     };
 
     try {
       if (editingStudent) {
-        await updateDoc(doc(db, `users/${user.uid}/programs/${programId}/students`, studentData.id), firestoreData);
-        setStudents(students.map(s => s.id === studentData.id ? {...studentData, programId} : s));
-        
+        await updateDoc(
+          doc(
+            db,
+            `users/${user.uid}/programs/${programId}/students`,
+            studentData.id
+          ),
+          firestoreData
+        );
+        setStudents(
+          students.map((s) =>
+            s.id === studentData.id ? { ...studentData, programId } : s
+          )
+        );
+
         if (editingStudent.programId !== programId) {
           const updatedPrograms = [...programs];
-          const oldProgramIndex = updatedPrograms.findIndex(p => p.id === editingStudent.programId);
+          const oldProgramIndex = updatedPrograms.findIndex(
+            (p) => p.id === editingStudent.programId
+          );
           if (oldProgramIndex !== -1) {
             updatedPrograms[oldProgramIndex].currentStudents--;
           }
@@ -138,10 +169,13 @@ export default function StudentManagement() {
           setPrograms(updatedPrograms);
         }
       } else {
-        const docRef = await addDoc(collection(db, `users/${user.uid}/programs/${programId}/students`), firestoreData);
+        const docRef = await addDoc(
+          collection(db, `users/${user.uid}/programs/${programId}/students`),
+          firestoreData
+        );
         const newStudent = { ...studentData, id: docRef.id, programId };
         setStudents([...students, newStudent]);
-        
+
         const updatedPrograms = [...programs];
         updatedPrograms[programIndex].currentStudents++;
         setPrograms(updatedPrograms);
@@ -149,7 +183,10 @@ export default function StudentManagement() {
       setEditingStudent(null);
       setShowForm(false);
     } catch (error) {
-      console.error("Erreur lors de l'ajout/mise à jour de l'étudiant : ", error);
+      console.error(
+        "Erreur lors de l'ajout/mise à jour de l'étudiant : ",
+        error
+      );
     }
   };
 
@@ -166,10 +203,12 @@ export default function StudentManagement() {
     }
 
     try {
-      await deleteDoc(doc(db, `users/${user.uid}/programs/${programId}/students`, id));
-      setStudents(students.filter(s => s.id !== id));
-      
-      const programIndex = programs.findIndex(p => p.id === programId);
+      await deleteDoc(
+        doc(db, `users/${user.uid}/programs/${programId}/students`, id)
+      );
+      setStudents(students.filter((s) => s.id !== id));
+
+      const programIndex = programs.findIndex((p) => p.id === programId);
       if (programIndex !== -1) {
         const updatedPrograms = [...programs];
         updatedPrograms[programIndex].currentStudents--;
@@ -200,7 +239,7 @@ export default function StudentManagement() {
         <Button
           onClick={() => setShowForm(true)}
           className="bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-xl shadow-lg">
-          <Plus className="mr-2 h-5 w-5" /> Ajouter un nouvel apprenant
+          <Plus className="mr-2 h-5 w-5" /> Ajouter un apprenant
         </Button>
       </div>
 

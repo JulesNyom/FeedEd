@@ -1,10 +1,10 @@
 import React from 'react'
-import Dashboard from '@/components/shared/Dashboard'
+import Dashboard from '@/components/shared/dashboard/Dashboard'
 
 const page = () => {
 
   return (
-    <main className="">
+    <main>
       <Dashboard />
     </main>
   )

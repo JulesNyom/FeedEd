@@ -16,7 +16,7 @@ export function Sidebar() {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="hidden border-r bg-background md:block overflow-hidden"
     >
-      <div className="flex h-full max-h-screen flex-col gap-2">
+      <div className="flex min-h-screen flex-col gap-2">
         <div className="flex lg:h-[70px] h-[70px] items-center border-b px-6">
           <Link href="/" className="flex-shrink-0 transition-transform hover:scale-105">
             <Image
