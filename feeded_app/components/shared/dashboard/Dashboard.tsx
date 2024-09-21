@@ -63,13 +63,13 @@ function StatCards() {
         <StatCard title="Students" value="1,234" emoji="👥" change="+5.2%" />
       </motion.div>
       <motion.div whileHover={{ scale: 1.03 }}>
-        <StatCard title="Forms" value="56" emoji="📝" change="+2.1%" />
+      <StatCard title="Forms" value="56" emoji="📝" change="+2.1%" />
       </motion.div>
       <motion.div whileHover={{ scale: 1.03 }}>
-        <StatCard title="Programs" value="23" emoji="🎓" change="+3.7%" />
+      <StatCard title="Programs" value="23" emoji="🎓" change="+3.7%" />
       </motion.div>
       <motion.div whileHover={{ scale: 1.03 }}>
-        <StatCard title="Completion" value="85%" emoji="🏆" change="+1.4%" />
+      <StatCard title="Completion" value="85%" emoji="🏆" change="+1.4%" />
       </motion.div>
     </motion.div>
   );
