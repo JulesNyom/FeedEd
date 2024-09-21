@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import AuthWrapper from "@/components/shared/AuthWrapper"; // Adjust this import path as needed
 
 export const metadata: Metadata = {
-  title: "FeedEd - admin",
+  title: "FeedEd - Questionnaires",
 };
 
 export default function DashboardLayout({
@@ -16,13 +16,7 @@ export default function DashboardLayout({
     <html lang="en">
       <body>
         <AuthWrapper>
-          <div className="bg-background overflow-hidden max-h-screen grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-            <Sidebar />
-            <div className="flex flex-col">
-              <Topbar />
               {children}
-            </div>
-          </div>
         </AuthWrapper>
       </body>
     </html>

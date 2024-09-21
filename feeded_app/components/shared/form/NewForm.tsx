@@ -1,18 +1,20 @@
-"use client"
+'use client'
 
-import { useState } from 'react'
-import { PlusCircle, Trash2, ChevronUp, ChevronDown, Plus, X } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { PlusCircle, Trash2, ChevronUp, ChevronDown, Plus, X, Copy, Sparkles, Save } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Switch } from "@/components/ui/switch"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 type Option = {
   id: number
@@ -25,18 +27,22 @@ type Question = {
   type: string
   text: string
   options: Option[]
+  required: boolean
 }
 
 type QuestionItemProps = {
   question: Question
   index: number
   totalQuestions: number
-  updateQuestion: (id: number, field: string, value: string) => void
+  updateQuestion: (id: number, field: string, value: string | boolean) => void
   removeQuestion: (id: number) => void
   addOption: (questionId: number) => void
   updateOption: (questionId: number, optionId: number, text: string) => void
   removeOption: (questionId: number, optionId: number) => void
   moveQuestion: (id: number, direction: 'up' | 'down') => void
+  duplicateQuestion: (id: number) => void
+  setActiveQuestionId: (id: number | null) => void
+  isActive: boolean
 }
 
 const QuestionItem = ({ 
@@ -48,39 +54,54 @@ const QuestionItem = ({
   addOption, 
   updateOption, 
   removeOption,
-  moveQuestion
+  moveQuestion,
+  duplicateQuestion,
+  setActiveQuestionId,
+  isActive
 }: QuestionItemProps) => {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (isActive && ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [isActive])
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      transition={{ duration: 0.3 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className={`border rounded-lg overflow-hidden mb-4 shadow-sm hover:shadow-md transition-all duration-300 ${isActive ? 'ring-2 ring-primary' : ''}`}
+      onClick={() => setActiveQuestionId(question.id)}
     >
-      <AccordionItem value={`item-${index}`} className="border rounded-lg overflow-hidden mb-4 shadow-md hover:shadow-lg transition-shadow duration-300">
-        <AccordionTrigger className="hover:no-underline px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900">
+      <AccordionItem value={`item-${index}`}>
+        <AccordionTrigger className="hover:no-underline px-4 py-3 bg-gradient-to-r from-primary/5 to-primary/10">
           <div className="flex items-center w-full">
-            <span className="font-medium mr-2 text-blue-700 dark:text-blue-300">Q{index + 1}.</span>
-            <span className="text-left flex-grow truncate mr-2">{question.name || "Unnamed Question"}</span>
+            <span className="font-medium mr-2 text-primary">{index + 1}.</span>
+            <span className="text-left flex-grow truncate mr-2 font-semibold">{question.name || "Question sans nom"}</span>
+            <span className="text-sm text-muted-foreground bg-primary/10 px-2 py-1 rounded-full">{question.type}</span>
           </div>
         </AccordionTrigger>
-        <AccordionContent className="px-4 pb-4 pt-2 bg-white dark:bg-gray-800">
+        <AccordionContent className="px-4 pb-4 pt-2 bg-background">
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Input
-                placeholder="Question Name"
+                placeholder="Nom de la question"
                 value={question.name}
                 onChange={(e) => updateQuestion(question.id, 'name', e.target.value)}
-                className="flex-grow focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+                className="flex-grow"
                 required
               />
             </div>
             <div className="flex items-center space-x-2">
               <Input
-                placeholder="Enter question text"
+                placeholder="Entrez le texte de la question"
                 value={question.text}
                 onChange={(e) => updateQuestion(question.id, 'text', e.target.value)}
-                className="flex-grow focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+                className="flex-grow"
                 required
               />
               <Select
@@ -91,9 +112,10 @@ const QuestionItem = ({
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="text">Text</SelectItem>
-                  <SelectItem value="multipleChoice">Multiple Choice</SelectItem>
-                  <SelectItem value="checkbox">Checkbox</SelectItem>
+                  <SelectItem value="text">Texte</SelectItem>
+                  <SelectItem value="multipleChoice">Choix multiple</SelectItem>
+                  <SelectItem value="checkbox">Case à cocher</SelectItem>
+                  <SelectItem value="rating">Évaluation</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -104,9 +126,9 @@ const QuestionItem = ({
                   {question.options.map((option, optionIndex) => (
                     <motion.div
                       key={option.id}
-                      initial={{ opacity: 0, x: -50 }}
+                      initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 50 }}
+                      exit={{ opacity: 0, x: 20 }}
                       transition={{ duration: 0.2 }}
                       className="flex items-center space-x-2"
                     >
@@ -121,7 +143,7 @@ const QuestionItem = ({
                         placeholder={`Option ${optionIndex + 1}`}
                         value={option.text}
                         onChange={(e) => updateOption(question.id, option.id, e.target.value)}
-                        className="flex-grow focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+                        className="flex-grow"
                       />
                       <Button
                         type="button"
@@ -129,7 +151,7 @@ const QuestionItem = ({
                         size="icon"
                         onClick={() => removeOption(question.id, option.id)}
                         disabled={question.options.length <= 2}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-100 transition-colors duration-300"
+                        className="text-muted-foreground hover:text-destructive"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -141,46 +163,95 @@ const QuestionItem = ({
                   variant="outline"
                   size="sm"
                   onClick={() => addOption(question.id)}
-                  className="w-full mt-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 transition-all duration-300"
+                  className="w-full mt-2"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Option
+                  Ajouter une option
                 </Button>
               </div>
             )}
-            <div className="flex justify-between items-center">
-              <div className="space-x-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => moveQuestion(question.id, 'up')}
-                  disabled={index === 0}
-                  className="transition-all duration-300"
+            {question.type === 'rating' && (
+              <div className="flex items-center space-x-2">
+                <Label className="text-sm font-medium">Note maximale :</Label>
+                <Select
+                  value={question.options[0]?.text || '5'}
+                  onValueChange={(value) => updateOption(question.id, question.options[0]?.id || 0, value)}
                 >
-                  <ChevronUp className="h-4 w-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => moveQuestion(question.id, 'down')}
-                  disabled={index === totalQuestions - 1}
-                  className="transition-all duration-300"
-                >
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
+                  <SelectTrigger className="w-[80px]">
+                    <SelectValue placeholder="Max" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[5, 7, 10].map((num) => (
+                      <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                onClick={() => removeQuestion(question.id)}
-                className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 transition-all duration-300"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Remove Question
-              </Button>
+            )}
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  checked={question.required}
+                  onCheckedChange={(checked) => updateQuestion(question.id, 'required', checked)}
+                  id={`required-${question.id}`}
+                />
+                <Label htmlFor={`required-${question.id}`}>Obligatoire</Label>
+              </div>
+              <div className="space-x-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => moveQuestion(question.id, 'up')}
+                        disabled={index === 0}
+                      >
+                        <ChevronUp className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Déplacer vers le haut</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => moveQuestion(question.id, 'down')}
+                        disabled={index === totalQuestions - 1}
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Déplacer vers le bas</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => duplicateQuestion(question.id)}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Dupliquer la question</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </div>
           </div>
         </AccordionContent>
@@ -189,11 +260,27 @@ const QuestionItem = ({
   )
 }
 
-export default function SurveyCreator() {
+export default function NewForm() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [questions, setQuestions] = useState<Question[]>([])
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null)
+
+  useEffect(() => {
+    const savedSurvey = localStorage.getItem('savedSurvey')
+    if (savedSurvey) {
+      const { title, description, questions } = JSON.parse(savedSurvey)
+      setTitle(title)
+      setDescription(description)
+      setQuestions(questions)
+    }
+  }, [])
+
+  useEffect(() => {
+    const surveyData = { title, description, questions }
+    localStorage.setItem('savedSurvey', JSON.stringify(surveyData))
+  }, [title, description, questions])
 
   const addQuestion = () => {
     const newQuestion: Question = {
@@ -201,20 +288,31 @@ export default function SurveyCreator() {
       name: `Question ${questions.length + 1}`,
       type: 'text',
       text: '',
-      options: []
+      options: [],
+      required: false
     }
     setQuestions([...questions, newQuestion])
+    setActiveQuestionId(newQuestion.id)
   }
 
   const removeQuestion = (id: number) => {
     setQuestions(questions.filter(q => q.id !== id))
+    if (activeQuestionId === id) {
+      setActiveQuestionId(questions.length > 1 ? questions[questions.length - 2].id : null)
+    }
   }
 
-  const updateQuestion = (id: number, field: string, value: string) => {
+  const updateQuestion = (id: number, field: string, value: string | boolean) => {
     setQuestions(questions.map(q => {
       if (q.id === id) {
-        if (field === 'type' && (value === 'checkbox' || value === 'multipleChoice') && q.options.length === 0) {
-          return { ...q, [field]: value, options: [{ id: Date.now(), text: '' }, { id: Date.now() + 1, text: '' }] }
+        if (field === 'type') {
+          if (value === 'checkbox' || value === 'multipleChoice') {
+            return { ...q, [field]: value, options: q.options.length === 0 ? [{ id: Date.now(), text: '' }, { id: Date.now() + 1, text: '' }] : q.options }
+          } else if (value === 'rating') {
+            return { ...q, [field]: value, options: [{ id: Date.now(), text: '5' }] }
+          } else {
+            return { ...q, [field]: value, options: [] }
+          }
         }
         return { ...q, [field]: value }
       }
@@ -264,119 +362,166 @@ export default function SurveyCreator() {
     setQuestions(newQuestions)
   }
 
+  const duplicateQuestion = (id: number) => {
+    const questionToDuplicate = questions.find(q => q.id === id)
+    if (questionToDuplicate) {
+      const newQuestion = {
+        ...questionToDuplicate,
+        id: Date.now(),
+        name: `${questionToDuplicate.name} (Copie)`,
+        options: questionToDuplicate.options.map(o => ({ ...o, id: Date.now() + o.id }))
+      }
+      setQuestions([...questions, newQuestion])
+      setActiveQuestionId(newQuestion.id)
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
     if (title.trim() === '') {
-      setMessage({ type: 'error', text: "Please enter a survey title." })
+      setMessage({ type: 'error', text: "Veuillez entrer un titre pour le sondage." })
       return
     }
 
     if (questions.length === 0) {
-      setMessage({ type: 'error', text: "Please add at least one question." })
+      setMessage({ type: 'error', text: "Veuillez ajouter au moins une question." })
       return
     }
 
     if (questions.some(q => q.text.trim() === '')) {
-      setMessage({ type: 'error', text: "All questions must have text." })
+      setMessage({ type: 'error', text: "Toutes les questions doivent avoir un texte." })
       return
     }
 
     if (questions.some(q => (q.type === 'checkbox' || q.type === 'multipleChoice') && q.options.length < 2)) {
-      setMessage({ type: 'error', text: "Checkbox and multiple choice questions must have at least two options." })
+      setMessage({ type: 'error', text: "Les questions à choix multiples et à cases à cocher doivent avoir au moins deux options." })
       return
     }
 
-    // Here you would typically send the survey data to your backend
-    console.log('Survey data:', { title, description, questions })
+    console.log('Données du sondage:', { title, description, questions })
 
-    setMessage({ type: 'success', text: "Your survey has been created!" })
+    setMessage({ type: 'success', text: "Votre sondage a été créé !" })
 
-    // Reset form
     setTitle('')
     setDescription('')
     setQuestions([])
+    localStorage.removeItem('savedSurvey')
   }
 
   return (
-    <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-4xl mx-auto shadow-lg overflow-hidden">
-        <form onSubmit={handleSubmit}>
-          <CardHeader className="space-y-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
-            <CardTitle className="text-3xl font-bold text-center">Create Your Survey</CardTitle>
-            <CardDescription className="text-center text-blue-100">Design an engaging survey in minutes</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6 pt-6 bg-gradient-to-b from-white to-blue-50 dark:from-gray-900 dark:to-blue-900">
-            {message && (
-              <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
-                <AlertTitle>{message.type === 'error' ? 'Error' : 'Success'}</AlertTitle>
-                <AlertDescription>{message.text}</AlertDescription>
-              </Alert>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="title" className="text-lg font-medium text-blue-700 dark:text-blue-300">Survey Title</Label>
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-muted">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 items-center">
+          <div className="mr-4 hidden md:flex">
+            <a className="mr-6 flex items-center space-x-2" href="/">
+              <Sparkles className="h-6 w-6" />
+              <span className="hidden font-bold sm:inline-block">
+                Créateur de Sondage
+              </span>
+            </a>
+          </div>
+          <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+            <div className="w-full flex-1 md:w-auto md:flex-none">
               <Input
-                id="title"
-                placeholder="Enter an engaging title for your survey"
+                placeholder="Entrez le titre du sondage"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                required
-                className="text-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+                className="w-full md:w-[300px]"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="description" className="text-lg font-medium text-blue-700 dark:text-blue-300">Survey Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Provide a brief description of your survey"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="min-h-[100px] resize-y focus:ring-2 focus:ring-blue-500 transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-4">
-              <div className="flex justify-end">
-                <Button
-                  type="button"
-                  onClick={addQuestion}
-                  variant="secondary"
-                  size="sm"
-                  className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover: to-blue-600 text-white transition-all duration-300 hover:scale-105"
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add Question
-                </Button>
-              </div>
-              <Accordion type="single" collapsible className="w-full space-y-2">
-                <AnimatePresence>
-                  {questions.map((question, index) => (
-                    <QuestionItem
-                      key={question.id}
-                      question={question}
-                      index={index}
-                      totalQuestions={questions.length}
-                      updateQuestion={updateQuestion}
-                      removeQuestion={removeQuestion}
-                      addOption={addOption}
-                      updateOption={updateOption}
-                      removeOption={removeOption}
-                      moveQuestion={moveQuestion}
-                    />
-                  ))}
-                </AnimatePresence>
-              </Accordion>
-            </div>
-          </CardContent>
-          <CardFooter className="bg-gradient-to-r from-blue-600 to-indigo-600">
-            <Button
-              type="submit"
-              className="w-full text-lg font-semibold py-6 bg-white text-blue-600 hover:bg-blue-50 transition-all duration-300 hover:scale-105"
-            >
-              Create Survey
+            <Button variant="outline" size="sm" onClick={handleSubmit}>
+              <Save className="mr-2 h-4 w-4" />
+              Enregistrer le sondage
             </Button>
-          </CardFooter>
-        </form>
-      </Card>
+          </div>
+        </div>
+      </header>
+      <main className="flex-1">
+        <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
+          <Card className="w-full max-w-4xl mx-auto shadow-lg border-primary/20">
+            <CardContent className="p-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {message && (
+                  <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
+                    <AlertTitle>{message.type === 'error' ? 'Erreur' : 'Succès'}</AlertTitle>
+                    <AlertDescription>{message.text}</AlertDescription>
+                  </Alert>
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-lg font-medium">Description du sondage</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Fournissez une brève description de votre sondage"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="min-h-[100px] resize-y"
+                  />
+                </div>
+                <div className="space-y-4">
+                  <Accordion type="single" collapsible className="w-full space-y-2">
+                    <AnimatePresence>
+                      {questions.map((question, index) => (
+                        <QuestionItem
+                          key={question.id}
+                          question={question}
+                          index={index}
+                          totalQuestions={questions.length}
+                          updateQuestion={updateQuestion}
+                          removeQuestion={removeQuestion}
+                          addOption={addOption}
+                          updateOption={updateOption}
+                          removeOption={removeOption}
+                          moveQuestion={moveQuestion}
+                          duplicateQuestion={duplicateQuestion}
+                          setActiveQuestionId={setActiveQuestionId}
+                          isActive={activeQuestionId === question.id}
+                        />
+                      ))}
+                    </AnimatePresence>
+                  </Accordion>
+                </div>
+                <div className="flex justify-center space-x-4">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          onClick={addQuestion}
+                          size="icon"
+                          variant="outline"
+                        >
+                          <PlusCircle className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Ajouter une question</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  {activeQuestionId !== null && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            onClick={() => removeQuestion(activeQuestionId)}
+                            size="icon"
+                            variant="outline"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Supprimer la question</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
     </div>
   )
 }
