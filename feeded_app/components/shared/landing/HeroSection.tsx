@@ -1,21 +1,9 @@
-"use client";
-
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { ArrowRight, CheckCircle, Zap, Clock } from "lucide-react";
 
 export default function HeroSection() {
-  const [email, setEmail] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle email submission here
-    console.log("Email soumis:", email);
-  };
-
   return (
     <div className="bg-gradient-to-b rounded-3xl from-primary/10 to-background">
       <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8 lg:py-24">

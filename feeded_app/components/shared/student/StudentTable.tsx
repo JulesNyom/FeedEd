@@ -71,7 +71,7 @@ export default function StudentTable({
               <TableHead>Prénom</TableHead>
               <TableHead>Nom</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Programme de formation</TableHead>
+              <TableHead>Formation</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>

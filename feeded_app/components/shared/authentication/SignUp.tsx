@@ -121,12 +121,12 @@ export function SignUp(): JSX.Element {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
             />
           </div>
-          <Button type="submit" className="bg-gradient-to-r from-[#9e7eff] from-15% via-[#7b57f9]  to-[#6740f3] w-full" disabled={loading}>
+          <Button type="submit" className="rounded-xl mr-2 bg-gradient-to-br from-purple-500 to-indigo-600 font-bold text-secondary transition-transform hover:scale-105" disabled={loading}>
             {loading ? "Création du compte..." : "Créer un compte"}
           </Button>
         </form>
         <Button variant="outline" className="w-full mt-4">
-          S'inscrire avec Google
+          Inscription avec Google
         </Button>
         <div className="mt-4 text-center text-sm">
           Vous avez déjà un compte ?{" "}

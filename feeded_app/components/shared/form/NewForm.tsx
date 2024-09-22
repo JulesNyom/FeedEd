@@ -1,8 +1,8 @@
-'use client'
+"use client"
 
-import { useState, useEffect, useRef } from 'react'
-import { PlusCircle, Trash2, ChevronUp, ChevronDown, Plus, X, Copy, Sparkles, Save } from 'lucide-react'
+import React, { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { PlusCircle, Trash2, ChevronUp, ChevronDown, Plus, X, Copy, Sparkles, Save } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -19,13 +19,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 type Option = {
   id: number
   text: string
+  isCorrect: boolean
 }
 
 type Question = {
   id: number
   name: string
   type: string
-  text: string
   options: Option[]
   required: boolean
 }
@@ -37,7 +37,7 @@ type QuestionItemProps = {
   updateQuestion: (id: number, field: string, value: string | boolean) => void
   removeQuestion: (id: number) => void
   addOption: (questionId: number) => void
-  updateOption: (questionId: number, optionId: number, text: string) => void
+  updateOption: (questionId: number, optionId: number, field: string, value: string | boolean) => void
   removeOption: (questionId: number, optionId: number) => void
   moveQuestion: (id: number, direction: 'up' | 'down') => void
   duplicateQuestion: (id: number) => void
@@ -50,7 +50,6 @@ const QuestionItem = ({
   index, 
   totalQuestions,
   updateQuestion, 
-  removeQuestion, 
   addOption, 
   updateOption, 
   removeOption,
@@ -60,12 +59,6 @@ const QuestionItem = ({
   isActive
 }: QuestionItemProps) => {
   const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (isActive && ref.current) {
-      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
-  }, [isActive])
 
   return (
     <motion.div
@@ -95,15 +88,6 @@ const QuestionItem = ({
                 className="flex-grow"
                 required
               />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Input
-                placeholder="Entrez le texte de la question"
-                value={question.text}
-                onChange={(e) => updateQuestion(question.id, 'text', e.target.value)}
-                className="flex-grow"
-                required
-              />
               <Select
                 value={question.type}
                 onValueChange={(value) => updateQuestion(question.id, 'type', value)}
@@ -112,14 +96,13 @@ const QuestionItem = ({
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="text">Texte</SelectItem>
-                  <SelectItem value="multipleChoice">Choix multiple</SelectItem>
-                  <SelectItem value="checkbox">Case à cocher</SelectItem>
-                  <SelectItem value="rating">Évaluation</SelectItem>
+                  <SelectItem value="choix unique">Choix unique</SelectItem>
+                  <SelectItem value="choix multiples">Choix multiples</SelectItem>
+                  <SelectItem value="évaluation">Évaluation</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            {(question.type === 'checkbox' || question.type === 'multipleChoice') && (
+            {(question.type === 'choix multiples' || question.type === 'choix unique') && (
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Options</Label>
                 <AnimatePresence>
@@ -132,17 +115,29 @@ const QuestionItem = ({
                       transition={{ duration: 0.2 }}
                       className="flex items-center space-x-2"
                     >
-                      {question.type === 'checkbox' ? (
-                        <Checkbox disabled />
-                      ) : (
-                        <RadioGroup>
-                          <RadioGroupItem value={option.id.toString()} disabled />
+                      {question.type === 'choix unique' ? (
+                        <RadioGroup
+                          value={question.options.find(o => o.isCorrect)?.id.toString() || ''}
+                          onValueChange={(value) => {
+                            question.options.forEach(o => {
+                              updateOption(question.id, o.id, 'isCorrect', o.id.toString() === value)
+                            })
+                          }}
+                        >
+                          <RadioGroupItem value={option.id.toString()} />
                         </RadioGroup>
+                      ) : (
+                        <Checkbox
+                          checked={option.isCorrect}
+                          onCheckedChange={(checked) => 
+                            updateOption(question.id, option.id, 'isCorrect', checked)
+                          }
+                        />
                       )}
                       <Input
                         placeholder={`Option ${optionIndex + 1}`}
                         value={option.text}
-                        onChange={(e) => updateOption(question.id, option.id, e.target.value)}
+                        onChange={(e) => updateOption(question.id, option.id, 'text', e.target.value)}
                         className="flex-grow"
                       />
                       <Button
@@ -170,18 +165,18 @@ const QuestionItem = ({
                 </Button>
               </div>
             )}
-            {question.type === 'rating' && (
+            {question.type === 'évaluation' && (
               <div className="flex items-center space-x-2">
                 <Label className="text-sm font-medium">Note maximale :</Label>
                 <Select
                   value={question.options[0]?.text || '5'}
-                  onValueChange={(value) => updateOption(question.id, question.options[0]?.id || 0, value)}
+                  onValueChange={(value) => updateOption(question.id, question.options[0]?.id || 0, 'text', value)}
                 >
                   <SelectTrigger className="w-[80px]">
                     <SelectValue placeholder="Max" />
                   </SelectTrigger>
                   <SelectContent>
-                    {[5, 7, 10].map((num) => (
+                    {[1,2,3,4,5,6,7,8,9,10].map((num) => (
                       <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
                     ))}
                   </SelectContent>
@@ -267,28 +262,16 @@ export default function NewForm() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null)
 
-  useEffect(() => {
-    const savedSurvey = localStorage.getItem('savedSurvey')
-    if (savedSurvey) {
-      const { title, description, questions } = JSON.parse(savedSurvey)
-      setTitle(title)
-      setDescription(description)
-      setQuestions(questions)
-    }
-  }, [])
-
-  useEffect(() => {
-    const surveyData = { title, description, questions }
-    localStorage.setItem('savedSurvey', JSON.stringify(surveyData))
-  }, [title, description, questions])
-
-  const addQuestion = () => {
+  const addQuestion = (e: React.MouseEvent) => {
+    e.preventDefault() 
     const newQuestion: Question = {
       id: Date.now(),
       name: `Question ${questions.length + 1}`,
-      type: 'text',
-      text: '',
-      options: [],
+      type: 'choix unique',
+      options: [
+        { id: Date.now(), text: '', isCorrect: false },
+        { id: Date.now() + 1, text: '', isCorrect: false }
+      ],
       required: false
     }
     setQuestions([...questions, newQuestion])
@@ -306,12 +289,10 @@ export default function NewForm() {
     setQuestions(questions.map(q => {
       if (q.id === id) {
         if (field === 'type') {
-          if (value === 'checkbox' || value === 'multipleChoice') {
-            return { ...q, [field]: value, options: q.options.length === 0 ? [{ id: Date.now(), text: '' }, { id: Date.now() + 1, text: '' }] : q.options }
-          } else if (value === 'rating') {
-            return { ...q, [field]: value, options: [{ id: Date.now(), text: '5' }] }
-          } else {
-            return { ...q, [field]: value, options: [] }
+          if (value === 'choix unique' || value === 'choix multiples') {
+            return { ...q, [field]: value, options: q.options.length === 0 ? [{ id: Date.now(), text: '', isCorrect: false }, { id: Date.now() + 1, text: '', isCorrect: false }] : q.options }
+          } else if (value === 'évaluation') {
+            return { ...q, [field]: value, options: [{ id: Date.now(), text: '5', isCorrect: false }] }
           }
         }
         return { ...q, [field]: value }
@@ -323,16 +304,21 @@ export default function NewForm() {
   const addOption = (questionId: number) => {
     setQuestions(questions.map(q => {
       if (q.id === questionId) {
-        return { ...q, options: [...q.options, { id: Date.now(), text: '' }] }
+        return { ...q, options: [...q.options, { id: Date.now(), text: '', isCorrect: false }] }
       }
       return q
     }))
   }
 
-  const updateOption = (questionId: number, optionId: number, text: string) => {
+  const updateOption = (questionId: number, optionId: number, field: string, value: string | boolean) => {
     setQuestions(questions.map(q => {
       if (q.id === questionId) {
-        return { ...q, options: q.options.map(o => o.id === optionId ? { ...o, text } : o) }
+        return { 
+          ...q, 
+          options: q.options.map(o => 
+            o.id === optionId ? { ...o, [field]: value } : o
+          )
+        }
       }
       return q
     }))
@@ -389,13 +375,14 @@ export default function NewForm() {
       return
     }
 
-    if (questions.some(q => q.text.trim() === '')) {
-      setMessage({ type: 'error', text: "Toutes les questions doivent avoir un texte." })
+    if (questions.some(q => q.name.trim() === '')) {
+      setMessage({ type: 'error', text: "Toutes les questions doivent avoir un nom." })
       return
     }
 
-    if (questions.some(q => (q.type === 'checkbox' || q.type === 'multipleChoice') && q.options.length < 2)) {
-      setMessage({ type: 'error', text: "Les questions à choix multiples et à cases à cocher doivent avoir au moins deux options." })
+    if (questions.some(q => (q.type === 'choix multiples' || q.type === 'choix unique') && q.options.length < 2))
+    {
+      setMessage({ type: 'error', text: "Les questions à choix multiples et à choix unique doivent avoir au moins deux options." })
       return
     }
 
@@ -406,7 +393,6 @@ export default function NewForm() {
     setTitle('')
     setDescription('')
     setQuestions([])
-    localStorage.removeItem('savedSurvey')
   }
 
   return (
@@ -424,7 +410,7 @@ export default function NewForm() {
           <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
             <div className="w-full flex-1 md:w-auto md:flex-none">
               <Input
-                placeholder="Entrez le titre du sondage"
+                placeholder="Titre du sondage"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full md:w-[300px]"

@@ -139,7 +139,7 @@ export default function StudentForm({
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="program">Programme de formation</Label>
+        <Label htmlFor="program">Formation</Label>
         <Select
           value={selectedProgramId}
           onValueChange={handleProgramChange}
