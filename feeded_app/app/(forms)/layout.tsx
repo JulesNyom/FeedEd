@@ -1,5 +1,3 @@
-import { Sidebar } from "@/components/shared/Sidebar";
-import { Topbar } from "@/components/shared/Topbar";
 import { Metadata } from "next";
 import AuthWrapper from "@/components/shared/AuthWrapper"; // Adjust this import path as needed
 
