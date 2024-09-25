@@ -1,9 +1,15 @@
 "use client"
 import { auth, db } from '@/firebase'
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
+import { 
+  createUserWithEmailAndPassword, 
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
+  signOut,
+  GoogleAuthProvider,
+  signInWithPopup
+} from 'firebase/auth'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 import React, { useContext, useState, useEffect } from 'react'
-
 
 const AuthContext = React.createContext()
 
@@ -31,27 +37,39 @@ export function AuthProvider({ children }) {
         return signOut(auth)
     }
 
+    function loginWithGoogle() {
+        const provider = new GoogleAuthProvider()
+        return signInWithPopup(auth, provider)
+    }
+
+    async function handleUser(user) {
+        if (user) {
+            const docRef = doc(db, 'users', user.uid)
+            const docSnap = await getDoc(docRef)
+            
+            if (docSnap.exists()) {
+                setUserDataObj(docSnap.data())
+            } else {
+                const userData = {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL
+                }
+                await setDoc(docRef, userData)
+                setUserDataObj(userData)
+            }
+        } else {
+            setUserDataObj(null)
+        }
+    }
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async user => {
             try {
-                // Set the user to our local context state
                 setLoading(true)
                 setCurrentUser(user)
-                if (!user) {
-                    console.log('No User Found')
-                    return
-                }
-
-                // if user exists, fetch data from firestore database
-                console.log('Fetching User Data')
-                const docRef = doc(db, 'users', user.uid)
-                const docSnap = await getDoc(docRef)
-                let firebaseData = {}
-                if (docSnap.exists()) {
-                    console.log('Found User Data')
-                    firebaseData = docSnap.data()
-                }
-                setUserDataObj(firebaseData)
+                await handleUser(user)
             } catch (err) {
                 console.log(err.message)
             } finally {
@@ -68,6 +86,7 @@ export function AuthProvider({ children }) {
         signup,
         logout,
         login,
+        loginWithGoogle,
         loading
     }
 

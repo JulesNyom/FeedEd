@@ -3,7 +3,7 @@
 import React, { useState, FormEvent } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { useAuth } from "@/context/AuthContext" 
+import { useAuth } from "@/context/AuthContext" // Adjust the import path as needed
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,7 +18,7 @@ export default function Login(): JSX.Element {
   const [password, setPassword] = useState<string>("")
   const [error, setError] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
-  const { login } = useAuth()
+  const { login, loginWithGoogle } = useAuth()
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault()
@@ -37,10 +37,25 @@ export default function Login(): JSX.Element {
     setLoading(false)
   }
 
+  async function handleGoogleLogin(): Promise<void> {
+    try {
+      setError("")
+      setLoading(true)
+      await loginWithGoogle()
+      // Redirect to admin page
+      window.location.href = '/admin'
+      console.log("Google login successful")
+    } catch (error: unknown) {
+      setError("La connexion avec Google a échoué. Veuillez réessayer.")
+      console.error("Google login error:", error instanceof Error ? error.message : String(error))
+    }
+    setLoading(false)
+  }
+
   return (
     <div className="flex min-h-screen">
       <div className="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
-        <div className="mx-auto w-full max-w-sm lg:w-96">
+        <div className="mx-auto 2xl:mx-36 w-full max-w-sm lg:w-96">
           <Card className="border-none shadow-none">
             <CardHeader className="space-y-1 text-center">
               <div className="flex justify-center mb-4">
@@ -121,15 +136,21 @@ export default function Login(): JSX.Element {
                   <span className="bg-background px-2 text-muted-foreground">Ou continuer avec</span>
                 </div>
               </div>
-              <Button variant="outline" className="w-full" type="button">
-                <FcGoogle className="mr-2 h-4 w-4" />
-                Google
+              <Button 
+                variant="outline" 
+                className="w-full" 
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={loading}
+              >
+                <FcGoogle className="mr-2 size-4" />
+                Connexion avec Google
               </Button>
             </CardContent>
             <CardFooter>
               <p className="text-center text-sm text-muted-foreground w-full">
                 Vous n'avez pas de compte ?{" "}
-                <Link href="#" className="text-primary hover:underline">
+                <Link href="/signup" className="text-primary hover:underline">
                   Inscrivez-vous
                 </Link>
               </p>
@@ -140,16 +161,16 @@ export default function Login(): JSX.Element {
       <div className="relative hidden w-0 flex-1 lg:block">
         <img
           className="absolute inset-0 h-full w-full object-cover"
-          src="https://images.pexels.com/photos/210571/pexels-photo-210571.jpeg?auto=compress&cs=tinysrgb&w=1200"
+          src="https://images.pexels.com/photos/518485/pexels-photo-518485.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
           alt="Students studying"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 mix-blend-multiply opacity-50" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-50" />
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-700 via-pink-500 to-orange-400 mix-blend-overlay opacity-70" />
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-50" />
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <blockquote className="mt-8">
             <div className="relative text-lg font-medium text-white md:flex-grow">
               <svg
-                className="absolute top-0 left-0 h-8 w-8 -translate-x-3 -translate-y-2 transform text-indigo-400"
+                className="absolute top-0 left-0 h-8 w-8 -translate-x-3 -translate-y-2 transform text-pink-400"
                 fill="currentColor"
                 viewBox="0 0 32 32"
                 aria-hidden="true"
@@ -161,7 +182,7 @@ export default function Login(): JSX.Element {
               </p>
             </div>
             <footer className="mt-4">
-              <p className="text-base font-semibold text-indigo-200">Nelson Mandela</p>
+              <p className="text-base font-semibold text-pink-200">Nelson Mandela</p>
             </footer>
           </blockquote>
         </div>

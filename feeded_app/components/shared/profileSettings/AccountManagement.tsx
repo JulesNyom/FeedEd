@@ -133,10 +133,6 @@ export default function AccountManagement() {
               onMiseAJour={handleMiseAJourUtilisateur} 
             />
             <Password />
-            <PreferencesNotification 
-              parametres={parametres}
-              onToggle={handleBasculementParametre}
-            />
           </div>
         </ScrollArea>
       </main>

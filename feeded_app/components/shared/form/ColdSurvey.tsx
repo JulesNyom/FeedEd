@@ -76,7 +76,7 @@ const questions = [
   }
 ]
 
-export default function Component() {
+export default function ColdSurvey() {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState({})
 

@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Flame, Snowflake, ChevronRight, Eye, X, TrendingUp, TrendingDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import Link from 'next/link'
 
 const trainingPrograms = [
   { id: 1, name: 'New Employee Onboarding' },
@@ -168,8 +169,10 @@ export default function FormManagement() {
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
                   <Button variant="outline" onClick={() => setViewingSurvey(type)} className="w-full sm:w-auto group">
+                    <Link href="/cold">
                     View Survey Questions
                     <Eye className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </Link>
                   </Button>
                 </motion.div>
               </div>

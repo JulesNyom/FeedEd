@@ -17,7 +17,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { doc, setDoc } from "firebase/firestore"
 import { db } from "@/firebase"
 import { User } from "firebase/auth"
-import { FaGoogle } from "react-icons/fa"
+import { FcGoogle } from "react-icons/fc"
 
 interface UserData {
   firstName: string
@@ -33,7 +33,7 @@ export default function SignUp(): JSX.Element {
   const [password, setPassword] = useState<string>("")
   const [error, setError] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
-  const { signup } = useAuth()
+  const { signup, loginWithGoogle } = useAuth()
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault()
@@ -61,13 +61,27 @@ export default function SignUp(): JSX.Element {
     }
   }
 
+  async function handleGoogleSignUp(): Promise<void> {
+    try {
+      setError("")
+      setLoading(true)
+      await loginWithGoogle()
+      console.log("Google account linked successfully")
+      window.location.href = '/admin'
+    } catch (error: unknown) {
+      setError("Nous n'avons pas pu vous connecter avec Google " + (error instanceof Error ? error.message : String(error)))
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className="max-h-screen flex items-center justify-center p-4">
+    <div className="max-h-screen p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-5xl 2xl:max-w-7xl bg-white rounded-2xl shadow-xl overflow-hidden"
+        className="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden"
       >
         <div className="flex flex-col md:flex-row">
           <div className="md:w-1/2 relative">
@@ -163,8 +177,13 @@ export default function SignUp(): JSX.Element {
                   </div>
                 </div>
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="mt-6">
-                  <Button variant="outline" className="w-full flex items-center justify-center">
-                    <FaGoogle className="mr-2" />
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex items-center justify-center"
+                    onClick={handleGoogleSignUp}
+                    disabled={loading}
+                  >
+                    <FcGoogle className="size-4 mr-2" />
                     Inscription avec Google
                   </Button>
                 </motion.div>
