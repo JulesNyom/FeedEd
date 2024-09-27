@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Flame, Snowflake, ChevronRight, Eye, X, TrendingUp, TrendingDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import Link from 'next/link'
 
 const trainingPrograms = [
   { id: 1, name: 'New Employee Onboarding' },
@@ -21,7 +20,7 @@ const surveyStats = {
     completed: 120, 
     avgResponseTime: '1 day', 
     activePrograms: 2,
-    trend: 'up',
+    trend: 'up' as const,
     completionRate: '80%',
     avgSatisfaction: 4.5
   },
@@ -30,7 +29,7 @@ const surveyStats = {
     completed: 80, 
     avgResponseTime: '5 days', 
     activePrograms: 3,
-    trend: 'down',
+    trend: 'down' as const,
     completionRate: '75%',
     avgSatisfaction: 4.2
   }
@@ -104,7 +103,7 @@ export default function FormManagement() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="perspective-1000 w-full"
+        className="perspective-1000  w-full"
       >
         <Card className="flex flex-col group transform transition-all border-b rounded-b-lg duration-300 hover:shadow-xl">
           <CardHeader className={`${gradient} transition-colors duration-300 text-white`}>
@@ -162,17 +161,15 @@ export default function FormManagement() {
               </Select>
               <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 sm:space-x-2">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
-                  <Button onClick={() => handleAttachSurvey(type)} className="w-full sm:w-auto group bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700">
+                  <Button onClick={() => handleAttachSurvey(type)} className="w-full sm:text-xs sm:w-auto group bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700">
                     Attach {title.split(' ')[0]} Survey
                     <ChevronRight className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </Button>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
-                  <Button variant="outline" onClick={() => setViewingSurvey(type)} className="w-full sm:w-auto group">
-                    <Link href="/cold">
+                  <Button variant="outline" onClick={() => setViewingSurvey(type)} className="w-full sm:text-xs sm:w-auto group">
                     View Survey Questions
                     <Eye className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </Link>
                   </Button>
                 </motion.div>
               </div>

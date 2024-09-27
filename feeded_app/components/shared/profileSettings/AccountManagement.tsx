@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { PersonnalInfo } from '../profileSettings/PersonnalInfo'
 import { Password } from '../profileSettings/Password'
-import { PreferencesNotification } from '../profileSettings/PreferencesNotification'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/context/AuthContext'
 import { db } from '@/firebase'
@@ -13,10 +12,9 @@ import { doc, updateDoc } from 'firebase/firestore'
 import { AvatarUpload } from '../AvatarUpload'
 
 interface Utilisateur {
-  firstName: string;
-  lastName: string;
+  displayName: string;
   email: string;
-  profilePicture: string;
+  photoURL: string;
   createdAt: string;
 }
 
@@ -25,14 +23,11 @@ interface Parametres {
   emailsMarketing: boolean;
 }
 
-// Définition du type pour userDataObj
 interface UserDataObj extends Utilisateur {
   parametres: Parametres;
-  // Ajoutez ici d'autres propriétés si nécessaire
 }
 
 export default function AccountManagement() {
-  // Mise à jour du type pour userDataObj et setUserDataObj
   const { currentUser, userDataObj, setUserDataObj } = useAuth() as {
     currentUser: { uid: string; email: string | null };
     userDataObj: UserDataObj;
@@ -40,10 +35,9 @@ export default function AccountManagement() {
   }
   
   const [utilisateur, setUtilisateur] = useState<Utilisateur>({
-    firstName: '',
-    lastName: '',
+    displayName: '',
     email: '',
-    profilePicture: '',
+    photoURL: '',
     createdAt: '',
   })
 
@@ -55,10 +49,9 @@ export default function AccountManagement() {
   useEffect(() => {
     if (currentUser && userDataObj) {
       setUtilisateur({
-        firstName: userDataObj.firstName || '',
-        lastName: userDataObj.lastName || '',
+        displayName: userDataObj.displayName || '',
         email: userDataObj.email || currentUser.email || '',
-        profilePicture: userDataObj.profilePicture || '',
+        photoURL: userDataObj.photoURL || '',
         createdAt: userDataObj.createdAt || '',
       })
       setParametres(userDataObj.parametres)
@@ -73,19 +66,17 @@ export default function AccountManagement() {
       setUserDataObj(prevUserDataObj => ({ ...prevUserDataObj, ...nouveauUtilisateur }))
     } catch (error) {
       console.error("Erreur lors de la mise à jour de l'utilisateur:", error)
-      // Gérer l'erreur (par exemple, afficher un message à l'utilisateur)
     }
   }
 
-  const handleMiseAJourAvatar = async (nouveauUtilisateur: { profilePicture: string }) => {
+  const handleMiseAJourAvatar = async (nouveauUtilisateur: { photoURL: string }) => {
     try {
       const userRef = doc(db, 'users', currentUser.uid)
-      await updateDoc(userRef, { profilePicture: nouveauUtilisateur.profilePicture })
+      await updateDoc(userRef, { photoURL: nouveauUtilisateur.photoURL })
       setUtilisateur(prev => ({ ...prev, ...nouveauUtilisateur }))
       setUserDataObj(prev => ({ ...prev, ...nouveauUtilisateur }))
     } catch (error) {
       console.error("Erreur lors de la mise à jour de l'avatar:", error)
-      // Gérer l'erreur (par exemple, afficher un message à l'utilisateur)
     }
   }
 
@@ -98,7 +89,6 @@ export default function AccountManagement() {
       setUserDataObj(prev => ({ ...prev, parametres: newParametres }))
     } catch (error) {
       console.error("Erreur lors de la mise à jour des paramètres:", error)
-      // Gérer l'erreur (par exemple, afficher un message à l'utilisateur)
     }
   }
 
@@ -108,33 +98,31 @@ export default function AccountManagement() {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden">
-            <motion.div whileHover={{ scale: 1.03 }}>
-      <Card className="h-fit w-fit ml-6 mt-6">
-        <CardContent className="mt-8 flex flex-col items-center">
-          <AvatarUpload 
-            utilisateur={utilisateur} 
-            onMiseAJour={handleMiseAJourAvatar} 
-          />
-          <div className='space-y-1 flex flex-col items-center'>
-            <h2 className="text-xl font-semibold mt-4">{utilisateur.firstName} {utilisateur.lastName}</h2>
-            <p className="text-sm text-muted-foreground">{utilisateur.email}</p>
-            <p className="text-sm text-muted-foreground">Membre depuis le {formatDate(utilisateur.createdAt)}</p>
-          </div>
-        </CardContent>
+    <div className="min-h-screen flex flex-col lg:flex-row overflow-hidden p-4 lg:p-6 gap-6">
+      <Card className="h-fit w-full lg:w-1/3 xl:w-1/4">
+        <motion.div whileHover={{ scale: 1.03 }}>
+          <CardContent className="p-6 flex flex-col items-center">
+            <AvatarUpload 
+              utilisateur={utilisateur} 
+              onMiseAJour={handleMiseAJourAvatar} 
+            />
+            <div className='space-y-1 flex flex-col items-center mt-4 text-center'>
+              <h2 className="text-xl font-semibold">{utilisateur.displayName}</h2>
+              <p className="text-sm text-muted-foreground">{utilisateur.email}</p>
+              <p className="text-sm text-muted-foreground">Membre depuis le {formatDate(utilisateur.createdAt)}</p>
+            </div>
+          </CardContent>
+        </motion.div>
       </Card>
-      </motion.div>
 
       <main className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
-          <div className="p-6 space-y-6">
+          <div className="space-y-6">
             <PersonnalInfo 
               utilisateur={utilisateur} 
               onMiseAJour={handleMiseAJourUtilisateur} 
             />
             <Password />
           </div>
-        </ScrollArea>
       </main>
     </div>
   )

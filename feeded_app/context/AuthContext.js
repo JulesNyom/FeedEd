@@ -41,7 +41,6 @@ export function AuthProvider({ children }) {
         const provider = new GoogleAuthProvider()
         return signInWithPopup(auth, provider)
     }
-
     async function handleUser(user) {
         if (user) {
             const docRef = doc(db, 'users', user.uid)

@@ -8,10 +8,9 @@ import { doc, updateDoc } from "firebase/firestore"
 import { db } from '@/firebase'  // Assurez-vous que ce chemin est correct
 
 interface Utilisateur {
-  firstName: string;
-  lastName: string;
+  displayName: string;
   email: string;
-  profilePicture: string;
+  photoURL: string;
   createdAt: string;
 }
 
@@ -40,8 +39,7 @@ export function PersonnalInfo({ utilisateur, onMiseAJour }: PersonnalInfoProps) 
     try {
       const userDocRef = doc(db, "users", currentUser.uid)
       await updateDoc(userDocRef, {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        displayName: formData.displayName,
         email: formData.email
       })
 
@@ -75,15 +73,7 @@ export function PersonnalInfo({ utilisateur, onMiseAJour }: PersonnalInfoProps) 
             <Label htmlFor="firstName">Prénom</Label>
             <Input
               id="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="lastName">Nom</Label>
-            <Input
-              id="lastName"
-              value={formData.lastName}
+              value={formData.displayName}
               onChange={handleInputChange}
             />
           </div>

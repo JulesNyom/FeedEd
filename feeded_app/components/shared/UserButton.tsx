@@ -14,13 +14,13 @@ import Link from 'next/link';
 
 const UserButton = () => {
   const { currentUser, userDataObj, logout } = useAuth();
-  const [profilePicture, setProfilePicture] = useState("");
+  const [photoURL, setPhotoURL] = useState("");
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
     if (currentUser && userDataObj) {
-      setProfilePicture(userDataObj.profilePicture || "");
-      setUserName(`${userDataObj.firstName} ${userDataObj.lastName}`);
+      setPhotoURL(userDataObj.photoURL || "");
+      setUserName(`${userDataObj.displayName}`);
     }
   }, [currentUser, userDataObj]);
 
@@ -40,7 +40,7 @@ const UserButton = () => {
         <DropdownMenuTrigger asChild>
           <Button variant="secondary" size="icon" className="rounded-full">
             <Avatar className="transition-transform hover:scale-125">
-              <AvatarImage src={profilePicture} alt={userName} />
+              <AvatarImage src={photoURL} alt={userName} />
               <AvatarFallback>
                 {userName
                   .split(" ")

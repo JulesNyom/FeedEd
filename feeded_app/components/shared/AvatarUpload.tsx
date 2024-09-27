@@ -7,11 +7,10 @@ import { useAuth } from '@/context/AuthContext';  // Assurez-vous que ce chemin 
 
 interface AvatarUploadProps {
   utilisateur: {
-    firstName: string;
-    lastName: string;
-    profilePicture: string;
+    displayName: string;
+    photoURL: string;
   };
-  onMiseAJour: (nouveauUtilisateur: { profilePicture: string }) => void;
+  onMiseAJour: (nouveauUtilisateur: { photoURL: string }) => void;
 }
 
 export function AvatarUpload({ utilisateur, onMiseAJour }: AvatarUploadProps) {
@@ -31,7 +30,7 @@ export function AvatarUpload({ utilisateur, onMiseAJour }: AvatarUploadProps) {
 
     try {
       const storage = getStorage();
-      const storageRef = ref(storage, `profilePictures/${currentUser.uid}`);
+      const storageRef = ref(storage, `photoURL/${currentUser.uid}`);
 
       // Upload the file to Firebase Storage
       await uploadBytes(storageRef, file);
@@ -42,11 +41,11 @@ export function AvatarUpload({ utilisateur, onMiseAJour }: AvatarUploadProps) {
       // Update the user's profile picture URL in Firestore
       const userDocRef = doc(db, "users", currentUser.uid);
       await updateDoc(userDocRef, {
-        profilePicture: downloadURL
+        photoURL: downloadURL
       });
 
       // Update local state
-      onMiseAJour({ profilePicture: downloadURL });
+      onMiseAJour({ photoURL: downloadURL });
     } catch (error) {
       console.error("Error uploading file: ", error);
       // Here you might want to show an error message to the user
@@ -58,8 +57,8 @@ export function AvatarUpload({ utilisateur, onMiseAJour }: AvatarUploadProps) {
   return (
     <div className="relative">
       <Avatar className="h-36 w-36 cursor-pointer" onClick={handleAvatarClick}>
-        <AvatarImage src={utilisateur.profilePicture} alt={`${utilisateur.firstName} ${utilisateur.lastName}`} />
-        <AvatarFallback>{utilisateur.firstName[0]}{utilisateur.lastName[0]}</AvatarFallback>
+        <AvatarImage src={utilisateur.photoURL} alt={`${utilisateur.displayName}`} />
+        <AvatarFallback>{utilisateur.displayName}</AvatarFallback>
       </Avatar>
       {uploading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
