@@ -1,82 +1,31 @@
 "use client"
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Textarea } from "@/components/ui/textarea"
-import { ChevronRight, ChevronLeft, Send } from 'lucide-react'
+import { useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
 const questions = [
-  { id: 1, type: 'text', question: "Votre nom :" },
-  { id: 2, type: 'text', question: "Votre prénom :" },
+  {
+    id: 1,
+    type: "multiple",
+    question: "Quelle est votre fréquence d'utilisation de FeedEd ?",
+    options: ["Quotidiennement", "Hebdomadairement", "Mensuellement", "Rarement"]
+  },
+  {
+    id: 2,
+    type: "scale",
+    question: "Sur une échelle de 1 à 5, comment évaluez-vous la facilité d'utilisation de FeedEd ?",
+    min: 1,
+    max: 5
+  },
   {
     id: 3,
-    type: 'radio',
-    question: "Avez-vous obtenu un emploi ou évolué professionnellement depuis la formation ?",
-    options: [
-      "Oui, j'ai trouvé un emploi lié à la formation.",
-      "Oui, j'ai obtenu une promotion ou évolué dans mon poste actuel.",
-      "Non, je suis toujours à la recherche d'un emploi.",
-      "Non, je n'ai pas encore évolué professionnellement."
-    ]
-  },
-  { id: 4, type: 'text', question: "Si vous avez obtenu un emploi, dans quel secteur travaillez-vous maintenant ?" },
-  {
-    id: 5,
-    type: 'radio',
-    question: "Dans quelle mesure utilisez-vous les compétences acquises lors de la formation dans votre travail quotidien ?",
-    options: ['Très fréquemment', 'Fréquemment', 'De temps en temps', 'Rarement', 'Jamais']
-  },
-  {
-    id: 6,
-    type: 'radio',
-    question: "Comment évalueriez-vous l'impact de la formation sur votre confiance en vos capacités professionnelles ?",
-    options: ['Impact très positif', 'Impact positif', 'Peu d\'impact', 'Pas d\'impact du tout']
-  },
-  {
-    id: 7,
-    type: 'radio',
-    question: "Pensez-vous que la formation vous a préparé(e) de manière adéquate aux défis professionnels que vous rencontrez ?",
-    options: ['Oui, parfaitement', 'Oui, en partie', 'Non, pas vraiment', 'Non, pas du tout']
-  },
-  {
-    id: 8,
-    type: 'radio',
-    question: "Depuis la formation, avez-vous entrepris d'autres actions pour développer vos compétences (formations supplémentaires, auto-apprentissage, etc.) ?",
-    options: ['Oui', 'Non']
-  },
-  {
-    id: 9,
-    type: 'radio',
-    question: "Recommanderiez-vous cette formation à d'autres personnes cherchant à évoluer dans leur carrière ?",
-    options: ['Oui, sans hésiter', 'Oui, avec quelques réserves', 'Non, pas vraiment', 'Non, pas du tout']
-  },
-  {
-    id: 10,
-    type: 'textarea',
-    question: "Quels sont les aspects de la formation que vous avez trouvés les plus bénéfiques ?"
-  },
-  {
-    id: 11,
-    type: 'textarea',
-    question: "Y a-t-il des compétences ou des sujets que vous auriez aimé approfondir davantage pendant la formation ?"
-  },
-  {
-    id: 12,
-    type: 'textarea',
-    question: "Avez-vous des suggestions sur comment nous pourrions améliorer cette formation pour mieux préparer les futurs apprenants à leurs carrières ?"
-  },
-  {
-    id: 13,
-    type: 'textarea',
-    question: "Avez-vous des commentaires supplémentaires concernant votre expérience avec notre formation ?"
+    type: "text",
+    question: "Quelle fonctionnalité aimeriez-vous voir ajoutée à FeedEd ?"
   }
 ]
 
-export default function ColdSurvey() {
+export default function ColdSurevy () {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState({})
 
@@ -96,103 +45,100 @@ export default function ColdSurvey() {
     setAnswers({ ...answers, [questions[currentQuestion].id]: answer })
   }
 
-  const handleSubmit = () => {
-    console.log('Survey submitted:', answers)
-    // Here you would typically send the answers to your backend
-  }
-
   const progress = ((currentQuestion + 1) / questions.length) * 100
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-600 flex flex-col justify-between">
-      <div className="flex-grow flex items-center justify-center p-4 sm:p-6 md:p-8">
-        <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
-          <AnimatePresence mode="wait">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
+      <div className="w-full max-w-7xl mx-auto px-4 py-8 flex flex-col flex-grow">
+        <div className="mb-8">
+          <svg className="w-12 h-12 text-blue-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <div className="flex-grow flex items-center justify-center">
+          <div className="w-full max-w-lg lg:max-w-xl xl:max-w-xl 2xl:max-w-xl">
             <motion.div
-              key={currentQuestion}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-4 sm:space-y-6"
-            >
-              <div className="space-y-1 sm:space-y-2 text-center">
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight">{questions[currentQuestion].question}</h2>
-                <p className="text-xs sm:text-sm text-white text-opacity-80">Question {currentQuestion + 1} sur {questions.length}</p>
-              </div>
-              <div className="space-y-2 sm:space-y-3">
-                {questions[currentQuestion].type === 'text' && (
-                  <Input
-                    type="text"
-                    value={answers[questions[currentQuestion].id] || ''}
-                    onChange={(e) => handleAnswer(e.target.value)}
-                    className="w-full bg-white bg-opacity-20 border-0 text-white text-sm sm:text-base placeholder-white placeholder-opacity-60 focus:ring-2 focus:ring-white py-1.5 sm:py-2"
-                    placeholder="Tapez votre réponse ici"
-                  />
-                )}
-                {questions[currentQuestion].type === 'radio' && (
-                  <RadioGroup
-                    value={answers[questions[currentQuestion].id] || ''}
-                    onValueChange={handleAnswer}
-                    className="space-y-1.5 sm:space-y-2"
-                  >
-                    {questions[currentQuestion].options.map((option) => (
-                      <div key={option} className="flex items-center space-x-2 bg-white bg-opacity-20 rounded-md p-1.5 sm:p-2 transition-colors hover:bg-opacity-30">
-                        <RadioGroupItem value={option} id={option} className="border-white text-white" />
-                        <Label htmlFor={option} className="text-white text-xs sm:text-sm font-medium cursor-pointer">{option}</Label>
-                      </div>
+              className="h-2 bg-blue-200 rounded-full mb-8"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.5 }}
+            />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentQuestion}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white rounded-lg shadow-lg p-8"
+              >
+                <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+                  {questions[currentQuestion].question}
+                </h2>
+                {questions[currentQuestion].type === "multiple" && (
+                  <div className="space-y-4">
+                    {questions[currentQuestion].options.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleAnswer(option)}
+                        className={`w-full text-left p-4 rounded-lg transition-all duration-200 ${
+                          answers[questions[currentQuestion].id] === option
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                        }`}
+                      >
+                        {option}
+                      </button>
                     ))}
-                  </RadioGroup>
+                  </div>
                 )}
-                {questions[currentQuestion].type === 'textarea' && (
-                  <Textarea
-                    value={answers[questions[currentQuestion].id] || ''}
+                {questions[currentQuestion].type === "scale" && (
+                  <div className="flex justify-between items-center">
+                    {[...Array(5)].map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleAnswer(index + 1)}
+                        className={`w-12 h-12 rounded-full text-lg font-semibold transition-all duration-200 ${
+                          answers[questions[currentQuestion].id] === index + 1
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                        }`}
+                      >
+                        {index + 1}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {questions[currentQuestion].type === "text" && (
+                  <textarea
+                    value={answers[questions[currentQuestion].id] || ""}
                     onChange={(e) => handleAnswer(e.target.value)}
-                    className="w-full bg-white bg-opacity-20 border-0 text-white text-sm sm:text-base placeholder-white placeholder-opacity-60 focus:ring-2 focus:ring-white py-1.5 sm:py-2"
-                    placeholder="Tapez votre réponse ici"
-                    rows={4}
+                    className="w-full p-4 rounded-lg bg-gray-100 text-gray-800 resize-none h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Votre réponse ici..."
                   />
                 )}
-              </div>
-            </motion.div>
-          </AnimatePresence>
-          <div className="mt-4 sm:mt-6 flex justify-between items-center">
-            <Button 
-              onClick={handlePrevious} 
-              disabled={currentQuestion === 0} 
-              variant="outline" 
-              className="border-white text-white hover:bg-white hover:bg-opacity-20 rounded-full p-1 sm:p-1.5"
-            >
-              <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="sr-only">Précédent</span>
-            </Button>
-            {currentQuestion < questions.length - 1 ? (
-              <Button 
-                onClick={handleNext} 
-                className="bg-white text-blue-600 hover:bg-opacity-90 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold"
+              </motion.div>
+            </AnimatePresence>
+            <div className="flex justify-between mt-8">
+              <button
+                onClick={handlePrevious}
+                disabled={currentQuestion === 0}
+                className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-md text-blue-500 hover:bg-blue-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Suivant
-                <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
-              </Button>
-            ) : (
-              <Button 
-                onClick={handleSubmit} 
-                className="bg-white text-blue-600 hover:bg-opacity-90 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold"
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={currentQuestion === questions.length - 1}
+                className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 shadow-md text-white hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Soumettre
-                <Send className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
-              </Button>
-            )}
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="w-full h-0.5 bg-white bg-opacity-20">
-        <motion.div
-          className="h-full bg-white"
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.5 }}
-        />
       </div>
     </div>
   )

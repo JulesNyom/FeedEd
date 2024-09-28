@@ -4,6 +4,12 @@ import { Badge } from "@/components/ui/badge"
 import { SmileIcon, BarChart2Icon, UsersIcon, ActivityIcon } from "lucide-react"
 
 export default function SurveyDashboard() {
+  const getBadgeVariant = (score: number) => {
+    if (score > 4) return "default"
+    if (score > 3) return "secondary"
+    return "destructive"
+  }
+
   return (
     <div className="h-fit 2xl:my-8 2xl:mx-6 p-2 sm:p-4 bg-background flex flex-col">
       {/* Key Metrics */}
@@ -75,7 +81,7 @@ export default function SurveyDashboard() {
                     <p className="text-[10px] sm:text-xs 2xl:text-sm text-muted-foreground">{survey.responses} responses</p>
                   </div>
                   <Badge 
-                    variant={survey.avgScore > 4 ? "success" : "warning"}
+                    variant={getBadgeVariant(survey.avgScore)}
                     className="text-[10px] sm:text-xs 2xl:text-sm"
                   >
                     {survey.avgScore.toFixed(1)} / 5
@@ -112,7 +118,7 @@ export default function SurveyDashboard() {
                     <TableCell className="text-[10px] sm:text-xs lg:text-sm 2xl:text-base">{response.respondent}</TableCell>
                     <TableCell>
                       <Badge 
-                        variant={response.score > 3 ? "success" : response.score === 3 ? "warning" : "destructive"}
+                        variant={getBadgeVariant(response.score)}
                         className="text-[10px] sm:text-xs 2xl:text-sm"
                       >
                         {response.score} / 5
