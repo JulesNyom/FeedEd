@@ -165,14 +165,14 @@ export default function FormManagement () {
             emoji="🔥"
             stats={hotQuestionnaireStats} 
             gradient="bg-gradient-to-r from-orange-400 to-pink-500"
-            detailsLink="/questionnaire/hot"
+            detailsLink="/hot"
           />
           <QuestionnaireCard 
             title="Questionnaire à froid" 
             emoji="❄️"
             stats={coldQuestionnaireStats} 
             gradient="bg-gradient-to-r from-blue-400 to-indigo-500"
-            detailsLink="/questionnaire/cold"
+            detailsLink="/cold"
           />
         </AnimatePresence>
       </div>

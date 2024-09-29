@@ -2,32 +2,84 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, Check } from "lucide-react"
 
 const questions = [
   {
-    id: 1,
-    type: "multiple",
-    question: "Quelle est votre fréquence d'utilisation de FeedEd ?",
-    options: ["Quotidiennement", "Hebdomadairement", "Mensuellement", "Rarement"]
-  },
-  {
-    id: 2,
-    type: "scale",
-    question: "Sur une échelle de 1 à 5, comment évaluez-vous la facilité d'utilisation de FeedEd ?",
-    min: 1,
-    max: 5
-  },
-  {
-    id: 3,
+    id: "nom",
     type: "text",
-    question: "Quelle fonctionnalité aimeriez-vous voir ajoutée à FeedEd ?"
+    question: "Nom :",
+    placeholder: "Votre nom"
+  },
+  {
+    id: "prenom",
+    type: "text",
+    question: "Prénom :",
+    placeholder: "Votre prénom"
+  },
+  {
+    id: "formation",
+    type: "text",
+    question: "Intitulé de la formation suivie :",
+    placeholder: "Nom de la formation"
+  },
+  {
+    id: "qualiteGlobale",
+    type: "scale",
+    question: "Comment évaluez-vous la qualité globale de la formation ?"
+  },
+  {
+    id: "objectifsClairs",
+    type: "scale",
+    question: "Les objectifs de la formation ont-ils été clairement annoncés ?"
+  },
+  {
+    id: "contenuAttentes",
+    type: "scale",
+    question: "Le contenu de la formation a-t-il répondu à vos attentes ?"
+  },
+  {
+    id: "qualiteSupports",
+    type: "scale",
+    question: "Comment jugez-vous la qualité des supports pédagogiques utilisés ?"
+  },
+  {
+    id: "maitriseSujet",
+    type: "scale",
+    question: "Le formateur maîtrisait-il le sujet ?"
+  },
+  {
+    id: "interactivite",
+    type: "scale",
+    question: "Le formateur a-t-il su rendre la formation interactive et dynamique ?"
+  },
+  {
+    id: "exercicesPertinents",
+    type: "scale",
+    question: "Les exercices pratiques étaient-ils pertinents et utiles ?"
+  },
+  {
+    id: "organisationLogistique",
+    type: "scale",
+    question: "Comment évaluez-vous l'organisation logistique de la formation (salle, équipements, etc.) ?"
+  },
+  {
+    id: "applicationConnaissances",
+    type: "scale",
+    question: "Pensez-vous pouvoir appliquer les connaissances acquises dans votre travail ?"
+  },
+  {
+    id: "commentaires",
+    type: "textarea",
+    question: "Commentaires supplémentaires :",
+    placeholder: "Vos commentaires ici"
   }
 ]
 
-export default function HotSurvey () {
+export default function HotSurvey() {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState({})
+  const [submitted, setSubmitted] = useState(false)
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
@@ -45,26 +97,70 @@ export default function HotSurvey () {
     setAnswers({ ...answers, [questions[currentQuestion].id]: answer })
   }
 
+  const isLastQuestion = currentQuestion === questions.length - 1
+
+  const validateAnswers = () => {
+    return questions.every(q => answers[q.id] !== undefined && answers[q.id] !== "")
+  }
+
+  const handleSubmit = () => {
+    if (validateAnswers()) {
+      console.log("Submitting answers:", answers)
+      setSubmitted(true)
+    } else {
+      alert("Veuillez répondre à toutes les questions avant de soumettre.")
+    }
+  }
+
   const progress = ((currentQuestion + 1) / questions.length) * 100
 
+  if (submitted) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-rose-400 via-orange-300 to-pink-500 animate-gradient-x"></div>
+        <div className="relative z-10 bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-8 border border-gray-200 text-center">
+          <Check className="w-16 h-16 text-green-600 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Merci pour votre participation !</h2>
+          <p className="text-gray-600">Vos réponses ont été enregistrées avec succès.</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
-      <div className="w-full max-w-7xl mx-auto px-4 py-8 flex flex-col flex-grow">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-rose-400 via-orange-300 to-pink-500 animate-gradient-x"></div>
+      <div className="relative w-full max-w-7xl mx-auto px-4 py-8 flex flex-col flex-grow z-10">
         <div className="mb-8">
-          <svg className="w-12 h-12 text-blue-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-12 h-12 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
-        <div className="flex-grow flex items-center justify-center">
+        <div className="flex-grow flex flex-col items-center justify-center">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-3xl font-bold text-white mb-8 text-center"
+          >
+            Questionnaire de satisfaction à chaud - Formation
+          </motion.h1>
           <div className="w-full max-w-lg lg:max-w-xl xl:max-w-xl 2xl:max-w-xl">
             <motion.div
-              className="h-2 bg-blue-200 rounded-full mb-8"
+              className="h-2 bg-white/30 rounded-full mb-8 overflow-hidden"
               initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
+              animate={{ width: "100%" }}
               transition={{ duration: 0.5 }}
-            />
+            >
+              <motion.div
+                className="h-full bg-white rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </motion.div>
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentQuestion}
@@ -72,70 +168,78 @@ export default function HotSurvey () {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5 }}
-                className="bg-white rounded-lg shadow-lg p-8"
+                className="bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-8 border border-gray-200"
               >
-                <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-6">
                   {questions[currentQuestion].question}
                 </h2>
-                {questions[currentQuestion].type === "multiple" && (
-                  <div className="space-y-4">
-                    {questions[currentQuestion].options.map((option, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleAnswer(option)}
-                        className={`w-full text-left p-4 rounded-lg transition-all duration-200 ${
-                          answers[questions[currentQuestion].id] === option
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                        }`}
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
+                {questions[currentQuestion].type === "text" && (
+                  <input
+                    type="text"
+                    value={answers[questions[currentQuestion].id] || ""}
+                    onChange={(e) => handleAnswer(e.target.value)}
+                    placeholder={questions[currentQuestion].placeholder}
+                    className="w-full p-4 rounded-lg bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
+                  />
                 )}
                 {questions[currentQuestion].type === "scale" && (
                   <div className="flex justify-between items-center">
-                    {[...Array(5)].map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleAnswer(index + 1)}
+                    {[1, 2, 3, 4, 5].map((value) => (
+                      <motion.button
+                        key={value}
+                        onClick={() => handleAnswer(value)}
                         className={`w-12 h-12 rounded-full text-lg font-semibold transition-all duration-200 ${
-                          answers[questions[currentQuestion].id] === index + 1
-                            ? "bg-blue-500 text-white"
+                          answers[questions[currentQuestion].id] === value
+                            ? "bg-orange-400 text-white"
                             : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                         }`}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
                       >
-                        {index + 1}
-                      </button>
+                        {value}
+                      </motion.button>
                     ))}
                   </div>
                 )}
-                {questions[currentQuestion].type === "text" && (
+                {questions[currentQuestion].type === "textarea" && (
                   <textarea
                     value={answers[questions[currentQuestion].id] || ""}
                     onChange={(e) => handleAnswer(e.target.value)}
-                    className="w-full p-4 rounded-lg bg-gray-100 text-gray-800 resize-none h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Votre réponse ici..."
+                    placeholder={questions[currentQuestion].placeholder}
+                    className="w-full p-4 rounded-lg bg-gray-50 text-gray-800 resize-none h-32 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
                   />
                 )}
               </motion.div>
             </AnimatePresence>
             <div className="flex justify-between mt-8">
-              <button
+              <motion.button
                 onClick={handlePrevious}
                 disabled={currentQuestion === 0}
-                className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-md text-blue-500 hover:bg-blue-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-md text-gray-600 hover:bg-gray-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
               >
                 <ChevronLeft className="w-6 h-6" />
-              </button>
-              <button
-                onClick={handleNext}
-                disabled={currentQuestion === questions.length - 1}
-                className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 shadow-md text-white hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
+              </motion.button>
+              {isLastQuestion ? (
+                <motion.button
+                  onClick={handleSubmit}
+                  className="flex items-center justify-center px-6 h-12 rounded-full bg-orange-400 shadow-md text-white hover:bg-orange-500 transition-all duration-200"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Valider et envoyer
+                </motion.button>
+              ) : (
+                <motion.button
+                  onClick={handleNext}
+                  className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-400 shadow-md text-white hover:bg-orange-500 transition-all duration-200"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </motion.button>
+              )}
             </div>
           </div>
         </div>
