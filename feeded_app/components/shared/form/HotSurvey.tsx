@@ -1,10 +1,17 @@
 "use client"
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ChevronLeft, ChevronRight, Check } from "lucide-react"
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 
-const questions = [
+interface Question {
+  id: string;
+  type: "text" | "scale" | "textarea";
+  question: string;
+  placeholder?: string;
+}
+
+const questions: Question[] = [
   {
     id: "nom",
     type: "text",
@@ -74,45 +81,45 @@ const questions = [
     question: "Commentaires supplémentaires :",
     placeholder: "Vos commentaires ici"
   }
-]
+];
 
-export default function HotSurvey() {
-  const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [answers, setAnswers] = useState({})
-  const [submitted, setSubmitted] = useState(false)
+const HotSurvey: React.FC = () => {
+  const [currentQuestion, setCurrentQuestion] = useState<number>(0);
+  const [answers, setAnswers] = useState<Record<string, string | number>>({});
+  const [submitted, setSubmitted] = useState<boolean>(false);
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1)
+      setCurrentQuestion(currentQuestion + 1);
     }
-  }
+  };
 
   const handlePrevious = () => {
     if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1)
+      setCurrentQuestion(currentQuestion - 1);
     }
-  }
+  };
 
-  const handleAnswer = (answer) => {
-    setAnswers({ ...answers, [questions[currentQuestion].id]: answer })
-  }
+  const handleAnswer = (answer: string | number) => {
+    setAnswers({ ...answers, [questions[currentQuestion].id]: answer });
+  };
 
-  const isLastQuestion = currentQuestion === questions.length - 1
+  const isLastQuestion = currentQuestion === questions.length - 1;
 
-  const validateAnswers = () => {
-    return questions.every(q => answers[q.id] !== undefined && answers[q.id] !== "")
-  }
+  const validateAnswers = (): boolean => {
+    return questions.every(q => answers[q.id] !== undefined && answers[q.id] !== "");
+  };
 
   const handleSubmit = () => {
     if (validateAnswers()) {
-      console.log("Submitting answers:", answers)
-      setSubmitted(true)
+      console.log("Submitting answers:", answers);
+      setSubmitted(true);
     } else {
-      alert("Veuillez répondre à toutes les questions avant de soumettre.")
+      alert("Veuillez répondre à toutes les questions avant de soumettre.");
     }
-  }
+  };
 
-  const progress = ((currentQuestion + 1) / questions.length) * 100
+  const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   if (submitted) {
     return (
@@ -124,7 +131,7 @@ export default function HotSurvey() {
           <p className="text-gray-600">Vos réponses ont été enregistrées avec succès.</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -176,7 +183,7 @@ export default function HotSurvey() {
                 {questions[currentQuestion].type === "text" && (
                   <input
                     type="text"
-                    value={answers[questions[currentQuestion].id] || ""}
+                    value={answers[questions[currentQuestion].id] as string || ""}
                     onChange={(e) => handleAnswer(e.target.value)}
                     placeholder={questions[currentQuestion].placeholder}
                     className="w-full p-4 rounded-lg bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
@@ -203,7 +210,7 @@ export default function HotSurvey() {
                 )}
                 {questions[currentQuestion].type === "textarea" && (
                   <textarea
-                    value={answers[questions[currentQuestion].id] || ""}
+                    value={answers[questions[currentQuestion].id] as string || ""}
                     onChange={(e) => handleAnswer(e.target.value)}
                     placeholder={questions[currentQuestion].placeholder}
                     className="w-full p-4 rounded-lg bg-gray-50 text-gray-800 resize-none h-32 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
@@ -245,5 +252,7 @@ export default function HotSurvey() {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default HotSurvey;

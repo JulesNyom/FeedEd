@@ -1,10 +1,16 @@
-"use client"
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ChevronLeft, ChevronRight, Check } from "lucide-react"
+interface Question {
+  id: string;
+  type: "text" | "radio" | "scale" | "textarea";
+  question: string;
+  placeholder?: string;
+  options?: string[];
+}
 
-const questions = [
+const questions: Question[] = [
   {
     id: "nom",
     type: "text",
@@ -87,45 +93,45 @@ const questions = [
     question: "Avez-vous des suggestions pour améliorer cette formation et mieux préparer les apprenants au marché du travail ?",
     placeholder: "Vos suggestions ici"
   }
-]
+];
 
-export default function ColdSurvey () {
-  const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [answers, setAnswers] = useState({})
-  const [submitted, setSubmitted] = useState(false)
+const ColdSurvey: React.FC = () => {
+  const [currentQuestion, setCurrentQuestion] = useState<number>(0);
+  const [answers, setAnswers] = useState<Record<string, string | number>>({});
+  const [submitted, setSubmitted] = useState<boolean>(false);
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1)
+      setCurrentQuestion(currentQuestion + 1);
     }
-  }
+  };
 
   const handlePrevious = () => {
     if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1)
+      setCurrentQuestion(currentQuestion - 1);
     }
-  }
+  };
 
-  const handleAnswer = (answer) => {
-    setAnswers({ ...answers, [questions[currentQuestion].id]: answer })
-  }
+  const handleAnswer = (answer: string | number) => {
+    setAnswers({ ...answers, [questions[currentQuestion].id]: answer });
+  };
 
-  const isLastQuestion = currentQuestion === questions.length - 1
+  const isLastQuestion = currentQuestion === questions.length - 1;
 
-  const validateAnswers = () => {
-    return questions.every(q => answers[q.id] !== undefined && answers[q.id] !== "")
-  }
+  const validateAnswers = (): boolean => {
+    return questions.every(q => answers[q.id] !== undefined && answers[q.id] !== "");
+  };
 
   const handleSubmit = () => {
     if (validateAnswers()) {
-      console.log("Submitting answers:", answers)
-      setSubmitted(true)
+      console.log("Submitting answers:", answers);
+      setSubmitted(true);
     } else {
-      alert("Veuillez répondre à toutes les questions avant de soumettre.")
+      alert("Veuillez répondre à toutes les questions avant de soumettre.");
     }
-  }
+  };
 
-  const progress = ((currentQuestion + 1) / questions.length) * 100
+  const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   if (submitted) {
     return (
@@ -137,10 +143,10 @@ export default function ColdSurvey () {
           <p className="text-gray-600">Vos réponses ont été enregistrées avec succès.</p>
         </div>
       </div>
-    )
+    );
   }
 
-  const currentQuestionData = questions[currentQuestion]
+  const currentQuestionData = questions[currentQuestion];
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
@@ -191,7 +197,7 @@ export default function ColdSurvey () {
                 {currentQuestionData.type === "text" && (
                   <input
                     type="text"
-                    value={answers[currentQuestionData.id] || ""}
+                    value={answers[currentQuestionData.id] as string || ""}
                     onChange={(e) => handleAnswer(e.target.value)}
                     placeholder={currentQuestionData.placeholder}
                     className="w-full p-4 rounded-lg bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
@@ -199,7 +205,7 @@ export default function ColdSurvey () {
                 )}
                 {currentQuestionData.type === "radio" && (
                   <div className="space-y-2">
-                    {currentQuestionData.options.map((option) => (
+                    {currentQuestionData.options?.map((option) => (
                       <label key={option} className="flex items-center space-x-2 cursor-pointer">
                         <input
                           type="radio"
@@ -234,7 +240,7 @@ export default function ColdSurvey () {
                 )}
                 {currentQuestionData.type === "textarea" && (
                   <textarea
-                    value={answers[currentQuestionData.id] || ""}
+                    value={answers[currentQuestionData.id] as string || ""}
                     onChange={(e) => handleAnswer(e.target.value)}
                     placeholder={currentQuestionData.placeholder}
                     className="w-full p-4 rounded-lg bg-gray-50 text-gray-800 resize-none h-32 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
@@ -276,5 +282,7 @@ export default function ColdSurvey () {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default ColdSurvey;
