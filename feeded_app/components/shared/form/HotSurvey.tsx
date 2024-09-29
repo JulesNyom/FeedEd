@@ -1,177 +1,258 @@
 "use client"
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Textarea } from "@/components/ui/textarea"
-import { ChevronRight, ChevronLeft, Send } from 'lucide-react'
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 
-const questions = [
+interface Question {
+  id: string;
+  type: "text" | "scale" | "textarea";
+  question: string;
+  placeholder?: string;
+}
+
+const questions: Question[] = [
   {
-    id: 1,
-    type: 'radio',
-    question: "À quel point êtes-vous satisfait(e) de cette formation ?",
-    options: ['Très satisfait(e)', 'Satisfait(e)', 'Moyennement satisfait(e)', 'Insatisfait(e)', 'Très insatisfait(e)']
+    id: "nom",
+    type: "text",
+    question: "Nom :",
+    placeholder: "Votre nom"
   },
   {
-    id: 2,
-    type: 'radio',
-    question: "La formation a-t-elle répondu à vos attentes ?",
-    options: ['Oui, entièrement', 'Oui, en partie', 'Non, pas vraiment', 'Non, pas du tout']
+    id: "prenom",
+    type: "text",
+    question: "Prénom :",
+    placeholder: "Votre prénom"
   },
   {
-    id: 3,
-    type: 'radio',
-    question: "Comment évaluez-vous le contenu de la formation ?",
-    options: ['Très utile et pertinent', 'Utile', 'Moyennement utile', 'Pas utile du tout']
+    id: "formation",
+    type: "text",
+    question: "Intitulé de la formation suivie :",
+    placeholder: "Nom de la formation"
   },
   {
-    id: 4,
-    type: 'radio',
-    question: "Comment évaluez-vous la clarté des explications fournies par le formateur ?",
-    options: ['Très clair', 'Clair', 'Moyennement clair', 'Pas clair du tout']
+    id: "qualiteGlobale",
+    type: "scale",
+    question: "Comment évaluez-vous la qualité globale de la formation ?"
   },
   {
-    id: 5,
-    type: 'radio',
-    question: "Comment évaluez-vous l'accessibilité et la disponibilité du centre de formation ?",
-    options: ['Très accessible et disponible', 'Accessible et disponible', 'Moyennement accessible', 'Pas du tout accessible']
+    id: "objectifsClairs",
+    type: "scale",
+    question: "Les objectifs de la formation ont-ils été clairement annoncés ?"
   },
   {
-    id: 6,
-    type: 'radio',
-    question: "Comment évaluez-vous la communication avec le centre de formation (informations, rappels, organisation) ?",
-    options: ['Très bonne', 'Bonne', 'Moyenne', 'Mauvaise']
+    id: "contenuAttentes",
+    type: "scale",
+    question: "Le contenu de la formation a-t-il répondu à vos attentes ?"
   },
   {
-    id: 7,
-    type: 'textarea',
-    question: "Qu'avez-vous le plus apprécié dans cette formation et dans votre relation avec le centre de formation ?"
+    id: "qualiteSupports",
+    type: "scale",
+    question: "Comment jugez-vous la qualité des supports pédagogiques utilisés ?"
   },
   {
-    id: 8,
-    type: 'radio',
-    question: "Recommanderiez-vous cette formation et ce centre de formation à d'autres personnes ?",
-    options: ['Oui', 'Non', 'Peut-être']
+    id: "maitriseSujet",
+    type: "scale",
+    question: "Le formateur maîtrisait-il le sujet ?"
   },
   {
-    id: 9,
-    type: 'textarea',
-    question: "Avez-vous des suggestions ou des commentaires supplémentaires concernant votre expérience avec le centre de formation ?"
+    id: "interactivite",
+    type: "scale",
+    question: "Le formateur a-t-il su rendre la formation interactive et dynamique ?"
+  },
+  {
+    id: "exercicesPertinents",
+    type: "scale",
+    question: "Les exercices pratiques étaient-ils pertinents et utiles ?"
+  },
+  {
+    id: "organisationLogistique",
+    type: "scale",
+    question: "Comment évaluez-vous l'organisation logistique de la formation (salle, équipements, etc.) ?"
+  },
+  {
+    id: "applicationConnaissances",
+    type: "scale",
+    question: "Pensez-vous pouvoir appliquer les connaissances acquises dans votre travail ?"
+  },
+  {
+    id: "commentaires",
+    type: "textarea",
+    question: "Commentaires supplémentaires :",
+    placeholder: "Vos commentaires ici"
   }
-]
+];
 
-export default function HotSurvey() {
-  const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [answers, setAnswers] = useState({})
+const HotSurvey: React.FC = () => {
+  const [currentQuestion, setCurrentQuestion] = useState<number>(0);
+  const [answers, setAnswers] = useState<Record<string, string | number>>({});
+  const [submitted, setSubmitted] = useState<boolean>(false);
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1)
+      setCurrentQuestion(currentQuestion + 1);
     }
-  }
+  };
 
   const handlePrevious = () => {
     if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1)
+      setCurrentQuestion(currentQuestion - 1);
     }
-  }
+  };
 
-  const handleAnswer = (answer) => {
-    setAnswers({ ...answers, [questions[currentQuestion].id]: answer })
-  }
+  const handleAnswer = (answer: string | number) => {
+    setAnswers({ ...answers, [questions[currentQuestion].id]: answer });
+  };
+
+  const isLastQuestion = currentQuestion === questions.length - 1;
+
+  const validateAnswers = (): boolean => {
+    return questions.every(q => answers[q.id] !== undefined && answers[q.id] !== "");
+  };
 
   const handleSubmit = () => {
-    console.log('Survey submitted:', answers)
-    // Here you would typically send the answers to your backend
+    if (validateAnswers()) {
+      console.log("Submitting answers:", answers);
+      setSubmitted(true);
+    } else {
+      alert("Veuillez répondre à toutes les questions avant de soumettre.");
+    }
+  };
+
+  const progress = ((currentQuestion + 1) / questions.length) * 100;
+
+  if (submitted) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-rose-400 via-orange-300 to-pink-500 animate-gradient-x"></div>
+        <div className="relative z-10 bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-8 border border-gray-200 text-center">
+          <Check className="w-16 h-16 text-green-600 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Merci pour votre participation !</h2>
+          <p className="text-gray-600">Vos réponses ont été enregistrées avec succès.</p>
+        </div>
+      </div>
+    );
   }
 
-  const progress = ((currentQuestion + 1) / questions.length) * 100
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex flex-col justify-between">
-      <div className="flex-grow flex items-center justify-center p-4 sm:p-6 md:p-8">
-        <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
-          <AnimatePresence mode="wait">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-rose-400 via-orange-300 to-pink-500 animate-gradient-x"></div>
+      <div className="relative w-full max-w-7xl mx-auto px-4 py-8 flex flex-col flex-grow z-10">
+        <div className="mb-8">
+          <svg className="w-12 h-12 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <div className="flex-grow flex flex-col items-center justify-center">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-3xl font-bold text-white mb-8 text-center"
+          >
+            Questionnaire de satisfaction à chaud - Formation
+          </motion.h1>
+          <div className="w-full max-w-lg lg:max-w-xl xl:max-w-xl 2xl:max-w-xl">
             <motion.div
-              key={currentQuestion}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-4 sm:space-y-6"
+              className="h-2 bg-white/30 rounded-full mb-8 overflow-hidden"
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 0.5 }}
             >
-              <div className="space-y-1 sm:space-y-2 text-center">
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight">{questions[currentQuestion].question}</h2>
-                <p className="text-xs sm:text-sm text-white text-opacity-80">Question {currentQuestion + 1} sur {questions.length}</p>
-              </div>
-              <div className="space-y-2 sm:space-y-3">
-                {questions[currentQuestion].type === 'radio' && (
-                  <RadioGroup
-                    value={answers[questions[currentQuestion].id] || ''}
-                    onValueChange={handleAnswer}
-                    className="space-y-1.5 sm:space-y-2"
-                  >
-                    {questions[currentQuestion].options.map((option) => (
-                      <div key={option} className="flex items-center space-x-2 bg-white bg-opacity-20 rounded-md p-1.5 sm:p-2 transition-colors hover:bg-opacity-30">
-                        <RadioGroupItem value={option} id={option} className="border-white text-white" />
-                        <Label htmlFor={option} className="text-white text-xs sm:text-sm font-medium cursor-pointer">{option}</Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                )}
-                {questions[currentQuestion].type === 'textarea' && (
-                  <Textarea
-                    value={answers[questions[currentQuestion].id] || ''}
+              <motion.div
+                className="h-full bg-white rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </motion.div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentQuestion}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-8 border border-gray-200"
+              >
+                <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                  {questions[currentQuestion].question}
+                </h2>
+                {questions[currentQuestion].type === "text" && (
+                  <input
+                    type="text"
+                    value={answers[questions[currentQuestion].id] as string || ""}
                     onChange={(e) => handleAnswer(e.target.value)}
-                    className="w-full bg-white bg-opacity-20 border-0 text-white text-sm sm:text-base placeholder-white placeholder-opacity-60 focus:ring-2 focus:ring-white py-1.5 sm:py-2"
-                    placeholder="Tapez votre réponse ici"
-                    rows={4}
+                    placeholder={questions[currentQuestion].placeholder}
+                    className="w-full p-4 rounded-lg bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
                   />
                 )}
-              </div>
-            </motion.div>
-          </AnimatePresence>
-          <div className="mt-4 sm:mt-6 flex justify-between items-center">
-            <Button 
-              onClick={handlePrevious} 
-              disabled={currentQuestion === 0} 
-              variant="outline" 
-              className="border-white text-white hover:bg-white hover:bg-opacity-20 rounded-full p-1 sm:p-1.5"
-            >
-              <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="sr-only">Précédent</span>
-            </Button>
-            {currentQuestion < questions.length - 1 ? (
-              <Button 
-                onClick={handleNext} 
-                className="bg-white text-purple-600 hover:bg-opacity-90 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold"
+                {questions[currentQuestion].type === "scale" && (
+                  <div className="flex justify-between items-center">
+                    {[1, 2, 3, 4, 5].map((value) => (
+                      <motion.button
+                        key={value}
+                        onClick={() => handleAnswer(value)}
+                        className={`w-12 h-12 rounded-full text-lg font-semibold transition-all duration-200 ${
+                          answers[questions[currentQuestion].id] === value
+                            ? "bg-orange-400 text-white"
+                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                        }`}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        {value}
+                      </motion.button>
+                    ))}
+                  </div>
+                )}
+                {questions[currentQuestion].type === "textarea" && (
+                  <textarea
+                    value={answers[questions[currentQuestion].id] as string || ""}
+                    onChange={(e) => handleAnswer(e.target.value)}
+                    placeholder={questions[currentQuestion].placeholder}
+                    className="w-full p-4 rounded-lg bg-gray-50 text-gray-800 resize-none h-32 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
+                  />
+                )}
+              </motion.div>
+            </AnimatePresence>
+            <div className="flex justify-between mt-8">
+              <motion.button
+                onClick={handlePrevious}
+                disabled={currentQuestion === 0}
+                className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-md text-gray-600 hover:bg-gray-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
               >
-                Suivant
-                <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
-              </Button>
-            ) : (
-              <Button 
-                onClick={handleSubmit} 
-                className="bg-white text-purple-600 hover:bg-opacity-90 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold"
-              >
-                Soumettre
-                <Send className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
-              </Button>
-            )}
+                <ChevronLeft className="w-6 h-6" />
+              </motion.button>
+              {isLastQuestion ? (
+                <motion.button
+                  onClick={handleSubmit}
+                  className="flex items-center justify-center px-6 h-12 rounded-full bg-orange-400 shadow-md text-white hover:bg-orange-500 transition-all duration-200"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Valider et envoyer
+                </motion.button>
+              ) : (
+                <motion.button
+                  onClick={handleNext}
+                  className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-400 shadow-md text-white hover:bg-orange-500 transition-all duration-200"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </motion.button>
+              )}
+            </div>
           </div>
         </div>
       </div>
-      <div className="w-full h-0.5 bg-white bg-opacity-20">
-        <motion.div
-          className="h-full bg-white"
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.5 }}
-        />
-      </div>
     </div>
-  )
-}
+  );
+};
+
+export default HotSurvey;

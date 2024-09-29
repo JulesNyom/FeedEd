@@ -1,5 +1,5 @@
 import React from 'react'
-import Dashboard from '@/components/shared/dashboard/Dashboard'
+import Dashboard from '@/components/shared/Dashboard'
 
 const page = () => {
 
