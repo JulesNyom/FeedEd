@@ -63,7 +63,7 @@ export default function Component() {
           <SearchIcon className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
           <Input
             type="text"
-            placeholder="Rechercher des formations..."
+            placeholder="Rechercher une formation..."
             className="pl-8 w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

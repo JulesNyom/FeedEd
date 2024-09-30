@@ -40,8 +40,8 @@ export function TrainingProgramForm({
 
   useEffect(() => {
     if (editingProgram) {
-      const { id, status, ...rest } = editingProgram;
-      setFormData(rest);
+      const { name, students, startDate, endDate } = editingProgram;
+      setFormData({ name, students, startDate, endDate });
     } else {
       setFormData({
         name: "",
@@ -87,7 +87,7 @@ export function TrainingProgramForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="students">Nombre d'étudiants</Label>
+            <Label htmlFor="students">Nombre d&apos;étudiants</Label>
             <Input
               id="students"
               name="students"
@@ -121,7 +121,8 @@ export function TrainingProgramForm({
           </div>
           <Button
             type="submit"
-            className="w-full bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700">
+            className="w-full bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700"
+          >
             {editingProgram
               ? "Mettre à jour le programme"
               : "Ajouter le programme"}

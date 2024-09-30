@@ -26,13 +26,15 @@ interface TrainingProgram {
   endDate: string
 }
 
+type StatusFilterType = "all" | TrainingProgram["status"]
+
 export default function ProgramTable() {
   const [programs, setPrograms] = useState<TrainingProgram[]>([])
   const [filteredPrograms, setFilteredPrograms] = useState<TrainingProgram[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingProgram, setEditingProgram] = useState<TrainingProgram | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState<"all" | "A venir" | "En cours" | "Terminé">("all")
+  const [statusFilter, setStatusFilter] = useState<StatusFilterType>("all")
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -155,7 +157,7 @@ export default function ProgramTable() {
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
           <Input
             type="text"
-            placeholder="Rechercher des formations..."
+            placeholder="Rechercher une formation..."
             className="pl-8 w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -164,7 +166,7 @@ export default function ProgramTable() {
         <div className="flex space-x-2 w-fit sm:w-auto">
           <Select
             value={statusFilter}
-            onValueChange={(value: any) => setStatusFilter(value)}
+            onValueChange={(value: StatusFilterType) => setStatusFilter(value)}
           >
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Filtrer par statut" />
