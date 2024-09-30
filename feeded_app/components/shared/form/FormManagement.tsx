@@ -59,7 +59,7 @@ export default function Component() {
         transition={{ delay: 0.4, duration: 0.5 }}
         className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4"
       >
-        <div className="relative w-full sm:w-auto">
+        <div className="relative w-full">
           <SearchIcon className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
           <Input
             type="text"

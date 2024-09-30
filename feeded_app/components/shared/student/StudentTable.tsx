@@ -1,5 +1,8 @@
-import React, { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
+"use client"
+
+import React, { useState, useMemo } from "react"
+import { motion } from "framer-motion"
+import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -7,28 +10,27 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Edit, Trash2, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { motion } from "framer-motion";
+} from "@/components/ui/table"
+import { Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
 
 interface Student {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  programId: string;
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  programId: string
 }
 
 interface TrainingProgram {
-  id: string;
-  name: string;
+  id: string
+  name: string
 }
 
 interface StudentTableProps {
-  students: Student[];
-  programs: TrainingProgram[];
-  onEdit: (student: Student) => void;
-  onDelete: (id: string, programId: string) => void;
+  students: Student[]
+  programs: TrainingProgram[]
+  onEdit: (student: Student) => void
+  onDelete: (id: string, programId: string) => void
 }
 
 export default function StudentTable({
@@ -37,40 +39,40 @@ export default function StudentTable({
   onEdit,
   onDelete,
 }: StudentTableProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const studentsPerPage = 5;
+  const [currentPage, setCurrentPage] = useState(1)
+  const studentsPerPage = 5
 
   const { currentStudents, totalPages } = useMemo(() => {
-    const indexOfLastStudent = currentPage * studentsPerPage;
-    const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+    const indexOfLastStudent = currentPage * studentsPerPage
+    const indexOfFirstStudent = indexOfLastStudent - studentsPerPage
     return {
       currentStudents: students.slice(indexOfFirstStudent, indexOfLastStudent),
       totalPages: Math.ceil(students.length / studentsPerPage)
-    };
-  }, [students, currentPage, studentsPerPage]);
+    }
+  }, [students, currentPage, studentsPerPage])
 
   const handleDelete = (student: Student) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer ${student.firstName} ${student.lastName} ?`)) {
-      onDelete(student.id, student.programId);
+      onDelete(student.id, student.programId)
     }
-  };
+  }
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className="space-y-4"
     >
-      <div className="overflow-x-auto border rounded-lg">
+      <div className="rounded-lg border overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Prénom</TableHead>
-              <TableHead>Nom</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Formation</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="font-semibold">Prénom</TableHead>
+              <TableHead className="font-semibold">Nom</TableHead>
+              <TableHead className="font-semibold">Email</TableHead>
+              <TableHead className="font-semibold">Formation</TableHead>
+              <TableHead className="font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -89,9 +91,10 @@ export default function StudentTable({
                         variant="outline"
                         size="sm"
                         onClick={() => onEdit(student)}
-                        title="Modifier l'étudiant"
+                        className="h-8 w-8 p-0"
                       >
                         <Edit className="h-4 w-4" />
+                        <span className="sr-only">Modifier l&apos;étudiant</span>
                       </Button>
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -99,9 +102,10 @@ export default function StudentTable({
                         variant="outline"
                         size="sm"
                         onClick={() => handleDelete(student)}
-                        title="Supprimer l'étudiant"
+                        className="h-8 w-8 p-0"
                       >
                         <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Supprimer l&apos;étudiant</span>
                       </Button>
                     </motion.div>
                   </div>
@@ -113,8 +117,8 @@ export default function StudentTable({
       </div>
       {totalPages > 1 && (
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
           className="flex flex-wrap justify-center items-center mt-4 space-x-2"
         >
@@ -125,7 +129,7 @@ export default function StudentTable({
               disabled={currentPage === 1}
               className={`${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''} mb-2 sm:mb-0`}
             >
-              <ChevronLeftIcon className="h-4 w-4 mr-2" />
+              <ChevronLeft className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Précédente</span>
               <span className="sm:hidden">Préc</span>
             </Button>
@@ -152,11 +156,11 @@ export default function StudentTable({
             >
               <span className="hidden sm:inline">Suivante</span>
               <span className="sm:hidden">Suiv</span>
-              <ChevronRightIcon className="h-4 w-4 ml-2" />
+              <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           </motion.div>
         </motion.div>
       )}
     </motion.div>
-  );
+  )
 }
