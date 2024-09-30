@@ -8,15 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2 } from "lucide-react";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { Edit, Trash2, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface Student {
   id: string;
@@ -63,8 +56,13 @@ export default function StudentTable({
   };
 
   return (
-    <>
-      <div className="overflow-x-auto">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-4"
+    >
+      <div className="overflow-x-auto border rounded-lg">
         <Table>
           <TableHeader>
             <TableRow>
@@ -86,22 +84,26 @@ export default function StudentTable({
                 </TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onEdit(student)}
-                      title="Modifier l'étudiant"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(student)}
-                      title="Supprimer l'étudiant"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onEdit(student)}
+                        title="Modifier l'étudiant"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDelete(student)}
+                        title="Supprimer l'étudiant"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </motion.div>
                   </div>
                 </TableCell>
               </TableRow>
@@ -110,36 +112,51 @@ export default function StudentTable({
         </Table>
       </div>
       {totalPages > 1 && (
-        <Pagination className="mt-4">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="flex flex-wrap justify-center items-center mt-4 space-x-2"
+        >
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              variant="outline"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className={`${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''} mb-2 sm:mb-0`}
+            >
+              <ChevronLeftIcon className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Précédente</span>
+              <span className="sm:hidden">Préc</span>
+            </Button>
+          </motion.div>
+          <div className="flex flex-wrap justify-center space-x-2 mb-2 sm:mb-0">
             {[...Array(totalPages)].map((_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
+              <motion.div key={i} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  variant={currentPage === i + 1 ? "default" : "outline"}
                   onClick={() => setCurrentPage(i + 1)}
-                  isActive={currentPage === i + 1}>
+                  className="w-8 h-8 mb-2 sm:mb-0"
+                >
                   {i + 1}
-                </PaginationLink>
-              </PaginationItem>
+                </Button>
+              </motion.div>
             ))}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                className={
-                  currentPage === totalPages ? "pointer-events-none opacity-50" : ""
-                }
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+          </div>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              variant="outline"
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className={`${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''} mb-2 sm:mb-0`}
+            >
+              <span className="hidden sm:inline">Suivante</span>
+              <span className="sm:hidden">Suiv</span>
+              <ChevronRightIcon className="h-4 w-4 ml-2" />
+            </Button>
+          </motion.div>
+        </motion.div>
       )}
-    </>
+    </motion.div>
   );
 }
