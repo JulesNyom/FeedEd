@@ -91,7 +91,7 @@ export default function SignUp(): JSX.Element {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-white text-center">
                 <h2 className="text-4xl font-bold mb-4">Bienvenue</h2>
-                <p className="text-xl mx-10">Rejoignez FeedEd et simplifiez l'évaluation de vos formations.</p>
+                <p className="text-xl mx-10">Rejoignez FeedEd et simplifiez l&apos;évaluation de vos formations.</p>
               </div>
             </div>
           </div>
@@ -116,7 +116,7 @@ export default function SignUp(): JSX.Element {
               )}
               <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="first-name">Nom d'utilisateur</Label>
+                    <Label htmlFor="first-name">Nom d&apos;utilisateur</Label>
                     <Input 
                       id="first-name" 
                       placeholder="Pierre Laroche" 
