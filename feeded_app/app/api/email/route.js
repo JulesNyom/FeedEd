@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 import Mailjet from 'node-mailjet';
+import admin from 'firebase-admin';
+import { getFirestore } from 'firebase-admin/firestore';
 
-let admin;
 let db;
 
 try {
-  admin = require('firebase-admin');
-  const { getFirestore } = require('firebase-admin/firestore');
-  
   if (!admin.apps.length) {
     admin.initializeApp({
       credential: admin.credential.cert({

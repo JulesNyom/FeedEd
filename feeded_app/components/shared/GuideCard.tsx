@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { PlayCircle } from "lucide-react"
+import Link from "next/link"
 
 export default function DiscoverFeedEdCard() {
   return (
@@ -63,9 +64,11 @@ export default function DiscoverFeedEdCard() {
             whileTap={{ scale: 0.95 }}
             className="w-full"
           >
+            <Link href="/guide">
             <Button className="w-full text-sm font-semibold bg-[#f8d254] text-black hover:scale-100 shadow-md" size="sm">
               Voir le guide
             </Button>
+            </Link>
           </motion.div>
         </CardFooter>
       </Card>
