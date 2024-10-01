@@ -1,10 +1,9 @@
-"use client"
+'use client'
 
 import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import {
   Popover,
   PopoverContent,
@@ -15,13 +14,13 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 
 const mockSurveys = [
-  { id: 1, formation: "Formation en Développement Web", apprenants: 25, reponsesChaud: 20, reponsesFroid: 18, statutChaud: "Envoyé", statutFroid: "Envoyé" },
-  { id: 2, formation: "Gestion de Projet Agile", apprenants: 30, reponsesChaud: 28, reponsesFroid: 25, statutChaud: "Envoyé", statutFroid: "Non envoyé" },
-  { id: 3, formation: "Marketing Digital", apprenants: 20, reponsesChaud: 18, reponsesFroid: 15, statutChaud: "Envoyé", statutFroid: "Envoyé" },
-  { id: 4, formation: "Intelligence Artificielle", apprenants: 15, reponsesChaud: 14, reponsesFroid: 12, statutChaud: "Non envoyé", statutFroid: "Non envoyé" },
-  { id: 5, formation: "Cybersécurité", apprenants: 22, reponsesChaud: 20, reponsesFroid: 19, statutChaud: "Envoyé", statutFroid: "Envoyé" },
-  { id: 6, formation: "Design UX/UI", apprenants: 18, reponsesChaud: 16, reponsesFroid: 14, statutChaud: "Envoyé", statutFroid: "Non envoyé" },
-  { id: 7, formation: "Data Science", apprenants: 28, reponsesChaud: 25, reponsesFroid: 22, statutChaud: "Envoyé", statutFroid: "Envoyé" },
+  { id: 1, formation: "Formation en Développement Web", apprenants: 25, reponsesChaud: { envoye: 20, enAttente: 3, relance: 2 }, reponsesFroid: { envoye: 18, enAttente: 5, relance: 2 } },
+  { id: 2, formation: "Gestion de Projet Agile", apprenants: 30, reponsesChaud: { envoye: 28, enAttente: 1, relance: 1 }, reponsesFroid: { envoye: 25, enAttente: 3, relance: 2 } },
+  { id: 3, formation: "Marketing Digital", apprenants: 20, reponsesChaud: { envoye: 18, enAttente: 1, relance: 1 }, reponsesFroid: { envoye: 15, enAttente: 3, relance: 2 } },
+  { id: 4, formation: "Intelligence Artificielle", apprenants: 15, reponsesChaud: { envoye: 14, enAttente: 1, relance: 0 }, reponsesFroid: { envoye: 12, enAttente: 2, relance: 1 } },
+  { id: 5, formation: "Cybersécurité", apprenants: 22, reponsesChaud: { envoye: 20, enAttente: 1, relance: 1 }, reponsesFroid: { envoye: 19, enAttente: 2, relance: 1 } },
+  { id: 6, formation: "Design UX/UI", apprenants: 18, reponsesChaud: { envoye: 16, enAttente: 1, relance: 1 }, reponsesFroid: { envoye: 14, enAttente: 3, relance: 1 } },
+  { id: 7, formation: "Data Science", apprenants: 28, reponsesChaud: { envoye: 25, enAttente: 2, relance: 1 }, reponsesFroid: { envoye: 22, enAttente: 4, relance: 2 } },
 ]
 
 export default function Component() {
@@ -38,6 +37,30 @@ export default function Component() {
   const endIndex = startIndex + itemsPerPage
   const currentSurveys = filteredSurveys.slice(startIndex, endIndex)
 
+  const ResponseDetails = ({ responses, title }) => (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="w-fit p-4 space-y-2"
+    >
+      <div className="space-y-2">
+        <div className="flex justify-between items-center bg-green-100 dark:bg-green-900 p-2 rounded">
+          <div className="text-sm">Envoyé :</div>
+          <div className="text-sm font-semibold">{responses.envoye}</div>
+        </div>
+        <div className="flex justify-between items-center bg-yellow-100 dark:bg-yellow-900 p-2 rounded">
+          <div className="text-sm">En attente :</div>
+          <div className="text-sm font-semibold">{responses.enAttente}</div>
+        </div>
+        <div className="flex justify-between items-center bg-red-100 dark:bg-red-900 p-2 rounded">
+          <div className="text-sm">Relancé :</div>
+          <div className="text-sm font-semibold">{responses.relance}</div>
+        </div>
+      </div>
+    </motion.div>
+  )
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -51,7 +74,7 @@ export default function Component() {
         transition={{ delay: 0.2, duration: 0.5 }}
         className="text-xl sm:text-2xl font-bold mb-4"
       >
-        Gestion des Enquêtes
+        Gestion des enquêtes
       </motion.h1>
       <motion.div
         initial={{ y: 20, opacity: 0 }}
@@ -100,62 +123,51 @@ export default function Component() {
           <TableHeader>
             <TableRow>
               <TableHead className="min-w-[200px]">Formation</TableHead>
-              <TableHead>Apprenants</TableHead>
-              <TableHead className="min-w-[100px]">Statut</TableHead>
-              <TableHead>Réponses à chaud</TableHead>
-              <TableHead>Réponses à froid</TableHead>
+              <TableHead className="text-center">Apprenants</TableHead>
+              <TableHead className="text-center">Réponses à chaud</TableHead>
+              <TableHead className="text-center">Réponses à froid</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {currentSurveys.map((survey) => (
               <TableRow key={survey.id}>
                 <TableCell className="font-medium">{survey.formation}</TableCell>
-                <TableCell>
-                  <div className="flex items-center">
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center">
                     <UsersIcon className="h-4 w-4 mr-2 text-gray-500" />
                     {survey.apprenants}
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="text-center">
                   <Popover>
                     <PopoverTrigger asChild>
-                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="inline-block">
                         <Button variant="outline" size="sm" className="w-[100px]">
-                          Voir statut
+                          Voir détails
                           <ChevronDownIcon className="h-4 w-4 ml-2" />
                         </Button>
                       </motion.div>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[280px] p-0">
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="p-4 space-y-2"
-                      >
-                        <h4 className="font-semibold text-sm mb-2">Statut des enquêtes</h4>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="flex items-center space-x-2">
-                            <FlameIcon className="h-4 w-4 text-orange-500" />
-                            <span className="text-sm">À chaud</span>
-                          </div>
-                          <Badge variant={survey.statutChaud === "Envoyé" ? "secondary" : "destructive"} className="justify-center">
-                            {survey.statutChaud}
-                          </Badge>
-                          <div className="flex items-center space-x-2">
-                            <SnowflakeIcon className="h-4 w-4 text-blue-500" />
-                            <span className="text-sm">À froid</span>
-                          </div>
-                          <Badge variant={survey.statutFroid === "Envoyé" ? "secondary" : "destructive"} className="justify-center">
-                            {survey.statutFroid}
-                          </Badge>
-                        </div>
-                      </motion.div>
+                    <PopoverContent className="w-fit p-0">
+                      <ResponseDetails responses={survey.reponsesChaud} title="Réponses à chaud" />
                     </PopoverContent>
                   </Popover>
                 </TableCell>
-                <TableCell>{survey.reponsesChaud}</TableCell>
-                <TableCell>{survey.reponsesFroid}</TableCell>
+                <TableCell className="text-center">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="inline-block">
+                        <Button variant="outline" size="sm" className="w-[100px]">
+                          Voir détails
+                          <ChevronDownIcon className="h-4 w-4 ml-2" />
+                        </Button>
+                      </motion.div>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-fit p-0">
+                      <ResponseDetails responses={survey.reponsesFroid} title="Réponses à froid" />
+                    </PopoverContent>
+                  </Popover>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
