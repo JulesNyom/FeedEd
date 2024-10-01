@@ -1,24 +1,33 @@
 "use client"
 
 import React, { useState } from 'react';
+import { auth } from '@/firebase';
 
 const EmailSender = () => {
   const [status, setStatus] = useState('');
 
   const sendEmail = async () => {
     setStatus('Sending...');
-    try {
-      const response = await fetch('/api/email', {
-        method: 'POST',
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setStatus('Email sent successfully!');
-      } else {
-        setStatus(`Failed to send email: ${data.error}`);
+    const user = auth.currentUser;
+    if (user) {
+      try {
+        const response = await fetch('/api/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: user.uid }),
+        });
+        const data = await response.json();
+        console.log(data);
+        setStatus(data.message || 'Email sent successfully');
+      } catch (error) {
+        console.error('Error sending email:', error);
+        setStatus('Failed to send email');
       }
-    } catch (error) {
-      setStatus(`Error: ${error.message}`);
+    } else {
+      console.error('No user is signed in.');
+      setStatus('No user is signed in');
     }
   };
 

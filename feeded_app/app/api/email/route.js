@@ -1,16 +1,56 @@
 import { NextResponse } from 'next/server';
 import Mailjet from 'node-mailjet';
 
-export async function POST() {
-  console.log('MJ_APIKEY_PUBLIC:', process.env.MJ_APIKEY_PUBLIC);
-  console.log('MJ_APIKEY_PRIVATE:', process.env.MJ_APIKEY_PRIVATE);
+let admin;
+let db;
+
+try {
+  admin = require('firebase-admin');
+  const { getFirestore } = require('firebase-admin/firestore');
+  
+  if (!admin.apps.length) {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      }),
+    });
+  }
+  
+  db = getFirestore();
+} catch (error) {
+  console.error('Failed to initialize Firebase Admin:', error);
+}
+
+export async function POST(req) {
+  if (!db) {
+    console.error('Firebase not initialized');
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 
   if (!process.env.MJ_APIKEY_PUBLIC || !process.env.MJ_APIKEY_PRIVATE) {
     console.error('Mailjet API keys are missing');
-    return NextResponse.json({ error: 'Mailjet API keys are missing' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   try {
+    const { userId } = await req.json();
+
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
+
+    // Fetch user data from Firestore
+    const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      return NextResponse.json({ error: 'User data not found' }, { status: 404 });
+    }
+
+    const userData = userDoc.data();
+    const userEmail = userData.email;
+    const userName = userData.displayName || 'User';
+
     const mailjet = new Mailjet({
       apiKey: process.env.MJ_APIKEY_PUBLIC,
       apiSecret: process.env.MJ_APIKEY_PRIVATE
@@ -22,8 +62,8 @@ export async function POST() {
         "Messages":[
           {
             "From": {
-              "Email": "julesnyom@gmail.com",
-              "Name": "Jules Nyom"
+              "Email": userEmail,
+              "Name": userName
             },
             "To": [
               {
@@ -40,7 +80,7 @@ export async function POST() {
 
     return NextResponse.json({ message: 'Email sent successfully', result: result.body });
   } catch (err) {
-    console.error('Mailjet Error:', err);
-    return NextResponse.json({ error: 'Failed to send email', details: err.message }, { status: 500 });
+    console.error('Error:', err);
+    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
   }
 }

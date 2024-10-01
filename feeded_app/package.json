@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-checkbox": "^1.1.1",
@@ -29,6 +30,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "firebase": "^10.13.1",
+    "firebase-admin": "^12.6.0",
     "framer-motion": "^11.5.4",
     "lucide-react": "^0.438.0",
     "next": "^14.2.12",
