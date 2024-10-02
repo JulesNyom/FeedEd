@@ -58,7 +58,7 @@ const AnimatedSection: React.FC<AnimatedSectionProps> = ({ children, className }
   )
 }
 
-export default function FeedEdGuide() {
+export default function UserGuide() {
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function FeedEdGuide() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-background">
       <motion.main
         className="container mx-auto px-4 py-12"
         initial="hidden"
@@ -74,38 +74,24 @@ export default function FeedEdGuide() {
         variants={containerVariants}
       >
         <AnimatedSection className="max-w-3xl mx-auto text-center mb-12">
-          <motion.div 
-            className="flex items-center justify-center space-x-2 mb-4"
-            variants={itemVariants}
-          >
-            <BookOpen className="h-12 w-12 text-blue-600" />
-            <motion.h1 
-              className="text-4xl font-bold text-gray-800"
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-            >
-              FeedEd
-            </motion.h1>
-          </motion.div>
           <motion.h2 
-            className="text-3xl font-bold text-gray-800 mb-4"
+            className="text-3xl font-bold text-foreground mb-4"
             variants={itemVariants}
           >
             Guide d&lsquo;utilisation
           </motion.h2>
           <motion.p 
-            className="text-xl text-gray-600"
+            className="text-xl text-muted-foreground"
             variants={itemVariants}
           >
-            FeedEd est votre solution intuitive pour collecter et gérer les retours d&lsquo;expérience de vos formations. 
+            Votre solution intuitive pour collecter et gérer les retours d&lsquo;expérience de vos formations. 
             Simplifiez votre processus de feedback et améliorez la qualité de vos formations.
           </motion.p>
         </AnimatedSection>
 
         <AnimatedSection className="mb-16">
           <motion.h3
-            className="text-2xl font-semibold text-gray-800 mb-8 text-center"
+            className="text-2xl font-semibold text-foreground mb-8 text-center"
             variants={itemVariants}
           >
             Comment ça marche
@@ -116,21 +102,21 @@ export default function FeedEdGuide() {
           >
             {[
               {
-                icon: <BookOpen className="h-12 w-12 text-blue-600 mb-4" />,
+                icon: <BookOpen className="h-12 w-12 text-primary mb-4" />,
                 title: "Créer une formation",
                 description: "Configurez facilement votre nouvelle formation avec tous les détails nécessaires.",
                 points: ["Titre et description", "Dates et durée", "Objectifs d'apprentissage"]
               },
               {
-                icon: <Users className="h-12 w-12 text-blue-600 mb-4" />,
+                icon: <Users className="h-12 w-12 text-primary mb-4" />,
                 title: "Ajouter des apprenants",
                 description: "Gérez votre liste d'apprenants en quelques clics.",
                 points: ["Importation en masse", "Ajout manuel", "Gestion des groupes"]
               },
               {
-                icon: <Mail className="h-12 w-12 text-blue-600 mb-4" />,
+                icon: <Mail className="h-12 w-12 text-primary mb-4" />,
                 title: "Envoi automatique des emails",
-                description: "Laissez FeedEd s'occuper de l'envoi des demandes de feedback.",
+                description: "Laissez-nous nous occuper de l'envoi des demandes de feedback.",
                 points: ["Personnalisation des emails", "Planification des envois", "Suivi des réponses"]
               }
             ].map((step, index) => (
@@ -149,9 +135,9 @@ export default function FeedEdGuide() {
                     >
                       {step.icon}
                     </motion.div>
-                    <h4 className="text-xl font-semibold text-gray-800 mb-2">{index + 1}. {step.title}</h4>
-                    <p className="text-gray-600 mb-4">{step.description}</p>
-                    <ul className="text-left text-gray-600">
+                    <h4 className="text-xl font-semibold text-foreground mb-2">{index + 1}. {step.title}</h4>
+                    <p className="text-muted-foreground mb-4">{step.description}</p>
+                    <ul className="text-left text-muted-foreground">
                       {step.points.map((point, i) => (
                         <motion.li
                           key={i}
@@ -160,7 +146,7 @@ export default function FeedEdGuide() {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 1 + index * 0.2 + i * 0.1 }}
                         >
-                          <ChevronRight className="h-4 w-4 text-blue-600 mr-2" />
+                          <ChevronRight className="h-4 w-4 text-primary mr-2" />
                           {point}
                         </motion.li>
                       ))}
@@ -174,7 +160,7 @@ export default function FeedEdGuide() {
 
         <AnimatedSection className="max-w-2xl mx-auto mb-16">
           <motion.h3 
-            className="text-2xl font-semibold text-gray-800 mb-8 text-center"
+            className="text-2xl font-semibold text-foreground mb-8 text-center"
             variants={itemVariants}
           >
             Foire Aux Questions
@@ -184,23 +170,23 @@ export default function FeedEdGuide() {
               {[
                 {
                   question: "Combien de formations puis-je créer ?",
-                  answer: "Vous pouvez créer un nombre illimité de formations avec FeedEd. Notre plateforme est conçue pour s'adapter à vos besoins, que vous ayez une seule formation ou des centaines."
+                  answer: "Vous pouvez créer un nombre illimité de formations. Notre plateforme est conçue pour s'adapter à vos besoins, que vous ayez une seule formation ou des centaines."
                 },
                 {
                   question: "Les apprenants peuvent-ils répondre de manière anonyme ?",
-                  answer: "Oui, FeedEd offre l'option de collecter des retours anonymes. Vous pouvez configurer chaque formation pour permettre des réponses anonymes, encourageant ainsi des feedbacks plus honnêtes et détaillés."
+                  answer: "Oui, nous offrons l'option de collecter des retours anonymes. Vous pouvez configurer chaque formation pour permettre des réponses anonymes, encourageant ainsi des feedbacks plus honnêtes et détaillés."
                 },
                 {
                   question: "Puis-je personnaliser les questions de feedback ?",
-                  answer: "Absolument ! FeedEd vous permet de créer des questionnaires sur mesure pour chaque formation. Vous pouvez ajouter des questions à choix multiples, des échelles de notation, et des champs de texte libre pour obtenir exactement les informations dont vous avez besoin."
+                  answer: "Absolument ! Vous pouvez créer des questionnaires sur mesure pour chaque formation. Vous pouvez ajouter des questions à choix multiples, des échelles de notation, et des champs de texte libre pour obtenir exactement les informations dont vous avez besoin."
                 },
                 {
                   question: "Comment puis-je analyser les résultats ?",
-                  answer: "FeedEd propose des outils d'analyse intégrés qui vous permettent de visualiser les tendances, de comparer les résultats entre les formations, et d&lsquo;exporter des rapports détaillés. Vous pouvez facilement identifier les points forts et les axes d'amélioration de vos formations."
+                  answer: "Nous proposons des outils d'analyse intégrés qui vous permettent de visualiser les tendances, de comparer les résultats entre les formations, et d&lsquo;exporter des rapports détaillés. Vous pouvez facilement identifier les points forts et les axes d'amélioration de vos formations."
                 }
               ].map((item, index) => (
                 <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left text-gray-800 hover:text-blue-600">
+                  <AccordionTrigger className="text-left text-foreground hover:text-primary">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -209,7 +195,7 @@ export default function FeedEdGuide() {
                       {item.question}
                     </motion.div>
                   </AccordionTrigger>
-                  <AccordionContent className="text-gray-600">
+                  <AccordionContent className="text-muted-foreground">
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -225,15 +211,15 @@ export default function FeedEdGuide() {
         </AnimatedSection>
       </motion.main>
 
-      <footer className="bg-gray-100 py-6">
-        <div className="container mx-auto px-4 text-center text-gray-600">
+      <footer className="bg-muted py-6">
+        <div className="container mx-auto px-4 text-center text-muted-foreground">
           <motion.p 
             className="mb-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            &copy; 2024 FeedEd. Tous droits réservés.
+            &copy; 2024 Tous droits réservés.
           </motion.p>
           <motion.div 
             className="space-x-4"
@@ -241,8 +227,8 @@ export default function FeedEdGuide() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
           >
-            <Link href="/mentions-legales" className="hover:text-blue-600 transition-colors duration-300">Mentions légales</Link>
-            <Link href="/politique-de-confidentialite" className="hover:text-blue-600 transition-colors duration-300">Politique de confidentialité</Link>
+            <Link href="/mentions-legales" className="hover:text-primary transition-colors duration-300">Mentions légales</Link>
+            <Link href="/politique-de-confidentialite" className="hover:text-primary transition-colors duration-300">Politique de confidentialité</Link>
           </motion.div>
         </div>
       </footer>
