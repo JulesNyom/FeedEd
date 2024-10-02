@@ -4,7 +4,6 @@ import Footer from "@/components/shared//landing/Footer";
 import HeroSection from "@/components/shared/landing/HeroSection";
 import QuestionSection from "@/components/shared/landing/QuestionSection";
 import React from "react";
-import EmailSender from "@/components/shared/test-email";
 
 const Page = () => {
   return (
@@ -19,7 +18,6 @@ const Page = () => {
       <div className="bg-[#11253e] w-full max-w-[calc(100%-6rem)] mb-10 rounded-3xl border shadow-md overflow-hidden flex flex-col items-center justify-center">
         <CTASection />
         <Footer />
-        <EmailSender />
       </div>
     </div>
   );

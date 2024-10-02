@@ -16,7 +16,7 @@ import {
   UserSquare2,
   ClipboardList,
 } from "lucide-react"
-import ProSubscriptionCard from "./GuideCard"
+import ProSubscriptionCard from "./Guide/GuideCard"
 
 const navItems = [
   { href: "/admin", icon: Home, label: "Dashboard" },

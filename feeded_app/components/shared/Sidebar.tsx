@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 import { SidebarNav } from "./SidebarNav"
-import   AdvertisementCard   from "./GuideCard"
+import   AdvertisementCard   from "./Guide/GuideCard"
 import { motion } from "framer-motion"
 
 export function Sidebar() {
