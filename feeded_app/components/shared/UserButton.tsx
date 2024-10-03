@@ -60,7 +60,11 @@ const UserButton = () => {
               Tableau de bord
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>Aide</DropdownMenuItem>
+          <DropdownMenuItem>
+          <Link href="/contact">
+          Contact
+          </Link>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>
             Déconnexion

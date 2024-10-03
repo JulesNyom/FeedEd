@@ -17,6 +17,7 @@ export default function Header() {
   const navItems = [
     { name: "Accueil", href: "/" },
     { name: "Fonctionnalités", href: "/guide" },
+    { name: "Contact", href: "/contact" }
   ]
 
   const linkVariants = {
@@ -46,7 +47,7 @@ export default function Header() {
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Link href="/" className="flex-shrink-0 transition-transform hover:scale-105">
+            <Link href="/" className="transition-transform hover:scale-105">
               <Image
                 src="/assets/icons/feeded.svg"
                 alt="Logo"
@@ -57,7 +58,7 @@ export default function Header() {
             </Link>
           </motion.div>
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-6">
+            <div className="flex 2xl:mr-24 lg:space-x-6 items-baseline">
               {navItems.map((item, index) => (
                 <motion.div
                   key={item.name}
@@ -85,14 +86,14 @@ export default function Header() {
               <>
                 <motion.div variants={buttonVariants} initial="initial" animate="animate" whileHover="hover">
                   <Link href="/signup">
-                    <Button className="bg-background text-foreground border-2 border-primary hover:bg-primary hover:text-background transition-colors duration-300" variant="outline">
+                    <Button className="rounded-2xl bg-card text-sm font-bold text-foreground border border-foreground/15 transition-transform hover:scale-105 hover:bg-card" variant="outline">
                       Inscription
                     </Button>
                   </Link>
                 </motion.div>
                 <motion.div variants={buttonVariants} initial="initial" animate="animate" whileHover="hover">
                   <Link href="/login">
-                    <Button className="bg-primary text-background hover:bg-background hover:text-primary border-2 border-primary transition-colors duration-300">
+                    <Button className="rounded-2xl mr-2 bg-gradient-to-br from-purple-500 to-indigo-600 font-bold text-secondary text-sm transition-transform hover:scale-105">
                       Connexion
                     </Button>
                   </Link>

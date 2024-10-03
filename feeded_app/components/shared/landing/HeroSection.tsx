@@ -32,7 +32,7 @@ export default function HeroSection() {
                 <Link href="/login">
             <Button 
               size="lg" 
-              className="rounded-2xl bg-card text-base font-bold text-foreground border border-foreground/15 hover:scale-105 hover:bg-card"
+              className="rounded-2xl bg-card text-base font-bold text-foreground border border-foreground/15 transition-transform hover:scale-105 hover:bg-card"
             >
               Connexion
             </Button>
@@ -64,7 +64,7 @@ export default function HeroSection() {
               <div>
                 <p className="font-semibold text-gray-900">Ultra Rapide</p>
                 <p className="text-sm text-gray-500">
-                  Enquêtes prêtes à l'emploi
+                  Enquêtes prêtes à l&lsquo;emploi
                 </p>
               </div>
             </div>

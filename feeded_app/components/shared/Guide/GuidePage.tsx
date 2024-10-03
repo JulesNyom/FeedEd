@@ -75,7 +75,7 @@ export default function UserGuide() {
       >
         <AnimatedSection className="max-w-3xl mx-auto text-center mb-12">
           <motion.h2 
-            className="text-3xl font-bold text-foreground mb-4"
+            className="text-3xl sm:text-4xl font-bold text-center mb-6 text-foreground"
             variants={itemVariants}
           >
             Guide d&lsquo;utilisation
