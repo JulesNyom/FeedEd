@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react"
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore'
+import { collection, getDocs, doc, updateDoc, increment } from 'firebase/firestore'
 import { db, auth } from '@/firebase'
 
 export type ResponseData = {
@@ -36,6 +36,7 @@ export const useSurveyManagement = () => {
   const [error, setError] = useState<string | null>(null)
   const itemsPerPage = 5
 
+  // Function to fetch programs from Firestore
   const fetchPrograms = async () => {
     const user = auth.currentUser
     if (!user) {
@@ -48,7 +49,7 @@ export const useSurveyManagement = () => {
       const programsCollection = collection(db, `users/${user.uid}/programs`)
       const programSnapshot = await getDocs(programsCollection)
       const programList = await Promise.all(programSnapshot.docs.map(async (doc) => {
-        const programData = doc.data() as Omit<Program, 'id' | 'students' | 'reponsesChaud' | 'reponsesFroid'>
+        const programData = doc.data() as Omit<Program, 'id' | 'students'>
         const studentsCollection = collection(db, `users/${user.uid}/programs/${doc.id}/students`)
         const studentSnapshot = await getDocs(studentsCollection)
         const students = studentSnapshot.docs.map(studentDoc => ({
@@ -56,12 +57,13 @@ export const useSurveyManagement = () => {
           ...studentDoc.data()
         })) as Student[]
         
+        // Include the survey response data from Firestore
         return {
           id: doc.id,
           ...programData,
           students,
-          reponsesChaud: { envoye: 0, enAttente: 0, relance: 0 },
-          reponsesFroid: { envoye: 0, enAttente: 0, relance: 0 },
+          reponsesChaud: programData.reponsesChaud || { envoye: 0, enAttente: 0, relance: 0 },
+          reponsesFroid: programData.reponsesFroid || { envoye: 0, enAttente: 0, relance: 0 },
         }
       }))
       
@@ -79,6 +81,7 @@ export const useSurveyManagement = () => {
     }
   }
 
+  // Function to send survey email and update counts
   const sendSurveyEmail = async (studentData: Student, programName: string, programId: string, type: 'hot' | 'cold') => {
     try {
       const response = await fetch('/api/email', {
@@ -107,13 +110,41 @@ export const useSurveyManagement = () => {
       }
 
       console.log(`Email sent to ${studentData.email} for program ${programName} (${type})`)
+      
+      // Update survey counts in Firestore
+      await updateSurveyCounts(programId, type, 'envoye');
+      
       return await response.json();
     } catch (error) {
       console.error('Error sending email:', error);
+      
+      // Update pending count in case of failure
+      await updateSurveyCounts(programId, type, 'enAttente');
+      
       throw error;
     }
   };
 
+  // Function to update survey counts in Firestore
+  const updateSurveyCounts = async (programId: string, type: 'hot' | 'cold', field: 'envoye' | 'enAttente' | 'relance') => {
+    const user = auth.currentUser
+    if (!user) {
+      console.error("No authenticated user found")
+      return
+    }
+
+    const programDocRef = doc(db, `users/${user.uid}/programs`, programId)
+    try {
+      await updateDoc(programDocRef, {
+        [`reponses${type === 'hot' ? 'Chaud' : 'Froid'}.${field}`]: increment(1)
+      })
+      console.log(`Updated ${type} survey ${field} count for program ${programId}`)
+    } catch (error) {
+      console.error(`Error updating ${type} survey ${field} count for program ${programId}:`, error)
+    }
+  }
+
+  // Function to update student email status
   const updateStudentEmailStatus = async (programId: string, studentId: string, type: 'hot' | 'cold') => {
     const user = auth.currentUser
     if (!user) {
@@ -132,6 +163,7 @@ export const useSurveyManagement = () => {
     }
   }
 
+  // Function to send hot surveys
   const sendHotSurveys = useCallback(async (programId: string) => {
     const program = programs.find(p => p.id === programId)
     if (!program) {
@@ -157,6 +189,7 @@ export const useSurveyManagement = () => {
     setPrograms(prevPrograms => prevPrograms.map(p => p.id === programId ? updatedProgram : p))
   }, [programs])
 
+  // Function to send cold surveys
   const sendColdSurveys = useCallback(async (programId: string) => {
     const program = programs.find(p => p.id === programId)
     if (!program) {
@@ -182,6 +215,7 @@ export const useSurveyManagement = () => {
     setPrograms(prevPrograms => prevPrograms.map(p => p.id === programId ? updatedProgram : p))
   }, [programs])
 
+  // Effect to fetch programs on component mount
   useEffect(() => {
     const fetchProgramsData = async () => {
       setIsLoading(true)
@@ -193,14 +227,24 @@ export const useSurveyManagement = () => {
     fetchProgramsData()
   }, [])
 
+  // Filter programs based on search term
   const filteredPrograms = programs.filter(program =>
     program.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  // Calculate pagination
   const totalPages = Math.ceil(filteredPrograms.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const currentPrograms = filteredPrograms.slice(startIndex, endIndex)
+
+  // Function to refresh programs data
+  const refreshPrograms = async () => {
+    setIsLoading(true)
+    const fetchedPrograms = await fetchPrograms()
+    setPrograms(fetchedPrograms)
+    setIsLoading(false)
+  }
 
   return {
     programs: currentPrograms,
@@ -213,5 +257,6 @@ export const useSurveyManagement = () => {
     totalPages,
     sendHotSurveys,
     sendColdSurveys,
+    refreshPrograms, // Expose the refresh function for manual updates
   }
 }

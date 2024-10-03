@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   Popover,
   PopoverContent,
@@ -24,22 +25,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Switch } from "@/components/ui/switch";
 import {
   SearchIcon,
   UsersIcon,
   FlameIcon,
   SnowflakeIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   ChevronDownIcon,
   SendIcon,
 } from "lucide-react";
 import {
   useSurveyManagement,
-  ResponseData,
   Program,
-} from "@/lib/surveyManagement";
+} from "@/lib/useSurveyManagement";
+
+export type ResponseData = {
+  envoye: number;
+  relance: number;
+}
 
 const ResponseDetails: React.FC<{
   responsesChaud: ResponseData;
@@ -90,10 +92,6 @@ const ResponseDetails: React.FC<{
               <div className="text-sm">Envoyé :</div>
               <div className="text-sm font-semibold">{responses.envoye}</div>
             </div>
-            <div className="flex justify-between items-center bg-yellow-100 dark:bg-yellow-900 p-2 rounded">
-              <div className="text-sm">En attente :</div>
-              <div className="text-sm font-semibold">{responses.enAttente}</div>
-            </div>
             <div className="flex justify-between items-center bg-red-100 dark:bg-red-900 p-2 rounded">
               <div className="text-sm">Relancé :</div>
               <div className="text-sm font-semibold">{responses.relance}</div>
@@ -110,11 +108,8 @@ export default function SurveyManagement() {
     programs,
     searchTerm,
     setSearchTerm,
-    currentPage,
-    setCurrentPage,
     isLoading,
     error,
-    totalPages,
     sendHotSurveys,
     sendColdSurveys,
   } = useSurveyManagement();
@@ -288,59 +283,6 @@ export default function SurveyManagement() {
           </TableBody>
         </Table>
       </motion.div>
-      {totalPages > 1 && (
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          className="flex flex-wrap justify-center items-center mt-4 space-x-2">
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={`${
-                currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-              } mb-2 sm:mb-0`}>
-              <ChevronLeftIcon className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Précédente</span>
-              <span className="sm:hidden">Préc</span>
-            </Button>
-          </motion.div>
-          <div className="flex flex-wrap justify-center space-x-2 mb-2 sm:mb-0">
-            {[...Array(totalPages)].map((_, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}>
-                <Button
-                  variant={currentPage === i + 1 ? "default" : "outline"}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className="w-8 h-8 mb-2 sm:mb-0">
-                  {i + 1}
-                </Button>
-              </motion.div>
-            ))}
-          </div>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              variant="outline"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-              className={`${
-                currentPage === totalPages
-                  ? "opacity-50 cursor-not-allowed"
-                  : ""
-              } mb-2 sm:mb-0`}>
-              <span className="hidden sm:inline">Suivante</span>
-              <span className="sm:hidden">Suiv</span>
-              <ChevronRightIcon className="h-4 w-4 ml-2" />
-            </Button>
-          </motion.div>
-        </motion.div>
-      )}
     </motion.div>
   );
 }
