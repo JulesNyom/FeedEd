@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
   Table,
@@ -18,6 +19,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
+import {
   SearchIcon,
   UsersIcon,
   FlameIcon,
@@ -25,6 +33,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronDownIcon,
+  SendIcon,
 } from "lucide-react";
 import {
   useSurveyManagement,
@@ -32,32 +41,69 @@ import {
   Program,
 } from "@/lib/surveyManagement";
 
-const ResponseDetails: React.FC<{ responses: ResponseData; title: string }> = ({
-  responses,
-  title,
-}) => (
-  <motion.div
-    initial={{ opacity: 0, y: -10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.2 }}
-    className="w-fit p-4 space-y-2">
-    <h3 className="font-semibold mb-2">{title}</h3>
-    <div className="space-y-2">
-      <div className="flex justify-between items-center bg-green-100 dark:bg-green-900 p-2 rounded">
-        <div className="text-sm">Envoyé :</div>
-        <div className="text-sm font-semibold">{responses.envoye}</div>
+const ResponseDetails: React.FC<{
+  responsesChaud: ResponseData;
+  reponsesFroid: ResponseData;
+}> = ({ responsesChaud, reponsesFroid }) => {
+  const [showChaud, setShowChaud] = useState(true);
+
+  const responses = showChaud ? responsesChaud : reponsesFroid;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="w-fit p-4 space-y-4">
+      <div className="flex items-center justify-between space-x-4">
+        <span
+          className={`text-sm font-medium ${
+            showChaud ? "text-orange-500" : "text-gray-500"
+          }`}>
+          À chaud
+        </span>
+        <Switch
+          checked={!showChaud}
+          onCheckedChange={() => setShowChaud(!showChaud)}
+          className="data-[state=checked]:bg-blue-500"
+        />
+        <span
+          className={`text-sm font-medium ${
+            !showChaud ? "text-blue-500" : "text-gray-500"
+          }`}>
+          À froid
+        </span>
       </div>
-      <div className="flex justify-between items-center bg-yellow-100 dark:bg-yellow-900 p-2 rounded">
-        <div className="text-sm">En attente :</div>
-        <div className="text-sm font-semibold">{responses.enAttente}</div>
-      </div>
-      <div className="flex justify-between items-center bg-red-100 dark:bg-red-900 p-2 rounded">
-        <div className="text-sm">Relancé :</div>
-        <div className="text-sm font-semibold">{responses.relance}</div>
-      </div>
-    </div>
-  </motion.div>
-);
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={showChaud ? "chaud" : "froid"}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.2 }}
+          className="space-y-2">
+          <h3 className="font-semibold mb-2">
+            {showChaud ? "Réponses à chaud" : "Réponses à froid"}
+          </h3>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center bg-green-100 dark:bg-green-900 p-2 rounded">
+              <div className="text-sm">Envoyé :</div>
+              <div className="text-sm font-semibold">{responses.envoye}</div>
+            </div>
+            <div className="flex justify-between items-center bg-yellow-100 dark:bg-yellow-900 p-2 rounded">
+              <div className="text-sm">En attente :</div>
+              <div className="text-sm font-semibold">{responses.enAttente}</div>
+            </div>
+            <div className="flex justify-between items-center bg-red-100 dark:bg-red-900 p-2 rounded">
+              <div className="text-sm">Relancé :</div>
+              <div className="text-sm font-semibold">{responses.relance}</div>
+            </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </motion.div>
+  );
+};
 
 export default function SurveyManagement() {
   const {
@@ -69,7 +115,29 @@ export default function SurveyManagement() {
     isLoading,
     error,
     totalPages,
+    sendHotSurveys,
+    sendColdSurveys,
   } = useSurveyManagement();
+
+  const [sendingSurvey, setSendingSurvey] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+  const handleSendSurvey = async (programId: string, type: "hot" | "cold") => {
+    setSendingSurvey((prev) => ({ ...prev, [programId]: true }));
+    try {
+      if (type === "hot") {
+        await sendHotSurveys(programId);
+      } else {
+        await sendColdSurveys(programId);
+      }
+      console.log(`Sent ${type} survey for program ${programId}`);
+    } catch (error) {
+      console.error(`Error sending ${type} survey for program ${programId}:`, error);
+    } finally {
+      setSendingSurvey((prev) => ({ ...prev, [programId]: false }));
+    }
+  };
 
   if (isLoading) {
     return <div className="text-center mt-8">Loading...</div>;
@@ -142,8 +210,8 @@ export default function SurveyManagement() {
             <TableRow>
               <TableHead className="min-w-[200px]">Formation</TableHead>
               <TableHead className="text-center">Apprenants</TableHead>
-              <TableHead className="text-center">Réponses à chaud</TableHead>
-              <TableHead className="text-center">Réponses à froid</TableHead>
+              <TableHead className="text-center">Réponses</TableHead>
+              <TableHead className="text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -166,23 +234,23 @@ export default function SurveyManagement() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-[100px]">
-                          Voir détails
-                          <ChevronDownIcon className="h-4 w-4 ml-2" />
+                          className="flex items-center justify-center ">
+                          <span className="mr-2">Voir détails</span>
+                          <ChevronDownIcon className="h-4 w-4" />
                         </Button>
                       </motion.div>
                     </PopoverTrigger>
                     <PopoverContent className="w-fit p-0">
                       <ResponseDetails
-                        responses={program.reponsesChaud}
-                        title="Réponses à chaud"
+                        responsesChaud={program.reponsesChaud}
+                        reponsesFroid={program.reponsesFroid}
                       />
                     </PopoverContent>
                   </Popover>
                 </TableCell>
                 <TableCell className="text-center">
-                  <Popover>
-                    <PopoverTrigger asChild>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                       <motion.div
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -190,19 +258,30 @@ export default function SurveyManagement() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-[100px]">
-                          Voir détails
-                          <ChevronDownIcon className="h-4 w-4 ml-2" />
+                          className=""
+                          disabled={sendingSurvey[program.id]}>
+                          Envoyer
+                          {sendingSurvey[program.id] ? (
+                            <span className="animate-spin ml-2">⏳</span>
+                          ) : (
+                            <SendIcon className="h-4 w-4 ml-2" />
+                          )}
                         </Button>
                       </motion.div>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-fit p-0">
-                      <ResponseDetails
-                        responses={program.reponsesFroid}
-                        title="Réponses à froid"
-                      />
-                    </PopoverContent>
-                  </Popover>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => handleSendSurvey(program.id, "hot")}>
+                        <FlameIcon className="h-4 w-4 mr-2 text-orange-500" />
+                        <span>Enquête à chaud</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleSendSurvey(program.id, "cold")}>
+                        <SnowflakeIcon className="h-4 w-4 mr-2 text-blue-500" />
+                        <span>Enquête à froid</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { collection, getDocs, doc, updateDoc } from 'firebase/firestore'
 import { db, auth } from '@/firebase'
 
@@ -81,7 +81,7 @@ export const useSurveyManagement = () => {
 
   const sendSurveyEmail = async (studentData: Student, programName: string, programId: string, type: 'hot' | 'cold') => {
     try {
-      const response = await fetch('/api/emailSurvey', {
+      const response = await fetch('/api/email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -132,72 +132,65 @@ export const useSurveyManagement = () => {
     }
   }
 
-  const sendProgramEmails = async (program: Program) => {
-    console.log(`Processing program: ${program.name}, Status: ${program.status}, End Date: ${program.endDate}`)
-    
-    const currentDate = new Date()
-    const endDate = new Date(program.endDate)
-    const daysSinceEnd = Math.floor((currentDate.getTime() - endDate.getTime()) / (1000 * 60 * 60 * 24))
-    
-    console.log(`Days since end: ${daysSinceEnd}`)
+  const sendHotSurveys = useCallback(async (programId: string) => {
+    const program = programs.find(p => p.id === programId)
+    if (!program) {
+      console.error(`Program with id ${programId} not found`)
+      return
+    }
 
-    if (program.status === "Terminé" && daysSinceEnd >= 1) {
-      console.log(`Sending hot survey emails for program: ${program.name}`)
-      for (const student of program.students) {
-        if (!student.hotEmailSent) {
-          try {
-            await sendSurveyEmail(student, program.name, program.id, 'hot')
-            await updateStudentEmailStatus(program.id, student.id, 'hot')
-            program.reponsesChaud.envoye++
-            student.hotEmailSent = true
-          } catch (error) {
-            console.error(`Failed to send hot survey email to ${student.email}:`, error)
-            program.reponsesChaud.enAttente++
-          }
-        } else {
-          console.log(`Hot email already sent to ${student.email}`)
+    const updatedProgram = { ...program }
+    for (const student of updatedProgram.students) {
+      if (!student.hotEmailSent) {
+        try {
+          await sendSurveyEmail(student, updatedProgram.name, updatedProgram.id, 'hot')
+          await updateStudentEmailStatus(updatedProgram.id, student.id, 'hot')
+          updatedProgram.reponsesChaud.envoye++
+          student.hotEmailSent = true
+        } catch (error) {
+          console.error(`Failed to send hot survey email to ${student.email}:`, error)
+          updatedProgram.reponsesChaud.enAttente++
         }
       }
     }
 
-    const programDuration = Math.floor((endDate.getTime() - new Date(program.startDate).getTime()) / (1000 * 60 * 60 * 24))
-    console.log(`Program duration: ${programDuration} days`)
-    
-    if (programDuration > 60 && daysSinceEnd >= 90) {
-      console.log(`Sending cold survey emails for program: ${program.name}`)
-      for (const student of program.students) {
-        if (!student.coldEmailSent) {
-          try {
-            await sendSurveyEmail(student, program.name, program.id, 'cold')
-            await updateStudentEmailStatus(program.id, student.id, 'cold')
-            program.reponsesFroid.envoye++
-            student.coldEmailSent = true
-          } catch (error) {
-            console.error(`Failed to send cold survey email to ${student.email}:`, error)
-            program.reponsesFroid.enAttente++
-          }
-        } else {
-          console.log(`Cold email already sent to ${student.email}`)
+    setPrograms(prevPrograms => prevPrograms.map(p => p.id === programId ? updatedProgram : p))
+  }, [programs])
+
+  const sendColdSurveys = useCallback(async (programId: string) => {
+    const program = programs.find(p => p.id === programId)
+    if (!program) {
+      console.error(`Program with id ${programId} not found`)
+      return
+    }
+
+    const updatedProgram = { ...program }
+    for (const student of updatedProgram.students) {
+      if (!student.coldEmailSent) {
+        try {
+          await sendSurveyEmail(student, updatedProgram.name, updatedProgram.id, 'cold')
+          await updateStudentEmailStatus(updatedProgram.id, student.id, 'cold')
+          updatedProgram.reponsesFroid.envoye++
+          student.coldEmailSent = true
+        } catch (error) {
+          console.error(`Failed to send cold survey email to ${student.email}:`, error)
+          updatedProgram.reponsesFroid.enAttente++
         }
       }
     }
 
-    return program
-  }
+    setPrograms(prevPrograms => prevPrograms.map(p => p.id === programId ? updatedProgram : p))
+  }, [programs])
 
   useEffect(() => {
-    const fetchProgramsAndSendEmails = async () => {
+    const fetchProgramsData = async () => {
       setIsLoading(true)
       const fetchedPrograms = await fetchPrograms()
-      if (fetchedPrograms.length > 0) {
-        const updatedPrograms = await Promise.all(fetchedPrograms.map(sendProgramEmails))
-        console.log("Updated programs after sending emails:", updatedPrograms)
-        setPrograms(updatedPrograms)
-      }
+      setPrograms(fetchedPrograms)
       setIsLoading(false)
     }
 
-    fetchProgramsAndSendEmails()
+    fetchProgramsData()
   }, [])
 
   const filteredPrograms = programs.filter(program =>
@@ -218,5 +211,7 @@ export const useSurveyManagement = () => {
     isLoading,
     error,
     totalPages,
+    sendHotSurveys,
+    sendColdSurveys,
   }
 }
