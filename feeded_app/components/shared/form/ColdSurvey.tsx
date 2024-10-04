@@ -155,11 +155,7 @@ const ColdSurvey: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-500 to-indigo-400 animate-gradient-x"></div>
       <div className="relative w-full max-w-7xl mx-auto px-4 py-8 flex flex-col flex-grow z-10">
         <div className="mb-8">
-          <svg className="w-12 h-12 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+        <p className="text-background text-sm font-semibold mt-5">En partenariat avec FeedEd</p>
         </div>
         <div className="flex-grow flex flex-col items-center justify-center">
           <motion.h1
@@ -168,7 +164,7 @@ const ColdSurvey: React.FC = () => {
             transition={{ duration: 0.5 }}
             className="text-3xl font-bold text-white mb-8 text-center"
           >
-            Questionnaire de satisfaction à froid - 3 mois après la formation
+            Questionnaire de satisfaction - 3 mois après votre formation
           </motion.h1>
           <div className="w-full max-w-lg lg:max-w-xl xl:max-w-xl 2xl:max-w-xl">
             <motion.div
