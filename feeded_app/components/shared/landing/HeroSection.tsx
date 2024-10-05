@@ -1,20 +1,47 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Mail, CheckCircle } from "lucide-react"
 import { motion } from 'framer-motion'
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { toast } from "@/hooks/use-toast"
+import { db } from '@/firebase' // Import db from your Firebase file
+import { collection, addDoc } from 'firebase/firestore'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 export default function VerticalHero() {
-  const [scrollY, setScrollY] = useState(0)
+  const [email, setEmail] = useState("")
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY)
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      // Add email to Firestore
+      await addDoc(collection(db, "launching"), {
+        email: email,
+        timestamp: new Date()
+      })
+      
+      setIsDialogOpen(true) // Open the dialog
+      setEmail("")
+    } catch (error) {
+      console.error("Error adding document: ", error)
+      toast({
+        title: "Une erreur s'est produite",
+        description: "Veuillez réessayer plus tard.",
+        variant: "destructive"
+      })
+    }
+  }
 
   return (
     <section className="text-gray-900 min-h-screen flex flex-col justify-between">
@@ -28,7 +55,7 @@ export default function VerticalHero() {
             FeedEd arrive bientôt
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto">
-            Préparez-vous à transformer vos formations avec des retours d&lsquo;expérience puissants. Sublimez vos formations, un retour à la fois.
+            Préparez-vous à transformer vos formations avec des retours d&apos;expérience puissants. Sublimez vos formations, un retour à la fois.
           </p>
         </motion.div>
 
@@ -48,31 +75,58 @@ export default function VerticalHero() {
           <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent rounded-lg"></div>
         </motion.div>
 
-        <motion.div 
-          className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
+        <motion.form 
+          onSubmit={handleSubmit}
+          className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full max-w-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.8 }}
         >
-          <Button asChild size="lg" className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 transition-all duration-300">
-            <Link href="/signup">
-              Être notifié au lancement
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
+          <Input
+            type="email"
+            placeholder="Votre adresse e-mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="flex-grow"
+          />
+          <Button type="submit" className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 transition-all duration-300">
+            Être notifié
+            <Mail className="ml-2 w-5 h-5" />
           </Button>
+        </motion.form>
+
+        <motion.div 
+          className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+        >
           <Button asChild size="lg" variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-50 transition-colors duration-300">
             <Link href="/guide">
               En savoir plus
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </Button>
         </motion.div>
       </div>
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-20px); }
-        }
-      `}</style>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle className="w-6 h-6 text-green-500" />
+              Merci pour votre inscription !
+            </DialogTitle>
+            <DialogDescription>
+              Votre adresse e-mail a bien été enregistrée. Nous vous tiendrons informé du lancement de FeedEd.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end">
+            <Button onClick={() => setIsDialogOpen(false)}>Fermer</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }
