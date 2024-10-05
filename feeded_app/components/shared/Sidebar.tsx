@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 import { SidebarNav } from "./SidebarNav"
-import   AdvertisementCard   from "./Guide/GuideCard"
+import   GuideCard  from "./Guide/GuideCard"
 import { motion } from "framer-motion"
 
 export function Sidebar() {
@@ -46,7 +46,7 @@ export function Sidebar() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
         >
-          <AdvertisementCard />
+          <GuideCard />
         </motion.div>
       </div>
     </motion.div>

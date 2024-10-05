@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { features } from "@/lib"
+import Image from "next/image"
 
 export default function SurveyFeatures() {
   return (
@@ -11,17 +12,19 @@ export default function SurveyFeatures() {
             Collectez des feedbacks formation en un éclair
           </h2>
           <p className="mt-4 text-xl text-gray-500 max-w-3xl mx-auto">
-            FeedEd simplifie chaque étape : de la création à l'analyse de vos enquêtes de satisfaction, en un temps record.
+            FeedEd simplifie chaque étape : de la création à l&lsquo;analyse de vos enquêtes de satisfaction, en un temps record.
           </p>
         </div>
         <div className="grid gap-12 lg:grid-cols-3">
           {features.map((feature, index) => (
             <Card key={index} className="overflow-hidden transition-all duration-300 hover:shadow-xl">
               <div className="aspect-video relative">
-                <img
+                <Image
                   src={feature.image}
                   alt={feature.title}
                   className="object-cover w-full h-full"
+                  width={500}
+                  height={300}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
                   <Badge variant="secondary" className="text-sm font-medium">

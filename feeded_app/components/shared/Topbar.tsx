@@ -16,7 +16,7 @@ import {
   UserSquare2,
   ClipboardList,
 } from "lucide-react"
-import ProSubscriptionCard from "./Guide/GuideCard"
+import GuideCard from "./Guide/GuideCard"
 
 const navItems = [
   { href: "/admin", icon: Home, label: "Dashboard" },
@@ -37,7 +37,7 @@ export function Topbar(): JSX.Element {
             <span className="sr-only">Toggle navigation menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="flex w-[300px] flex-col p-0">
+        <SheetContent side="left" className="flex w-[300px] min-h-screen flex-col p-0">
           <div className="border-b px-6 py-2">
             <Link href="/" className="flex items-center gap-2">
               <Image
@@ -50,6 +50,7 @@ export function Topbar(): JSX.Element {
               />
             </Link>
           </div>
+          <div className="flex flex-col min-h-screen">
           <nav className="grid gap-2 p-4 text-sm font-medium">
             {navItems.map((item) => {
               const isActive = pathname === item.href
@@ -89,8 +90,9 @@ export function Topbar(): JSX.Element {
               )
             })}
           </nav>
-          <div className="mt-auto p-4">
-            <ProSubscriptionCard />
+          <div className="mt-auto mb-24 p-6">
+          <GuideCard />
+          </div>
           </div>
         </SheetContent>
       </Sheet>

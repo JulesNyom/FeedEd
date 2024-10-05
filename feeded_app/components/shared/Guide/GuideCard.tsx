@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { PlayCircle } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
-export default function DiscoverFeedEdCard() {
+export default function GuideCard () {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -19,10 +20,12 @@ export default function DiscoverFeedEdCard() {
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 300 }}
         >
-          <img
-            src="https://images.pexels.com/photos/7516363/pexels-photo-7516363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+          <Image
+            src="/assets/images/guide.webp"
             alt="Découvrez FeedEd"
             className="w-full h-[140px] object-cover"
+            width={280}
+            height={140}
           />
           <motion.div 
             className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"

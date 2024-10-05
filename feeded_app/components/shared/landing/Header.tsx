@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Menu } from "lucide-react"
+import { Menu, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import Link from "next/link"
@@ -111,6 +111,27 @@ export default function Header() {
               </SheetTrigger>
               <SheetContent side="right" className="w-[240px] sm:w-[300px]">
                 <div className="flex flex-col space-y-4 mt-4">
+                {currentUser ? (
+                    <UserButton />
+                  ) : (
+                    <>
+                      <motion.div variants={buttonVariants} initial="initial" animate="animate" whileHover="hover">
+                        <Link href="/signup">
+                          <Button className="rounded-2xl mr-2 bg-gradient-to-br from-purple-500 to-indigo-600 font-bold text-secondary text-base transition-transform hover:scale-105">
+                            Inscription
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        </Link>
+                      </motion.div>
+                      <motion.div variants={buttonVariants} initial="initial" animate="animate" whileHover="hover">
+                        <Link href="/login">
+                          <Button className="rounded-2xl bg-card text-base font-bold text-foreground border border-foreground/15 transition-transform hover:scale-105 hover:bg-card">
+                            Connexion
+                          </Button>
+                        </Link>
+                      </motion.div>
+                    </>
+                  )}
                   {navItems.map((item) => (
                     <motion.div
                       key={item.name}
@@ -128,26 +149,7 @@ export default function Header() {
                       </Link>
                     </motion.div>
                   ))}
-                  {currentUser ? (
-                    <UserButton />
-                  ) : (
-                    <>
-                      <motion.div variants={buttonVariants} initial="initial" animate="animate" whileHover="hover">
-                        <Link href="/signup">
-                          <Button className="w-full bg-background text-foreground border-2 border-primary hover:bg-primary hover:text-background transition-colors duration-300" variant="outline">
-                            Inscription
-                          </Button>
-                        </Link>
-                      </motion.div>
-                      <motion.div variants={buttonVariants} initial="initial" animate="animate" whileHover="hover">
-                        <Link href="/login">
-                          <Button className="w-full bg-primary text-background hover:bg-background hover:text-primary border-2 border-primary transition-colors duration-300">
-                            Connexion
-                          </Button>
-                        </Link>
-                      </motion.div>
-                    </>
-                  )}
+                  
                 </div>
               </SheetContent>
             </Sheet>

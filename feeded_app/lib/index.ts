@@ -9,21 +9,21 @@ export const features = [
     title: "Créateur d'enquêtes intuitif",
     description: "Concevez des enquêtes de formation professionnelles en quelques minutes ou utilisez nos modèles adaptés.",
     icon: PenTool,
-    image: "https://images.pexels.com/photos/1015568/pexels-photo-1015568.jpeg?auto=compress&cs=tinysrgb&w=800",
+    image: "/assets/images/coffe.jpeg",
     badge: "Ultra rapide"
   },
   {
     title: "Analyses instantanées",
     description: "Obtenez des insights précieux sur vos formations grâce à la visualisation des données en temps réel.",
     icon: BarChart2,
-    image: "https://images.pexels.com/photos/1595385/pexels-photo-1595385.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    image: "/assets/images/reunion.webp",
     badge: "Actionnable"
   },
   {
     title: "Distribution automatisée",
     description: "Envoyez vos enquêtes au bon moment grâce aux campagnes e-mail automatisées.",
     icon: Zap,
-    image: "https://images.pexels.com/photos/3277806/pexels-photo-3277806.jpeg?auto=compress&cs=tinysrgb&w=800",
+    image: "/assets/images/duo.jpeg",
     badge: "Gain de temps"
   }
 ]
