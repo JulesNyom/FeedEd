@@ -34,7 +34,7 @@ export default function Header() {
 
   return (
     <motion.nav
-      className="bg-background"
+      className="bg-transparent"
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
