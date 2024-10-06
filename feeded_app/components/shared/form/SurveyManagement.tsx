@@ -205,7 +205,7 @@ export default function SurveyManagement() {
             <TableRow>
               <TableHead className="min-w-[200px]">Formation</TableHead>
               <TableHead className="text-center">Apprenants</TableHead>
-              <TableHead className="text-center">Réponses</TableHead>
+              <TableHead className="text-center">Statuts</TableHead>
               <TableHead className="text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>

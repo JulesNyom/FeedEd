@@ -1,20 +1,20 @@
-"use client";
+"use client"
 
 import { useState, useEffect, useRef, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Facebook,
   Twitter,
   Instagram,
   Linkedin,
   Mail,
-  Phone,
-  Clock,
 } from "lucide-react";
+import Link from "next/link";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "@/firebase";
 
 interface FadeInSectionProps {
   children: ReactNode;
@@ -54,13 +54,34 @@ const FadeInSection: React.FC<FadeInSectionProps> = ({
   );
 };
 
-export default function ContactPage() {
+export default function Component() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: ""
+  });
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = event.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [id]: value
+    }));
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Ici, vous ajouteriez la logique pour envoyer le formulaire
-    setIsSubmitted(true);
+    try {
+      // Add document to Firestore
+      await addDoc(collection(db, "contact"), formData);
+      setIsSubmitted(true);
+      // Reset form data
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      // Handle error (e.g., show error message to user)
+    }
   };
 
   return (
@@ -72,9 +93,9 @@ export default function ContactPage() {
               Contactez-nous
             </h2>
             <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">
-              Vous avez des questions sur FeedEd ? Notre équipe est là pour vous
+              Vous avez des questions sur FeedEd ? Nous sommes là pour vous
               fournir toutes les informations dont vous avez besoin sur notre
-              produit.
+              application.
             </p>
           </FadeInSection>
 
@@ -86,10 +107,10 @@ export default function ContactPage() {
                     className="bg-primary/10 border border-primary text-primary px-4 py-3 rounded-md"
                     role="alert">
                     <strong className="font-bold">
-                      Merci pour votre message !
+                      Merci pour votre message ! 
                     </strong>
                     <p className="block sm:inline">
-                      Nous vous répondrons dans les plus brefs délais.
+                      {" "}Nous vous répondrons dans les plus brefs délais.
                     </p>
                   </div>
                 ) : (
@@ -100,6 +121,8 @@ export default function ContactPage() {
                         id="name"
                         required
                         className="transition-all duration-300 focus:ring-2 focus:ring-primary"
+                        value={formData.name}
+                        onChange={handleInputChange}
                       />
                     </div>
                     <div className="space-y-2">
@@ -109,6 +132,8 @@ export default function ContactPage() {
                         type="email"
                         required
                         className="transition-all duration-300 focus:ring-2 focus:ring-primary"
+                        value={formData.email}
+                        onChange={handleInputChange}
                       />
                     </div>
                     <div className="space-y-2">
@@ -117,17 +142,13 @@ export default function ContactPage() {
                         id="message"
                         required
                         className="transition-all duration-300 focus:ring-2 focus:ring-primary"
+                        value={formData.message}
+                        onChange={handleInputChange}
                       />
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="privacy" required />
-                      <Label htmlFor="privacy">
-                        J&lsquo;accepte la politique de confidentialité
-                      </Label>
                     </div>
                     <Button
                       type="submit"
-                      className="w-full transition-all duration-300 hover:scale-105">
+                      className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 hover:scale-105 transition-all duration-300">
                       Envoyer
                     </Button>
                   </form>
@@ -139,26 +160,16 @@ export default function ContactPage() {
               <div className="space-y-8">
                 <div>
                   <h3 className="text-xl font-semibold mb-4 text-foreground">
-                    Autres moyens de nous contacter
+                    Autre moyen de nous contacter
                   </h3>
                   <ul className="space-y-4">
                     <li className="flex items-center transition-all duration-300 hover:translate-x-2">
                       <Mail className="mr-2 h-5 w-5 text-primary" />
-                      <span className="text-muted-foreground">
-                        info@feeded.com
-                      </span>
-                    </li>
-                    <li className="flex items-center transition-all duration-300 hover:translate-x-2">
-                      <Phone className="mr-2 h-5 w-5 text-primary" />
-                      <span className="text-muted-foreground">
-                        +33 1 23 45 67 89
-                      </span>
-                    </li>
-                    <li className="flex items-center transition-all duration-300 hover:translate-x-2">
-                      <Clock className="mr-2 h-5 w-5 text-primary" />
-                      <span className="text-muted-foreground">
-                        Lun-Ven, 9h-18h
-                      </span>
+                      <Link
+                        href="mailto:feeded.io@gmail.com"
+                        className="flex items-center text-muted-foreground hover:text-primary/80 transition-colors duration-300 group">
+                        feeded.io@gmail.com
+                      </Link>
                     </li>
                   </ul>
                 </div>
@@ -169,23 +180,27 @@ export default function ContactPage() {
                   <div className="flex space-x-4">
                     <a
                       href="#"
-                      className="text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110">
+                      className="text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110"
+                      aria-label="Facebook">
                       <Facebook className="h-6 w-6" />
                     </a>
                     <a
                       href="#"
-                      className="text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110">
+                      className="text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110"
+                      aria-label="Twitter">
                       <Twitter className="h-6 w-6" />
                     </a>
                     <a
                       href="#"
-                      className="text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110">
+                      className="text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110"
+                      aria-label="Instagram">
                       <Instagram className="h-6 w-6" />
                     </a>
                     <a
                       href="#"
-                      className="text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110">
-                      <Linkedin className="h-6 w-6" />
+                      className="text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110 group"
+                      aria-label="LinkedIn">
+                      <Linkedin className="h-6 w-6 transition-all duration-300 group-hover:rotate-[360deg] group-hover:text-blue-500" />
                     </a>
                   </div>
                 </div>

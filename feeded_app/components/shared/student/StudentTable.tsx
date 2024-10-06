@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
+import { Edit, Trash2, ChevronLeft, ChevronRight, Mail, CheckCircle, AlertCircle } from "lucide-react"
 
 interface Student {
   id: string
@@ -19,6 +19,7 @@ interface Student {
   lastName: string
   email: string
   programId: string
+  formStatus: "sent" | "responded" | "reminded" | "none"
 }
 
 interface TrainingProgram {
@@ -33,12 +34,7 @@ interface StudentTableProps {
   onDelete: (id: string, programId: string) => void
 }
 
-export default function StudentTable({
-  students,
-  programs,
-  onEdit,
-  onDelete,
-}: StudentTableProps) {
+export default function Component({ students, programs, onEdit, onDelete }: StudentTableProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const studentsPerPage = 5
 
@@ -57,6 +53,32 @@ export default function StudentTable({
     }
   }
 
+  const getFormStatusIcon = (status: Student["formStatus"]) => {
+    switch (status) {
+      case "sent":
+        return <Mail className="h-4 w-4 text-blue-500" />
+      case "responded":
+        return <CheckCircle className="h-4 w-4 text-green-500" />
+      case "reminded":
+        return <AlertCircle className="h-4 w-4 text-yellow-500" />
+      default:
+        return null
+    }
+  }
+
+  const getFormStatusText = (status: Student["formStatus"]) => {
+    switch (status) {
+      case "sent":
+        return "Envoyé"
+      case "responded":
+        return "Répondu"
+      case "reminded":
+        return "Rappelé"
+      default:
+        return "Non envoyé"
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -72,6 +94,7 @@ export default function StudentTable({
               <TableHead className="font-semibold">Nom</TableHead>
               <TableHead className="font-semibold">Email</TableHead>
               <TableHead className="font-semibold">Formation</TableHead>
+              <TableHead className="font-semibold">Statut du formulaire</TableHead>
               <TableHead className="font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -83,6 +106,12 @@ export default function StudentTable({
                 <TableCell>{student.email}</TableCell>
                 <TableCell>
                   {programs.find((p) => p.id === student.programId)?.name || "N/A"}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center space-x-2">
+                    {getFormStatusIcon(student.formStatus)}
+                    <span>{getFormStatusText(student.formStatus)}</span>
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
