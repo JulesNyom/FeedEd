@@ -105,7 +105,7 @@ export default function Login(): JSX.Element {
                       Mot de passe
                     </Label>
                     <Link
-                      href="/forgot-password"
+                      href="/recover"
                       className="ml-auto text-sm text-primary hover:underline"
                     >
                       Mot de passe oublié ?
@@ -149,7 +149,7 @@ export default function Login(): JSX.Element {
             </CardContent>
             <CardFooter>
               <p className="text-center text-sm text-muted-foreground w-full">
-                Vous n'avez pas de compte ?{" "}
+                Vous n&lsquo;avez pas de compte ?{" "}
                 <Link href="/signup" className="text-primary hover:underline">
                   Inscrivez-vous
                 </Link>
@@ -159,10 +159,12 @@ export default function Login(): JSX.Element {
         </div>
       </div>
       <div className="relative hidden w-0 flex-1 lg:block">
-        <img
+        <Image
           className="absolute inset-0 h-full w-full object-cover"
-          src="https://images.pexels.com/photos/2387799/pexels-photo-2387799.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+          src="/assets/images/ice.jpeg"
           alt="Students studying"
+          width={1200}
+          height={1200}
         />
         <div className="absolute inset-0 bg-gradient-to-br from-purple-700 via-pink-500 to-orange-400 mix-blend-overlay opacity-70" />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-50" />
@@ -178,7 +180,7 @@ export default function Login(): JSX.Element {
                 <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
               </svg>
               <p className="relative">
-              Vos clients les plus mécontents sont votre plus grande source d'apprentissage.
+              Vos clients les plus mécontents sont votre plus grande source d&lsquo;apprentissage.
               </p>
             </div>
             <footer className="mt-4">

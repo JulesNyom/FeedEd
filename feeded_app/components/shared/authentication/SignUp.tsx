@@ -18,6 +18,7 @@ import { doc, setDoc } from "firebase/firestore"
 import { db } from "@/firebase"
 import { User } from "firebase/auth"
 import { FcGoogle } from "react-icons/fc"
+import Image from "next/image"
 
 interface UserData {
   displayName: string
@@ -82,10 +83,11 @@ export default function SignUp(): JSX.Element {
       >
         <div className="flex flex-col md:flex-row">
           <div className="md:w-1/2 relative">
-            <img
-              src="https://images.pexels.com/photos/2102850/pexels-photo-2102850.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            <Image
+              src="/assets/images/ice2.webp"
               alt="Abstract background"
-              className="object-cover w-full h-full"
+              width={800}
+              height={1200}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-indigo-600 opacity-75" />
             <div className="absolute inset-0 flex items-center justify-center">

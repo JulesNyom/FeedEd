@@ -6,7 +6,8 @@ import {
   signInWithEmailAndPassword, 
   signOut,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  sendPasswordResetEmail // Add this import
 } from 'firebase/auth'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import React, { useContext, useState, useEffect } from 'react'
@@ -41,6 +42,11 @@ export function AuthProvider({ children }) {
         const provider = new GoogleAuthProvider()
         return signInWithPopup(auth, provider)
     }
+
+    function resetPassword(email) {
+        return sendPasswordResetEmail(auth, email)
+    }
+
     async function handleUser(user) {
         if (user) {
             const docRef = doc(db, 'users', user.uid)
@@ -86,6 +92,7 @@ export function AuthProvider({ children }) {
         logout,
         login,
         loginWithGoogle,
+        resetPassword, 
         loading
     }
 
