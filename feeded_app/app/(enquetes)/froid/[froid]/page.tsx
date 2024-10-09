@@ -3,14 +3,13 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
 
 interface Question {
   id: string;
-  type: "text" | "scale" | "textarea";
+  type: "text" | "radio" | "scale" | "textarea";
   question: string;
   placeholder?: string;
+  options?: string[];
 }
 
 const questions: Question[] = [
@@ -33,59 +32,72 @@ const questions: Question[] = [
     placeholder: "Nom de la formation"
   },
   {
-    id: "qualiteGlobale",
-    type: "scale",
-    question: "Comment évaluez-vous la qualité globale de la formation ?"
+    id: "situationProfessionnelle",
+    type: "radio",
+    question: "Quelle est votre situation professionnelle actuelle ?",
+    options: [
+      "En emploi (CDI, CDD, intérim)",
+      "En formation complémentaire",
+      "En recherche d'emploi",
+      "Autre"
+    ]
   },
   {
-    id: "objectifsClairs",
-    type: "scale",
-    question: "Les objectifs de la formation ont-ils été clairement annoncés ?"
+    id: "situationProfessionnelleAutre",
+    type: "text",
+    question: "Si 'Autre', précisez votre situation professionnelle :",
+    placeholder: "Votre situation"
   },
   {
-    id: "contenuAttentes",
-    type: "scale",
-    question: "Le contenu de la formation a-t-il répondu à vos attentes ?"
+    id: "emploiGraceFormation",
+    type: "radio",
+    question: "Si vous êtes en emploi, est-ce grâce à la formation suivie ?",
+    options: [
+      "Oui, totalement",
+      "Oui, partiellement",
+      "Non",
+      "Non applicable"
+    ]
   },
   {
-    id: "qualiteSupports",
+    id: "pertinenceConnaissances",
     type: "scale",
-    question: "Comment jugez-vous la qualité des supports pédagogiques utilisés ?"
+    question: "Les connaissances acquises lors de la formation sont pertinentes dans mon travail actuel ou ma recherche d'emploi."
   },
   {
-    id: "maitriseSujet",
+    id: "miseEnPratique",
     type: "scale",
-    question: "Le formateur maîtrisait-il le sujet ?"
+    question: "J'ai pu mettre en pratique les compétences apprises durant la formation."
   },
   {
-    id: "interactivite",
+    id: "impactSituation",
     type: "scale",
-    question: "Le formateur a-t-il su rendre la formation interactive et dynamique ?"
+    question: "La formation a eu un impact positif sur ma situation professionnelle et/ou mon employabilité."
   },
   {
-    id: "exercicesPertinents",
+    id: "confiance",
     type: "scale",
-    question: "Les exercices pratiques étaient-ils pertinents et utiles ?"
+    question: "Je me sens plus confiant(e) dans mes compétences professionnelles grâce à cette formation."
   },
   {
-    id: "organisationLogistique",
+    id: "reponseBesoins",
     type: "scale",
-    question: "Comment évaluez-vous l'organisation logistique de la formation (salle, équipements, etc.) ?"
+    question: "Avec le recul, cette formation a répondu à mes besoins professionnels."
   },
   {
-    id: "applicationConnaissances",
+    id: "recommandation",
     type: "scale",
-    question: "Pensez-vous pouvoir appliquer les connaissances acquises dans votre travail ?"
+    question: "Je recommanderais cette formation à d'autres personnes dans ma situation."
   },
   {
-    id: "commentaires",
+    id: "suggestions",
     type: "textarea",
-    question: "Commentaires supplémentaires :",
-    placeholder: "Vos commentaires ici"
+    question: "Avez-vous des suggestions pour améliorer cette formation et mieux préparer les apprenants au marché du travail ?",
+    placeholder: "Vos suggestions ici"
   }
 ];
 
-const HotSurvey: React.FC = () => {
+const ColdSurvey: React.FC = () => {
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -126,9 +138,9 @@ const HotSurvey: React.FC = () => {
   if (submitted) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-rose-400 via-orange-300 to-pink-500 animate-gradient-x"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-500 to-indigo-400 animate-gradient-x"></div>
         <div className="relative z-10 bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-8 border border-gray-200 text-center">
-          <Check className="w-16 h-16 text-green-600 mx-auto mb-4" />
+          <Check className="w-16 h-16 text-blue-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Merci pour votre participation !</h2>
           <p className="text-gray-600">Vos réponses ont été enregistrées avec succès.</p>
         </div>
@@ -136,28 +148,15 @@ const HotSurvey: React.FC = () => {
     );
   }
 
+  const currentQuestionData = questions[currentQuestion];
+
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-rose-400 via-orange-300 to-pink-500 animate-gradient-x"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-500 to-indigo-400 animate-gradient-x"></div>
       <div className="relative w-full max-w-7xl mx-auto px-4 py-8 flex flex-col flex-grow z-10">
-      <motion.div
-            className="flex items-center"
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-          <p className="text-background text-xs font-semibold mt-3">En partenariat avec</p>
-          
-            <Link href="/" className="transition-transform hover:scale-105">
-              <Image
-                src="/assets/icons/feeded.svg"
-                alt="Logo"
-                width={125}
-                height={50}
-                className="text-background"
-              />
-            </Link>
-          </motion.div>
+        <div className="mb-8">
+        <p className="text-background text-sm font-semibold mt-5">En partenariat avec FeedEd</p>
+        </div>
         <div className="flex-grow flex flex-col items-center justify-center">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
@@ -165,7 +164,7 @@ const HotSurvey: React.FC = () => {
             transition={{ duration: 0.5 }}
             className="text-3xl font-bold text-white mb-8 text-center"
           >
-            Questionnaire de satisfaction à chaud - Formation
+            Questionnaire de satisfaction - 3 mois après votre formation
           </motion.h1>
           <div className="w-full max-w-lg lg:max-w-xl xl:max-w-xl 2xl:max-w-xl">
             <motion.div
@@ -191,26 +190,42 @@ const HotSurvey: React.FC = () => {
                 className="bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-8 border border-gray-200"
               >
                 <h2 className="text-xl font-semibold text-gray-800 mb-6">
-                  {questions[currentQuestion].question}
+                  {currentQuestionData.question}
                 </h2>
-                {questions[currentQuestion].type === "text" && (
+                {currentQuestionData.type === "text" && (
                   <input
                     type="text"
-                    value={answers[questions[currentQuestion].id] as string || ""}
+                    value={answers[currentQuestionData.id] as string || ""}
                     onChange={(e) => handleAnswer(e.target.value)}
-                    placeholder={questions[currentQuestion].placeholder}
-                    className="w-full p-4 rounded-lg bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
+                    placeholder={currentQuestionData.placeholder}
+                    className="w-full p-4 rounded-lg bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
                   />
                 )}
-                {questions[currentQuestion].type === "scale" && (
+                {currentQuestionData.type === "radio" && (
+                  <div className="space-y-2">
+                    {currentQuestionData.options?.map((option) => (
+                      <label key={option} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          value={option}
+                          checked={answers[currentQuestionData.id] === option}
+                          onChange={() => handleAnswer(option)}
+                          className="form-radio text-blue-500 focus:ring-blue-400"
+                        />
+                        <span className="text-gray-700">{option}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+                {currentQuestionData.type === "scale" && (
                   <div className="flex justify-between items-center">
                     {[1, 2, 3, 4, 5].map((value) => (
                       <motion.button
                         key={value}
                         onClick={() => handleAnswer(value)}
                         className={`w-12 h-12 rounded-full text-lg font-semibold transition-all duration-200 ${
-                          answers[questions[currentQuestion].id] === value
-                            ? "bg-orange-400 text-white"
+                          answers[currentQuestionData.id] === value
+                            ? "bg-blue-500 text-white"
                             : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                         }`}
                         whileHover={{ scale: 1.1 }}
@@ -221,12 +236,12 @@ const HotSurvey: React.FC = () => {
                     ))}
                   </div>
                 )}
-                {questions[currentQuestion].type === "textarea" && (
+                {currentQuestionData.type === "textarea" && (
                   <textarea
-                    value={answers[questions[currentQuestion].id] as string || ""}
+                    value={answers[currentQuestionData.id] as string || ""}
                     onChange={(e) => handleAnswer(e.target.value)}
-                    placeholder={questions[currentQuestion].placeholder}
-                    className="w-full p-4 rounded-lg bg-gray-50 text-gray-800 resize-none h-32 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
+                    placeholder={currentQuestionData.placeholder}
+                    className="w-full p-4 rounded-lg bg-gray-50 text-gray-800 resize-none h-32 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
                   />
                 )}
               </motion.div>
@@ -244,7 +259,7 @@ const HotSurvey: React.FC = () => {
               {isLastQuestion ? (
                 <motion.button
                   onClick={handleSubmit}
-                  className="flex items-center justify-center px-6 h-12 rounded-full bg-orange-400 shadow-md text-white hover:bg-orange-500 transition-all duration-200"
+                  className="flex items-center justify-center px-6 h-12 rounded-full bg-blue-500 shadow-md text-white hover:bg-blue-600 transition-all duration-200"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -253,7 +268,7 @@ const HotSurvey: React.FC = () => {
               ) : (
                 <motion.button
                   onClick={handleNext}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-400 shadow-md text-white hover:bg-orange-500 transition-all duration-200"
+                  className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 shadow-md text-white hover:bg-blue-600 transition-all duration-200"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
@@ -268,4 +283,4 @@ const HotSurvey: React.FC = () => {
   );
 };
 
-export default HotSurvey;
+export default ColdSurvey;

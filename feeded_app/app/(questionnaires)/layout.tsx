@@ -1,5 +1,5 @@
+import AuthWrapper from "@/components/shared/AuthWrapper";
 import { Metadata } from "next";
-import AuthWrapper from "@/components/shared/AuthWrapper"; // Adjust this import path as needed
 
 export const metadata: Metadata = {
   title: "FeedEd - Questionnaires",
@@ -12,11 +12,9 @@ export default function DashboardLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <AuthWrapper>
-              {children}
-        </AuthWrapper>
-      </body>
+      <AuthWrapper>
+        <body>{children}</body>
+      </AuthWrapper>
     </html>
   );
 }

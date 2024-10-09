@@ -108,7 +108,6 @@ export default function SurveyManagement() {
     programs,
     searchTerm,
     setSearchTerm,
-    isLoading,
     error,
     sendHotSurveys,
     sendColdSurveys,
@@ -133,10 +132,6 @@ export default function SurveyManagement() {
       setSendingSurvey((prev) => ({ ...prev, [programId]: false }));
     }
   };
-
-  if (isLoading) {
-    return <div className="text-center mt-8">Loading...</div>;
-  }
 
   if (error) {
     return <div className="text-center mt-8 text-red-500">{error}</div>;
