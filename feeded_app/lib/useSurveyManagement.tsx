@@ -57,7 +57,6 @@ export const useSurveyManagement = () => {
           ...studentDoc.data()
         })) as Student[]
         
-        // Include the survey response data from Firestore
         return {
           id: doc.id,
           ...programData,
@@ -81,8 +80,27 @@ export const useSurveyManagement = () => {
     }
   }
 
-  // Function to send survey email and update counts
+  // Updated function to send survey email
   const sendSurveyEmail = async (studentData: Student, programName: string, programId: string, type: 'hot' | 'cold') => {
+    const user = auth.currentUser
+    if (!user) {
+      throw new Error("No authenticated user found")
+    }
+
+    const surveyLink = `http://localhost:3000/${type === 'hot' ? 'chaud' : 'froid'}/studentId=${studentData.id}&programId=${programId}`
+    
+    const subject = type === 'hot' 
+      ? "Merci pour votre participation et enquête de satisfaction"
+      : "Suivi de votre formation et enquête d'impact"
+
+    const textContent = type === 'hot'
+      ? `Cher(e) ${studentData.firstName} ${studentData.lastName},\n\nMerci d'avoir participé à notre programme de formation "${programName}". Nous espérons que vous avez trouvé cette expérience enrichissante.\n\nNous vous serions reconnaissants de bien vouloir prendre quelques minutes pour répondre à notre enquête de satisfaction : ${surveyLink}\n\nVotre feedback est précieux pour nous aider à améliorer nos formations.\n\nCordialement,\nL'équipe de formation`
+      : `Cher(e) ${studentData.firstName} ${studentData.lastName},\n\n90 jours se sont écoulés depuis la fin de votre formation "${programName}". Nous espérons que les compétences acquises vous sont utiles dans votre travail quotidien.\n\nNous aimerions connaître l'impact à long terme de cette formation sur votre travail. Merci de prendre quelques minutes pour répondre à notre enquête : ${surveyLink}\n\nVotre retour d'expérience est très important pour nous.\n\nCordialement,\nL'équipe de formation`
+
+    const htmlContent = type === 'hot'
+      ? `<p>Cher(e) ${studentData.firstName} ${studentData.lastName},</p><p>Merci d'avoir participé à notre programme de formation "${programName}". Nous espérons que vous avez trouvé cette expérience enrichissante.</p><p>Nous vous serions reconnaissants de bien vouloir prendre quelques minutes pour répondre à notre <a href="${surveyLink}">enquête de satisfaction</a>.</p><p>Votre feedback est précieux pour nous aider à améliorer nos formations.</p><p>Cordialement,<br>L'équipe de formation</p>`
+      : `<p>Cher(e) ${studentData.firstName} ${studentData.lastName},</p><p>90 jours se sont écoulés depuis la fin de votre formation "${programName}". Nous espérons que les compétences acquises vous sont utiles dans votre travail quotidien.</p><p>Nous aimerions connaître l'impact à long terme de cette formation sur votre travail. Merci de prendre quelques minutes pour répondre à notre <a href="${surveyLink}">enquête d'impact</a>.</p><p>Votre retour d'expérience est très important pour nous.</p><p>Cordialement,<br>L'équipe de formation</p>`
+
     try {
       const response = await fetch('/api/email', {
         method: 'POST',
@@ -90,16 +108,12 @@ export const useSurveyManagement = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: auth.currentUser?.uid,
+          userId: user.uid,
           programId: programId,
           studentId: studentData.id,
-          subject: type === 'hot' ? "Merci pour votre participation" : "Suivi de votre formation",
-          textContent: type === 'hot' 
-            ? `Cher(e) ${studentData.firstName} ${studentData.lastName},\n\nMerci d'avoir participé à notre programme de formation "${programName}". Nous espérons que vous avez trouvé cette expérience enrichissante.\n\nCordialement,\nL'équipe de formation`
-            : `Cher(e) ${studentData.firstName} ${studentData.lastName},\n\n90 jours se sont écoulés depuis la fin de votre formation "${programName}". Nous espérons que les compétences acquises vous sont utiles dans votre travail quotidien.\n\nCordialement,\nL'équipe de formation`,
-          htmlContent: type === 'hot'
-            ? `<p>Cher(e) ${studentData.firstName} ${studentData.lastName},</p><p>Merci d'avoir participé à notre programme de formation "${programName}". Nous espérons que vous avez trouvé cette expérience enrichissante.</p><p>Cordialement,<br>L'équipe de formation</p>`
-            : `<p>Cher(e) ${studentData.firstName} ${studentData.lastName},</p><p>90 jours se sont écoulés depuis la fin de votre formation "${programName}". Nous espérons que les compétences acquises vous sont utiles dans votre travail quotidien.</p><p>Cordialement,<br>L'équipe de formation</p>`,
+          subject: subject,
+          textContent: textContent,
+          htmlContent: htmlContent,
           type: type,
         }),
       });
@@ -257,6 +271,6 @@ export const useSurveyManagement = () => {
     totalPages,
     sendHotSurveys,
     sendColdSurveys,
-    refreshPrograms, // Expose the refresh function for manual updates
+    refreshPrograms,
   }
 }

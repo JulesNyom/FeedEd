@@ -18,6 +18,7 @@ interface Student {
   lastName: string;
   email: string;
   programId: string;
+  formStatus: "sent" | "responded" | "reminded" | "none";
 }
 
 interface TrainingProgram {
@@ -42,6 +43,7 @@ export default function StudentForm({
     firstName: "",
     lastName: "",
     email: "",
+    formStatus: "none",
   });
   const [selectedProgramId, setSelectedProgramId] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +54,7 @@ export default function StudentForm({
         firstName: student.firstName,
         lastName: student.lastName,
         email: student.email,
+        formStatus: student.formStatus,
       });
       setSelectedProgramId(student.programId);
     } else {
@@ -59,6 +62,7 @@ export default function StudentForm({
         firstName: "",
         lastName: "",
         email: "",
+        formStatus: "none",
       });
       setSelectedProgramId("");
     }
