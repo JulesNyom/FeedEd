@@ -87,7 +87,7 @@ export const useSurveyManagement = () => {
       throw new Error("No authenticated user found")
     }
 
-    const surveyLink = `http://localhost:3000/${type === 'hot' ? 'chaud' : 'froid'}/studentId=${studentData.id}&programId=${programId}`
+    const surveyLink = `http://localhost:3000/${type === 'hot' ? 'chaud' : 'froid'}/${programId}-${studentData.id}`
     
     const subject = type === 'hot' 
       ? "Merci pour votre participation et enquête de satisfaction"

@@ -125,25 +125,17 @@ const ColdSurvey: React.FC<ColdSurveyProps> = ({ params }) => {
         const decodedFroid = decodeURIComponent(params.froid);
         console.log("Decoded froid:", decodedFroid);
 
-        const parts = decodedFroid.split(/[-&]/);
-        console.log("Split parts:", parts);
+        const [possibleProgramId, possibleStudentId] = decodedFroid.split("-");
 
-        if (parts.length >= 2) {
-          const possibleStudentId = parts[parts.length - 1];
-          const possibleProgramId = parts[parts.length - 2];
-
-          if (possibleProgramId && possibleStudentId) {
-            setProgramId(possibleProgramId);
-            setStudentId(possibleStudentId);
-            console.log("Extracted IDs:", {
-              programId: possibleProgramId,
-              studentId: possibleStudentId,
-            });
-          } else {
-            throw new Error("Unable to extract valid IDs from URL parts");
-          }
+        if (possibleProgramId && possibleStudentId) {
+          setProgramId(possibleProgramId);
+          setStudentId(possibleStudentId);
+          console.log("Extracted IDs:", {
+            programId: possibleProgramId,
+            studentId: possibleStudentId,
+          });
         } else {
-          throw new Error("URL does not contain enough parts to extract IDs");
+          throw new Error("Unable to extract valid IDs from URL parts");
         }
       } catch (err) {
         console.error("Error parsing URL:", err);

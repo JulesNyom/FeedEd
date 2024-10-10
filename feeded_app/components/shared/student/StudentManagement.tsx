@@ -21,15 +21,23 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  query,
+  where,
 } from "firebase/firestore";
 
+// Interface definitions
 interface Student {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
   programId: string;
-  formStatus: "sent" | "responded" | "reminded" | "none";
+  formStatusHot: "sent" | "responded" | "reminded" | "none";
+  formStatusCold: "sent" | "responded" | "reminded" | "none";
+  hotEmailSent?: boolean;
+  coldEmailSent?: boolean;
+  hotEmailSentDate?: Date;
+  coldEmailSentDate?: Date;
 }
 
 interface TrainingProgram {
@@ -39,67 +47,148 @@ interface TrainingProgram {
   currentStudents: number;
 }
 
+interface Form {
+  id: string;
+  formType: "hot" | "cold";
+  studentId: string;
+  programId: string;
+  submittedAt: Date;
+  // Add other form fields as needed
+}
+
 export default function StudentManagement() {
+  // State declarations
   const [students, setStudents] = useState<Student[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [programs, setPrograms] = useState<TrainingProgram[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
+  // Effect to fetch user data on auth state change
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        fetchPrograms(user.uid);
+        fetchUserData(user.uid);
       } else {
         setStudents([]);
         setFilteredStudents([]);
         setPrograms([]);
+        setError("No authenticated user found. Please log in.");
       }
     });
 
     return () => unsubscribe();
   }, []);
 
+  // Effect to filter students when the search term or students list changes
   useEffect(() => {
     filterStudents();
   }, [students, searchTerm]);
 
+  // Function to fetch user data
+  const fetchUserData = async (userId: string) => {
+    setError(null);
+    try {
+      await fetchPrograms(userId);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setError("Unable to fetch user data. Please try again later.");
+    }
+  };
+
+  // Function to fetch programs and associated students
   const fetchPrograms = async (userId: string) => {
-    const programsCollection = collection(db, `users/${userId}/programs`);
-    const programSnapshot = await getDocs(programsCollection);
-    const programList = programSnapshot.docs.map(
-      (doc) =>
-        ({
+    try {
+      // Fetch programs
+      const programsCollection = collection(db, `users/${userId}/programs`);
+      const programSnapshot = await getDocs(programsCollection);
+      const programList = programSnapshot.docs.map(
+        (doc) => ({
           id: doc.id,
           name: doc.data().name,
           students: doc.data().students,
           currentStudents: 0,
         } as TrainingProgram)
-    );
-
-    const allStudents: Student[] = [];
-    for (const program of programList) {
-      const studentsCollection = collection(
-        db,
-        `users/${userId}/programs/${program.id}/students`
       );
-      const studentSnapshot = await getDocs(studentsCollection);
-      const programStudents = studentSnapshot.docs.map(
-        (doc) =>
-          ({
+
+      // Fetch students for each program
+      const allStudents: Student[] = [];
+      for (const program of programList) {
+        const studentsCollection = collection(
+          db,
+          `users/${userId}/programs/${program.id}/students`
+        );
+        const studentSnapshot = await getDocs(studentsCollection);
+        const programStudents = studentSnapshot.docs.map(
+          (doc) => ({
             id: doc.id,
             ...doc.data(),
             programId: program.id,
+            formStatusHot: "none",
+            formStatusCold: "none",
           } as Student)
-      );
-      allStudents.push(...programStudents);
-      program.currentStudents = programStudents.length;
+        );
+        allStudents.push(...programStudents);
+        program.currentStudents = programStudents.length;
+      }
+
+      // Update form statuses
+      await updateFormStatuses(userId, allStudents);
+
+      setPrograms(programList);
+      setStudents(allStudents);
+    } catch (error) {
+      console.error("Error fetching programs and students:", error);
+      setError("Unable to fetch programs and students. Please try again later.");
     }
-    setPrograms(programList);
-    setStudents(allStudents);
   };
 
+  // Function to update form statuses for all students
+  const updateFormStatuses = async (userId: string, students: Student[]) => {
+    try {
+      // Fetch all forms for the user
+      const formsCollection = collection(db, 'forms');
+      const formsQuery = query(formsCollection, where("userId", "==", userId));
+      const formsSnapshot = await getDocs(formsQuery);
+      const forms = formsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Form));
+
+      // Update each student's form status
+      const updatedStudents = students.map(student => {
+        // Find forms for this student
+        const hotForm = forms.find(form => 
+          form.studentId === student.id && 
+          form.programId === student.programId && 
+          form.formType === "hot"
+        );
+        const coldForm = forms.find(form => 
+          form.studentId === student.id && 
+          form.programId === student.programId && 
+          form.formType === "cold"
+        );
+
+        // Determine form statuses
+        const hotStatus = hotForm ? "responded" : 
+                          student.hotEmailSent ? "sent" : "none";
+        const coldStatus = coldForm ? "responded" : 
+                           student.coldEmailSent ? "sent" : "none";
+
+        return {
+          ...student,
+          formStatusHot: hotStatus,
+          formStatusCold: coldStatus,
+        };
+      });
+
+      setStudents(updatedStudents);
+    } catch (error) {
+      console.error("Error updating form statuses:", error);
+      setError("Unable to update form statuses. Some information may be outdated.");
+    }
+  };
+
+  // Function to filter students based on search term
   const filterStudents = () => {
     let filtered = students;
     if (searchTerm) {
@@ -113,24 +202,25 @@ export default function StudentManagement() {
     setFilteredStudents(filtered);
   };
 
+  // Function to handle student form submission (add/edit)
   const handleSubmit = async (studentData: Student, programId: string) => {
     const user = auth.currentUser;
     if (!user) {
       console.error("No authenticated user found");
+      setError("You must be logged in to perform this action.");
       return;
     }
 
     const programIndex = programs.findIndex((p) => p.id === programId);
     if (programIndex === -1) {
       console.error("Program not found");
+      setError("The selected program was not found.");
       return;
     }
 
     const program = programs[programIndex];
     if (program.currentStudents >= program.students && !editingStudent) {
-      alert(
-        `Le programme "${program.name}" a atteint son nombre maximum d'étudiants (${program.students})`
-      );
+      setError(`Le programme "${program.name}" a atteint son nombre maximum d'étudiants (${program.students})`);
       return;
     }
 
@@ -143,6 +233,7 @@ export default function StudentManagement() {
 
     try {
       if (editingStudent) {
+        // Update existing student
         await updateDoc(
           doc(
             db,
@@ -169,6 +260,7 @@ export default function StudentManagement() {
           setPrograms(updatedPrograms);
         }
       } else {
+        // Add new student
         const docRef = await addDoc(
           collection(db, `users/${user.uid}/programs/${programId}/students`),
           firestoreData
@@ -187,18 +279,22 @@ export default function StudentManagement() {
         "Erreur lors de l'ajout/mise à jour de l'étudiant : ",
         error
       );
+      setError("Une erreur est survenue lors de l'enregistrement de l'étudiant. Veuillez réessayer.");
     }
   };
 
+  // Function to handle editing a student
   const handleEdit = (student: Student) => {
     setEditingStudent(student);
     setShowForm(true);
   };
 
+  // Function to handle deleting a student
   const handleDelete = async (id: string, programId: string) => {
     const user = auth.currentUser;
     if (!user) {
       console.error("No authenticated user found");
+      setError("You must be logged in to perform this action.");
       return;
     }
 
@@ -216,9 +312,16 @@ export default function StudentManagement() {
       }
     } catch (error) {
       console.error("Erreur lors de la suppression de l'étudiant : ", error);
+      setError("Une erreur est survenue lors de la suppression de l'étudiant. Veuillez réessayer.");
     }
   };
 
+  // Render error message if there's an error
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
+
+  // Main component render
   return (
     <motion.div
       initial={{ opacity: 0 }}

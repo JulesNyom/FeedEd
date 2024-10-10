@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +20,12 @@ interface Student {
   lastName: string;
   email: string;
   programId: string;
-  formStatus: "sent" | "responded" | "reminded" | "none";
+  hotEmailSent: boolean;
+  coldEmailSent: boolean;
+  hotEmailSentDate?: Date;
+  coldEmailSentDate?: Date;
+  formStatusHot: "sent" | "responded" | "reminded" | "none";
+  formStatusCold: "sent" | "responded" | "reminded" | "none";
 }
 
 interface TrainingProgram {
@@ -43,7 +50,10 @@ export default function StudentForm({
     firstName: "",
     lastName: "",
     email: "",
-    formStatus: "none",
+    hotEmailSent: false,
+    coldEmailSent: false,
+    formStatusHot: "none",
+    formStatusCold: "none",
   });
   const [selectedProgramId, setSelectedProgramId] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +64,12 @@ export default function StudentForm({
         firstName: student.firstName,
         lastName: student.lastName,
         email: student.email,
-        formStatus: student.formStatus,
+        hotEmailSent: student.hotEmailSent,
+        coldEmailSent: student.coldEmailSent,
+        hotEmailSentDate: student.hotEmailSentDate,
+        coldEmailSentDate: student.coldEmailSentDate,
+        formStatusHot: student.formStatusHot,
+        formStatusCold: student.formStatusCold,
       });
       setSelectedProgramId(student.programId);
     } else {
@@ -62,7 +77,10 @@ export default function StudentForm({
         firstName: "",
         lastName: "",
         email: "",
-        formStatus: "none",
+        hotEmailSent: false,
+        coldEmailSent: false,
+        formStatusHot: "none",
+        formStatusCold: "none",
       });
       setSelectedProgramId("");
     }
@@ -71,6 +89,28 @@ export default function StudentForm({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData({ ...formData, [name]: checked });
+    if (checked) {
+      setFormData(prev => ({
+        ...prev,
+        [`${name}Date`]: new Date(),
+        [`formStatus${name.includes('hot') ? 'Hot' : 'Cold'}`]: 'sent'
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [`${name}Date`]: undefined,
+        [`formStatus${name.includes('hot') ? 'Hot' : 'Cold'}`]: 'none'
+      }));
+    }
   };
 
   const handleProgramChange = (value: string) => {
@@ -165,6 +205,64 @@ export default function StudentForm({
             ))}
           </SelectContent>
         </Select>
+      </div>
+      <div className="space-y-2">
+        <Label>Formulaire à chaud</Label>
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="hotEmailSent"
+            name="hotEmailSent"
+            checked={formData.hotEmailSent}
+            onChange={handleCheckboxChange}
+          />
+          <Label htmlFor="hotEmailSent">Email envoyé</Label>
+        </div>
+        {formData.hotEmailSent && (
+          <Select
+            value={formData.formStatusHot}
+            onValueChange={(value) => handleSelectChange("formStatusHot", value)}
+            required
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Sélectionner un statut" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sent">Envoyé</SelectItem>
+              <SelectItem value="responded">Répondu</SelectItem>
+              <SelectItem value="reminded">Rappelé</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+      <div className="space-y-2">
+        <Label>Formulaire à froid</Label>
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="coldEmailSent"
+            name="coldEmailSent"
+            checked={formData.coldEmailSent}
+            onChange={handleCheckboxChange}
+          />
+          <Label htmlFor="coldEmailSent">Email envoyé</Label>
+        </div>
+        {formData.coldEmailSent && (
+          <Select
+            value={formData.formStatusCold}
+            onValueChange={(value) => handleSelectChange("formStatusCold", value)}
+            required
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Sélectionner un statut" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sent">Envoyé</SelectItem>
+              <SelectItem value="responded">Répondu</SelectItem>
+              <SelectItem value="reminded">Rappelé</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
       </div>
       {error && (
         <Alert variant="destructive">

@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit, Trash2, ChevronLeft, ChevronRight, Mail, CheckCircle, AlertCircle } from "lucide-react"
+import { Edit, Trash2, ChevronLeft, ChevronRight, Mail, CheckCircle, AlertCircle, XCircle } from "lucide-react"
 
 interface Student {
   id: string
@@ -19,7 +19,12 @@ interface Student {
   lastName: string
   email: string
   programId: string
-  formStatus: "sent" | "responded" | "reminded" | "none"
+  hotEmailSent: boolean
+  coldEmailSent: boolean
+  hotEmailSentDate?: Date
+  coldEmailSentDate?: Date
+  formStatusHot: "sent" | "responded" | "reminded" | "none"
+  formStatusCold: "sent" | "responded" | "reminded" | "none"
 }
 
 interface TrainingProgram {
@@ -34,7 +39,7 @@ interface StudentTableProps {
   onDelete: (id: string, programId: string) => void
 }
 
-export default function Component({ students, programs, onEdit, onDelete }: StudentTableProps) {
+export default function StudentTable({ students, programs, onEdit, onDelete }: StudentTableProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const studentsPerPage = 5
 
@@ -53,7 +58,7 @@ export default function Component({ students, programs, onEdit, onDelete }: Stud
     }
   }
 
-  const getFormStatusIcon = (status: Student["formStatus"]) => {
+  const getFormStatusIcon = (status: Student["formStatusHot"] | Student["formStatusCold"]) => {
     switch (status) {
       case "sent":
         return <Mail className="h-4 w-4 text-blue-500" />
@@ -61,12 +66,14 @@ export default function Component({ students, programs, onEdit, onDelete }: Stud
         return <CheckCircle className="h-4 w-4 text-green-500" />
       case "reminded":
         return <AlertCircle className="h-4 w-4 text-yellow-500" />
+      case "none":
+        return <XCircle className="h-4 w-4 text-gray-400" />
       default:
         return null
     }
   }
 
-  const getFormStatusText = (status: Student["formStatus"]) => {
+  const getFormStatusText = (status: Student["formStatusHot"] | Student["formStatusCold"]) => {
     switch (status) {
       case "sent":
         return "Envoyé"
@@ -74,9 +81,42 @@ export default function Component({ students, programs, onEdit, onDelete }: Stud
         return "Répondu"
       case "reminded":
         return "Rappelé"
-      default:
+      case "none":
         return "Non envoyé"
+      default:
+        return "Inconnu"
     }
+  }
+
+  const formatDate = (date: Date | undefined) => {
+    if (!date) return "N/A"
+    return new Date(date).toLocaleDateString("fr-FR", {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  const renderFormStatus = (status: "hot" | "cold", student: Student) => {
+    const formStatus = status === "hot" ? student.formStatusHot : student.formStatusCold
+    const emailSent = status === "hot" ? student.hotEmailSent : student.coldEmailSent
+    const emailSentDate = status === "hot" ? student.hotEmailSentDate : student.coldEmailSentDate
+
+    return (
+      <div className="flex flex-col">
+        <div className="flex items-center space-x-2">
+          {getFormStatusIcon(formStatus)}
+          <span>{getFormStatusText(formStatus)}</span>
+        </div>
+        {emailSent && (
+          <span className="text-xs text-gray-500">
+            Envoyé le: {formatDate(emailSentDate)}
+          </span>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -94,7 +134,8 @@ export default function Component({ students, programs, onEdit, onDelete }: Stud
               <TableHead className="font-semibold">Nom</TableHead>
               <TableHead className="font-semibold">Email</TableHead>
               <TableHead className="font-semibold">Formation</TableHead>
-              <TableHead className="font-semibold">Statut du formulaire</TableHead>
+              <TableHead className="font-semibold">Formulaire à chaud</TableHead>
+              <TableHead className="font-semibold">Formulaire à froid</TableHead>
               <TableHead className="font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -107,12 +148,8 @@ export default function Component({ students, programs, onEdit, onDelete }: Stud
                 <TableCell>
                   {programs.find((p) => p.id === student.programId)?.name || "N/A"}
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-2">
-                    {getFormStatusIcon(student.formStatus)}
-                    <span>{getFormStatusText(student.formStatus)}</span>
-                  </div>
-                </TableCell>
+                <TableCell>{renderFormStatus("hot", student)}</TableCell>
+                <TableCell>{renderFormStatus("cold", student)}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

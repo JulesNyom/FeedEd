@@ -109,22 +109,17 @@ const HotSurvey: React.FC<HotSurveyProps> = ({ params }) => {
         const decodedChaud = decodeURIComponent(params.chaud);
         console.log("Decoded chaud:", decodedChaud);
 
-        const parts = decodedChaud.split(/[-&]/);
-        console.log("Split parts:", parts);
-
-        if (parts.length >= 2) {
-          const possibleStudentId = parts[parts.length - 1];
-          const possibleProgramId = parts[parts.length - 2];
-
-          if (possibleProgramId && possibleStudentId) {
-            setProgramId(possibleProgramId);
-            setStudentId(possibleStudentId);
-            console.log("Extracted IDs:", { programId: possibleProgramId, studentId: possibleStudentId });
-          } else {
-            throw new Error("Unable to extract valid IDs from URL parts");
-          }
+        const [possibleProgramId, possibleStudentId] = decodedChaud.split('-');
+        
+        if (possibleProgramId && possibleStudentId) {
+          setProgramId(possibleProgramId);
+          setStudentId(possibleStudentId);
+          console.log("Extracted IDs:", {
+            programId: possibleProgramId,
+            studentId: possibleStudentId,
+          });
         } else {
-          throw new Error("URL does not contain enough parts to extract IDs");
+          throw new Error("Unable to extract valid IDs from URL parts");
         }
       } catch (err) {
         console.error("Error parsing URL:", err);
@@ -176,18 +171,22 @@ const HotSurvey: React.FC<HotSurveyProps> = ({ params }) => {
     try {
       console.log("Submitting form with data:", { programId, studentId, answers });
       const formsCollectionRef = collection(db, 'forms');
-      await addDoc(formsCollectionRef, {
+      const docRef = await addDoc(formsCollectionRef, {
         programId,
         studentId,
         ...answers,
         submittedAt: new Date(),
         formType: 'hot'
       });
-      console.log("Form submitted successfully");
+      console.log("Form submitted successfully with ID: ", docRef.id);
       setSubmitted(true);
     } catch (error) {
       console.error("Error submitting form: ", error);
-      setError(`Une erreur s'est produite lors de la soumission du formulaire: ${error}`);
+      if (error instanceof Error) {
+        setError(`Une erreur s'est produite lors de la soumission du formulaire: ${error.message}`);
+      } else {
+        setError("Une erreur inconnue s'est produite lors de la soumission du formulaire.");
+      }
     }
   };
 
