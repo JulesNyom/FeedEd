@@ -1,11 +1,11 @@
 import React from 'react'
-import StudentManagement from '@/components/shared/student/StudentManagement'
+import StudentManagementUI from '@/components/shared/student/StudentPage'
 
 const page = () => {
 
   return (
     <div>
-      <StudentManagement />
+      <StudentManagementUI />
       </div>
   )
 }
