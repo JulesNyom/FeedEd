@@ -41,9 +41,23 @@ import {
 } from "lucide-react";
 import { useStudentManagement } from "./StudentLogic";
 
+interface Student {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    programId: string;
+    formStatusHot: "sent" | "responded" | "reminded" | "none";
+    formStatusCold: "sent" | "responded" | "reminded" | "none";
+    hotEmailSent?: boolean;
+    coldEmailSent?: boolean;
+    hotEmailSentDate?: Date;
+    coldEmailSentDate?: Date;
+  }
+  
+
 export default function StudentManagementUI() {
   const {
-    students,
     filteredStudents,
     programs,
     error,
@@ -236,7 +250,7 @@ export default function StudentManagementUI() {
                         onClick={() => handleEdit(student)}
                         className="h-8 w-8 p-0">
                         <Edit className="h-4 w-4" />
-                        <span className="sr-only">Modifier l'étudiant</span>
+                        <span className="sr-only">Modifier l&lsquo;étudiant</span>
                       </Button>
                     </motion.div>
                     <motion.div
@@ -256,7 +270,7 @@ export default function StudentManagementUI() {
                         }}
                         className="h-8 w-8 p-0">
                         <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Supprimer l'étudiant</span>
+                        <span className="sr-only">Supprimer l&lsquo;étudiant</span>
                       </Button>
                     </motion.div>
                   </div>
