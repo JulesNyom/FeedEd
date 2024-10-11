@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description:
     "FeedEd est une application web conçue pour faciliter les enquêtes de satisfaction pour les formateurs et les organismes de formation. Simplifiez la collecte de feedback, améliorez vos programmes et offrez une meilleure expérience d'apprentissage.",
   icons: {
-    icon: "/assets/images/logo.png",
+    icon: "/assets/icons/logo.svg",
   },
 };
 

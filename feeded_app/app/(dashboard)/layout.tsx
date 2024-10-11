@@ -5,6 +5,9 @@ import AuthWrapper from "@/components/shared/AuthWrapper"; // Adjust this import
 
 export const metadata: Metadata = {
   title: "FeedEd - admin",
+  icons: {
+    icon: "/assets/icons/logo.svg",
+  },
 };
 
 export default function DashboardLayout({
@@ -14,6 +17,9 @@ export default function DashboardLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+      <link rel="icon" href="/assets/icons/logo.svg" sizes="any" />
+      </head>
       <body>
         <AuthWrapper>
           <div className="bg-background max-h-screen overflow-auto grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">

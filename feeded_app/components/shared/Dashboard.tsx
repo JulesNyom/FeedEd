@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { BookOpen, Users, ThumbsUp, Star, Brain, Award } from 'lucide-react'
+import { BookOpen, Users, ThumbsUp, Star, Brain, Award, Send, MessageSquare } from 'lucide-react'
 
 const dashboardData = {
   totalFormations: 120,
@@ -13,7 +13,9 @@ const dashboardData = {
   tauxRecommandation: 95,
   noteContenu: 4.7,
   noteFormateurs: 4.8,
-  tauxApplication: 88
+  tauxApplication: 88,
+  formsSent: 2000,
+  formsResponded: 1850
 }
 
 export default function Dashboard() {
@@ -34,6 +36,8 @@ export default function Dashboard() {
     { title: "Note du contenu", value: dashboardData.noteContenu.toFixed(1), icon: Award, detail: "Sur une échelle de 1 à 5" },
     { title: "Note des formateurs", value: dashboardData.noteFormateurs.toFixed(1), icon: Star, detail: "Sur une échelle de 1 à 5" },
     { title: "Taux d'application", value: `${dashboardData.tauxApplication}%`, icon: Brain, detail: "Des connaissances acquises mises en pratique" },
+    { title: "Formulaires envoyés", value: dashboardData.formsSent, icon: Send, detail: "Total des formulaires envoyés" },
+    { title: "Formulaires répondus", value: dashboardData.formsResponded, icon: MessageSquare, detail: `Taux de réponse: ${((dashboardData.formsResponded / dashboardData.formsSent) * 100).toFixed(1)}%` },
   ]
 
   return (
