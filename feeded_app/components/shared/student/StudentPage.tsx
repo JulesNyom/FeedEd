@@ -40,6 +40,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useStudentManagement } from "./StudentLogic";
+import { Timestamp } from 'firebase/firestore';
 
 interface Student {
     id: string;
@@ -118,9 +119,13 @@ export default function StudentManagementUI() {
     }
   };
 
-  const formatDate = (date: Date | undefined) => {
+  const formatDate = (date: Date | Timestamp | undefined) => {
     if (!date) return "N/A";
-    return new Date(date).toLocaleDateString("fr-FR", {
+    const dateObject = date instanceof Date ? date : date.toDate();
+    if (isNaN(dateObject.getTime())) {
+      return "Date invalide";
+    }
+    return dateObject.toLocaleDateString("fr-FR", {
       year: "numeric",
       month: "long",
       day: "numeric",

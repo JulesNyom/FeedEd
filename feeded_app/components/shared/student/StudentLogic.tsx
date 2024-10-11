@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, useCallback } from "react";
 import { db, auth } from "@/firebase";
 import {
@@ -9,6 +7,7 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  Timestamp,
 } from "firebase/firestore";
 
 // Interface definitions
@@ -124,15 +123,18 @@ export function useStudentManagement() {
           `users/${userId}/programs/${program.id}/students`
         );
         const studentSnapshot = await getDocs(studentsCollection);
-        const programStudents = studentSnapshot.docs.map(
-          (doc) => ({
+        const programStudents = studentSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
             id: doc.id,
-            ...doc.data(),
+            ...data,
             programId: program.id,
             formStatusHot: "none",
             formStatusCold: "none",
-          } as Student)
-        );
+            hotEmailSentDate: data.hotEmailSentDate ? data.hotEmailSentDate.toDate() : undefined,
+            coldEmailSentDate: data.coldEmailSentDate ? data.coldEmailSentDate.toDate() : undefined,
+          } as Student;
+        });
         allStudents.push(...programStudents);
         program.currentStudents = programStudents.length;
       }
@@ -221,8 +223,8 @@ export function useStudentManagement() {
       programId: programId,
       hotEmailSent: studentData.hotEmailSent,
       coldEmailSent: studentData.coldEmailSent,
-      hotEmailSentDate: studentData.hotEmailSentDate,
-      coldEmailSentDate: studentData.coldEmailSentDate,
+      hotEmailSentDate: studentData.hotEmailSentDate ? Timestamp.fromDate(studentData.hotEmailSentDate) : null,
+      coldEmailSentDate: studentData.coldEmailSentDate ? Timestamp.fromDate(studentData.coldEmailSentDate) : null,
       formStatusHot: studentData.formStatusHot,
       formStatusCold: studentData.formStatusCold,
     };
