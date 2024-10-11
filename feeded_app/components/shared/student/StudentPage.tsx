@@ -40,22 +40,21 @@ import {
   XCircle,
 } from "lucide-react";
 import { useStudentManagement } from "./StudentLogic";
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp } from "firebase/firestore";
 
 interface Student {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    programId: string;
-    formStatusHot: "sent" | "responded" | "reminded" | "none";
-    formStatusCold: "sent" | "responded" | "reminded" | "none";
-    hotEmailSent?: boolean;
-    coldEmailSent?: boolean;
-    hotEmailSentDate?: Date;
-    coldEmailSentDate?: Date;
-  }
-  
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  programId: string;
+  formStatusHot: "sent" | "responded" | "reminded" | "none";
+  formStatusCold: "sent" | "responded" | "reminded" | "none";
+  hotEmailSent?: boolean;
+  coldEmailSent?: boolean;
+  hotEmailSentDate?: Date;
+  coldEmailSentDate?: Date;
+}
 
 export default function StudentManagementUI() {
   const {
@@ -74,6 +73,7 @@ export default function StudentManagementUI() {
     currentPage,
     setCurrentPage,
     studentsPerPage,
+    exportToCSV,
   } = useStudentManagement();
 
   const { currentStudents, totalPages } = useMemo(() => {
@@ -195,8 +195,10 @@ export default function StudentManagementUI() {
           </Button>
         </motion.div>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Button className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white rounded-xl shadow-lg">
-            <FileSpreadsheet className="mr-2 h-5 w-5" /> Exporter le tableau
+          <Button
+            onClick={exportToCSV}
+            className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white rounded-xl shadow-lg">
+            <FileSpreadsheet className="mr-2 h-5 w-5" /> Télécharger le tableau
           </Button>
         </motion.div>
       </motion.div>
@@ -255,7 +257,9 @@ export default function StudentManagementUI() {
                         onClick={() => handleEdit(student)}
                         className="h-8 w-8 p-0">
                         <Edit className="h-4 w-4" />
-                        <span className="sr-only">Modifier l&lsquo;étudiant</span>
+                        <span className="sr-only">
+                          Modifier l&apos;étudiant
+                        </span>
                       </Button>
                     </motion.div>
                     <motion.div
@@ -275,7 +279,9 @@ export default function StudentManagementUI() {
                         }}
                         className="h-8 w-8 p-0">
                         <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Supprimer l&lsquo;étudiant</span>
+                        <span className="sr-only">
+                          Supprimer l&apos;étudiant
+                        </span>
                       </Button>
                     </motion.div>
                   </div>

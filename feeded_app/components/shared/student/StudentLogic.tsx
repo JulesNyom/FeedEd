@@ -315,6 +315,58 @@ export function useStudentManagement() {
     setShowForm(true);
   };
 
+  const exportToCSV = () => {
+    const getFormStatusText = (status: "sent" | "responded" | "reminded" | "none") => {
+      switch (status) {
+        case "sent": return "Envoyé";
+        case "responded": return "Répondu";
+        case "reminded": return "Rappelé";
+        case "none": return "Non envoyé";
+      }
+    };
+
+    const formatDate = (date: Date | undefined) => {
+      if (!date) return "N/A";
+      return date.toLocaleDateString("fr-FR", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    };
+
+    const data = filteredStudents.map(student => ({
+      'Prénom': student.firstName,
+      'Nom': student.lastName,
+      'Email': student.email,
+      'Formation': programs.find(p => p.id === student.programId)?.name || 'N/A',
+      'Formulaire à chaud': getFormStatusText(student.formStatusHot),
+      'Formulaire à froid': getFormStatusText(student.formStatusCold),
+      'Email à chaud envoyé': student.hotEmailSent ? 'Oui' : 'Non',
+      'Email à froid envoyé': student.coldEmailSent ? 'Oui' : 'Non',
+      'Date envoi email à chaud': formatDate(student.hotEmailSentDate),
+      'Date envoi email à froid': formatDate(student.coldEmailSentDate)
+    }));
+
+    const csvContent = [
+      Object.keys(data[0]).join(','),
+      ...data.map(row => Object.values(row).map(value => `"${value}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'students_data.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   return {
     students,
     filteredStudents,
@@ -332,5 +384,6 @@ export function useStudentManagement() {
     currentPage,
     setCurrentPage,
     studentsPerPage,
+    exportToCSV,
   };
 }
