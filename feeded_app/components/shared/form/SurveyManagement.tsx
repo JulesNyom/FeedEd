@@ -32,16 +32,13 @@ import {
   SnowflakeIcon,
   ChevronDownIcon,
   SendIcon,
+  DownloadIcon,
 } from "lucide-react";
 import {
   useSurveyManagement,
   Program,
+  ResponseData,
 } from "@/lib/useSurveyManagement";
-
-export type ResponseData = {
-  envoye: number;
-  relance: number;
-}
 
 const ResponseDetails: React.FC<{
   responsesChaud: ResponseData;
@@ -92,6 +89,10 @@ const ResponseDetails: React.FC<{
               <div className="text-sm">Envoyé :</div>
               <div className="text-sm font-semibold">{responses.envoye}</div>
             </div>
+            <div className="flex justify-between items-center bg-yellow-100 dark:bg-yellow-900 p-2 rounded">
+              <div className="text-sm">En attente :</div>
+              <div className="text-sm font-semibold">{responses.enAttente}</div>
+            </div>
             <div className="flex justify-between items-center bg-red-100 dark:bg-red-900 p-2 rounded">
               <div className="text-sm">Relancé :</div>
               <div className="text-sm font-semibold">{responses.relance}</div>
@@ -108,12 +109,23 @@ export default function SurveyManagement() {
     programs,
     searchTerm,
     setSearchTerm,
+    currentPage,
+    setCurrentPage,
+    isLoading,
     error,
+    totalPages,
     sendHotSurveys,
     sendColdSurveys,
+    fetchFormAnswersByProgram,
+    downloadFormAnswers,
+    setFormAnswers,
   } = useSurveyManagement();
 
   const [sendingSurvey, setSendingSurvey] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+  const [downloadingAnswers, setDownloadingAnswers] = useState<{
     [key: string]: boolean;
   }>({});
 
@@ -127,11 +139,45 @@ export default function SurveyManagement() {
       }
       console.log(`Sent ${type} survey for program ${programId}`);
     } catch (error) {
-      console.error(`Error sending ${type} survey for program ${programId}:`, error);
+      console.error(
+        `Error sending ${type} survey for program ${programId}:`,
+        error
+      );
     } finally {
       setSendingSurvey((prev) => ({ ...prev, [programId]: false }));
     }
   };
+
+  const handleDownloadResponses = async (
+    programId: string,
+    type: "hot" | "cold"
+  ) => {
+    setDownloadingAnswers((prev) => ({ ...prev, [programId]: true }));
+    try {
+      const fetchedAnswers = await fetchFormAnswersByProgram(programId);
+      setFormAnswers(fetchedAnswers);
+
+      // Wait for the state to update
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      downloadFormAnswers(type, fetchedAnswers);
+      console.log(
+        `Downloaded ${type} survey responses for program ${programId}`
+      );
+    } catch (error) {
+      console.error(
+        `Error downloading ${type} survey responses for program ${programId}:`,
+        error
+      );
+      // Here you might want to show an error message to the user
+    } finally {
+      setDownloadingAnswers((prev) => ({ ...prev, [programId]: false }));
+    }
+  };
+
+  if (isLoading) {
+    return <div className="text-center mt-8">Loading...</div>;
+  }
 
   if (error) {
     return <div className="text-center mt-8 text-red-500">{error}</div>;
@@ -201,7 +247,8 @@ export default function SurveyManagement() {
               <TableHead className="min-w-[200px]">Formation</TableHead>
               <TableHead className="text-center">Apprenants</TableHead>
               <TableHead className="text-center">Statuts</TableHead>
-              <TableHead className="text-center">Actions</TableHead>
+              <TableHead className="text-center">Envoyer</TableHead>
+              <TableHead className="text-center">Télécharger</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -273,11 +320,67 @@ export default function SurveyManagement() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
+                <TableCell className="text-center">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="inline-block">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className=""
+                          disabled={downloadingAnswers[program.id]}>
+                          Télécharger
+                          {downloadingAnswers[program.id] ? (
+                            <span className="animate-spin ml-2">⏳</span>
+                          ) : (
+                            <DownloadIcon className="h-4 w-4 ml-2" />
+                          )}
+                        </Button>
+                      </motion.div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() =>
+                          handleDownloadResponses(program.id, "hot")
+                        }>
+                        <FlameIcon className="h-4 w-4 mr-2 text-orange-500" />
+                        <span>Réponses à chaud</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          handleDownloadResponses(program.id, "cold")
+                        }>
+                        <SnowflakeIcon className="h-4 w-4 mr-2 text-blue-500" />
+                        <span>Réponses à froid</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </motion.div>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center space-x-2 mt-4">
+          <Button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}>
+            Previous
+          </Button>
+          <span>{`Page ${currentPage} of ${totalPages}`}</span>
+          <Button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}>
+            Next
+          </Button>
+        </div>
+      )}
     </motion.div>
   );
 }
