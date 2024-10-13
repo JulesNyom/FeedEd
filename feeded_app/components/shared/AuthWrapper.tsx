@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext' // Adjust this import path as needed
-import LoadingPage from './loading'
+import PageDeChargement from '../../app/loading'
 
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const { currentUser, loading } = useAuth()
@@ -15,7 +15,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
 
   if (loading) {
     return <div>
-        <LoadingPage />
+        <PageDeChargement />
     </div> // Or a more sophisticated loading component
   }
 
