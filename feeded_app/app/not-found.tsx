@@ -21,29 +21,29 @@ export default function ErrorPage() {
   }, [])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-white p-4">
       <div className="max-w-md w-full space-y-8 text-center">
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-gray-900 animate-fade-in">
+          <h1 className="text-4xl font-bold text-purple-900 animate-fade-in">
             Oups ! Quelque chose s&lsquo;est mal passé
           </h1>
-          <p className="text-xl text-gray-600 animate-fade-in animation-delay-200">
+          <p className="text-xl text-purple-600 animate-fade-in animation-delay-200">
             Nous rencontrons des difficultés techniques. Veuillez réessayer dans quelques instants.
           </p>
         </div>
         
         <div className="relative w-64 h-64 mx-auto animate-float">
-          <div className="absolute inset-0 bg-blue-200 rounded-full opacity-50 animate-pulse"></div>
+          <div className="absolute inset-0 bg-purple-200 rounded-full opacity-50 animate-pulse"></div>
           <svg
             className="absolute inset-0 w-full h-full"
             viewBox="0 0 100 100"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <circle cx="50" cy="50" r="40" stroke="#3B82F6" strokeWidth="4" />
+            <circle cx="50" cy="50" r="40" stroke="#8B5CF6" strokeWidth="4" />
             <path
               d="M30 50L45 65L70 40"
-              stroke="#3B82F6"
+              stroke="#8B5CF6"
               strokeWidth="4"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -54,7 +54,7 @@ export default function ErrorPage() {
         
         <button
           onClick={handleRefresh}
-          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out animate-fade-in animation-delay-400"
+          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out animate-fade-in animation-delay-400"
           disabled={isLoading}
         >
           {isLoading ? (
@@ -70,7 +70,7 @@ export default function ErrorPage() {
         {[...Array(20)].map((_, i) => (
           <div
             key={i}
-            className="absolute bg-blue-500 rounded-full opacity-10 animate-float"
+            className="absolute bg-purple-500 rounded-full opacity-10 animate-float"
             style={{
               width: `${Math.random() * 20 + 10}px`,
               height: `${Math.random() * 20 + 10}px`,
