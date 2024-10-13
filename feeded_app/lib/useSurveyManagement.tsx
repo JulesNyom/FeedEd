@@ -34,22 +34,40 @@ export type FormAnswer = {
   studentId: string;
   programId: string;
   submittedAt: Date;
-  answers: {
-    applicationConnaissances: number;
-    commentaires: string;
-    contenuAttentes: number;
-    exercicesPertinents: number;
-    formation: string;
-    interactivite: number;
-    maitriseSujet: number;
-    nom: string;
-    objectifsClairs: number;
-    organisationLogistique: number;
-    prenom: string;
-    qualiteGlobale: number;
-    qualiteSupports: number;
-  };
-}
+  answers: HotSurveyAnswers | ColdSurveyAnswers;
+};
+
+type HotSurveyAnswers = {
+  applicationConnaissances: number;
+  commentaires: string;
+  contenuAttentes: number;
+  exercicesPertinents: number;
+  formation: string;
+  interactivite: number;
+  maitriseSujet: number;
+  nom: string;
+  objectifsClairs: number;
+  organisationLogistique: number;
+  prenom: string;
+  qualiteGlobale: number;
+  qualiteSupports: number;
+};
+
+type ColdSurveyAnswers = {
+  confiance?: number;
+  emploiGraceFormation?: string;
+  formation?: string;
+  impactSituation?: number;
+  miseEnPratique?: number;
+  nom?: string;
+  pertinenceConnaissances?: number;
+  prenom?: string;
+  recommandation?: number;
+  reponseBesoins?: number;
+  situationProfessionnelle?: string;
+  situationProfessionnelleAutre?: string;
+  suggestions?: string;
+};
 
 export type OrganizedFormAnswers = {
   hot: FormAnswer[];
@@ -276,30 +294,17 @@ export const useSurveyManagement = () => {
       querySnapshot.forEach(doc => {
         console.log(`Processing document ${doc.id}`);
         const data = doc.data();
+        console.log("Raw document data:", data); // Log raw data for debugging
+
         const formAnswer: FormAnswer = {
           id: doc.id,
           formType: data.formType,
           studentId: data.studentId,
           programId: data.programId,
           submittedAt: data.submittedAt.toDate(),
-          answers: {
-            applicationConnaissances: data.applicationConnaissances,
-            commentaires: data.commentaires,
-            contenuAttentes: data.contenuAttentes,
-            exercicesPertinents: data.exercicesPertinents,
-            formation: data.formation,
-            interactivite: data.interactivite,
-            maitriseSujet: data.maitriseSujet,
-            nom: data.nom,
-            objectifsClairs: data.objectifsClairs,
-            organisationLogistique: data.organisationLogistique,
-            prenom: data.prenom,
-            qualiteGlobale: data.qualiteGlobale,
-            qualiteSupports: data.qualiteSupports,
-          }
+          answers: data // Store all fields from the document
         };
 
-        console.log(`Form type: ${formAnswer.formType}`);
         if (formAnswer.formType === "hot") {
           organizedAnswers.hot.push(formAnswer);
         } else if (formAnswer.formType === "cold") {
@@ -309,7 +314,7 @@ export const useSurveyManagement = () => {
         }
       });
 
-      console.log(`Organized answers: ${JSON.stringify(organizedAnswers, null, 2)}`);
+      console.log(`Organized answers:`, JSON.stringify(organizedAnswers, null, 2));
       return organizedAnswers;
     } catch (error) {
       console.error("Error fetching form answers for program:", error);
@@ -317,96 +322,156 @@ export const useSurveyManagement = () => {
     }
   }, []);
 
-  const generateCSV = useCallback((formAnswers: FormAnswer[]): string => {
+  const generateCSV = useCallback((formAnswers: FormAnswer[], formType: 'hot' | 'cold'): string => {
     if (formAnswers.length === 0) {
-        return "No data available";
+      return "No data available";
     }
 
-    const headers = ["Student ID", "Submitted At", ...Object.keys(formAnswers[0].answers)];
-    const csvRows = [headers.join(',')];
+    let headers: string[];
+    let csvRows: string[];
 
-    for (const answer of formAnswers) {
+    if (formType === 'hot') {
+      headers = [
+        "Student ID", "Submitted At", "Application Connaissances", "Commentaires", "Contenu Attentes",
+        "Exercices Pertinents", "Formation", "Interactivite", "Maitrise Sujet", "Nom",
+        "Objectifs Clairs", "Organisation Logistique", "Prenom", "Qualite Globale", "Qualite Supports"
+      ];
+      csvRows = [headers.join(',')];
+
+      for (const answer of formAnswers) {
+        const hotAnswers = answer.answers as HotSurveyAnswers;
         const row = [
-            answer.studentId,
-            answer.submittedAt.toISOString(),
-            ...Object.values(answer.answers).map(value => `"${value.toString().replace(/"/g, '""')}"`)
+          answer.studentId,
+          answer.submittedAt.toISOString(),
+          escapeCSVField(hotAnswers.applicationConnaissances?.toString() ?? ''),
+          escapeCSVField(hotAnswers.commentaires ?? ''),
+          escapeCSVField(hotAnswers.contenuAttentes?.toString() ?? ''),
+          escapeCSVField(hotAnswers.exercicesPertinents?.toString() ?? ''),
+          escapeCSVField(hotAnswers.formation ?? ''),
+          escapeCSVField(hotAnswers.interactivite?.toString() ?? ''),
+          escapeCSVField(hotAnswers.maitriseSujet?.toString() ?? ''),
+          escapeCSVField(hotAnswers.nom ?? ''),
+          escapeCSVField(hotAnswers.objectifsClairs?.toString() ?? ''),
+          escapeCSVField(hotAnswers.organisationLogistique?.toString() ?? ''),
+          escapeCSVField(hotAnswers.prenom ?? ''),
+          escapeCSVField(hotAnswers.qualiteGlobale?.toString() ?? ''),
+          escapeCSVField(hotAnswers.qualiteSupports?.toString() ?? '')
         ];
         csvRows.push(row.join(','));
+      }
+    } else {
+      headers = [
+        "Student ID", "Submitted At", "Confiance", "Emploi Grace Formation", "Formation",
+        "Impact Situation", "Mise En Pratique", "Nom", "Pertinence Connaissances", "Prenom",
+        "Recommandation", "Reponse Besoins", "Situation Professionnelle", "Situation Professionnelle Autre",
+        "Suggestions"
+      ];
+      csvRows = [headers.join(',')];
+
+      for (const answer of formAnswers) {
+        const coldAnswers = answer.answers as ColdSurveyAnswers;
+        const row = [
+          answer.studentId,
+          answer.submittedAt.toISOString(),
+          escapeCSVField(coldAnswers.confiance?.toString() ?? ''),
+          escapeCSVField(coldAnswers.emploiGraceFormation ?? ''),
+          escapeCSVField(coldAnswers.formation ?? ''),
+          escapeCSVField(coldAnswers.impactSituation?.toString() ?? ''),
+          escapeCSVField(coldAnswers.miseEnPratique?.toString() ?? ''),
+          escapeCSVField(coldAnswers.nom ?? ''),
+          escapeCSVField(coldAnswers.pertinenceConnaissances?.toString() ?? ''),
+          escapeCSVField(coldAnswers.prenom ?? ''),
+          escapeCSVField(coldAnswers.recommandation?.toString() ?? ''),
+          escapeCSVField(coldAnswers.reponseBesoins?.toString() ?? ''),
+          escapeCSVField(coldAnswers.situationProfessionnelle ?? ''),
+          escapeCSVField(coldAnswers.situationProfessionnelleAutre ?? ''),
+          escapeCSVField(coldAnswers.suggestions ?? '')
+        ];
+        csvRows.push(row.join(','));
+      }
     }
 
+    console.log('CSV Rows before join:', csvRows); // Log all rows before joining
     return csvRows.join('\n');
-}, []);
+  }, []);
 
-const downloadCSV = useCallback((csv: string, filename: string) => {
+  const escapeCSVField = (field: string): string => {
+    if (field.includes(',') || field.includes('\n') || field.includes('"')) {
+      return `"${field.replace(/"/g, '""')}"`;
+    }
+    return field;
+  };
+
+  const downloadCSV = useCallback((csv: string, filename: string) => {
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', filename);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
-}, []);
+  }, []);
 
-const downloadFormAnswers = useCallback((formType: "hot" | "cold", currentFormAnswers: OrganizedFormAnswers | null = formAnswers) => {
-  console.log("Attempting to download form answers. Current formAnswers state:", currentFormAnswers);
-  
-  if (!currentFormAnswers) {
-    console.error("formAnswers is null. Please fetch the data first.");
-    throw new Error("No form answers available. Please fetch the data first.");
-  }
+  const downloadFormAnswers = useCallback((formType: "hot" | "cold", currentFormAnswers: OrganizedFormAnswers | null = formAnswers) => {
+    console.log("Attempting to download form answers. Current formAnswers state:", currentFormAnswers);
+    
+    if (!currentFormAnswers) {
+      console.error("formAnswers is null. Please fetch the data first.");
+      throw new Error("No form answers available. Please fetch the data first.");
+    }
 
-  const answers = formType === "hot" ? currentFormAnswers.hot : currentFormAnswers.cold;
-  
-  if (answers.length === 0) {
-    console.error(`No ${formType} form answers available.`);
-    throw new Error(`No ${formType} form answers available for download.`);
-  }
+    const answers = formType === "hot" ? currentFormAnswers.hot : currentFormAnswers.cold;
+    
+    if (answers.length === 0) {
+      console.error(`No ${formType} form answers available.`);
+      throw new Error(`No ${formType} form answers available for download.`);
+    }
 
-  console.log(`Generating CSV for ${formType} answers:`, answers);
-  const csv = generateCSV(answers);
-  
-  if (csv === "No data available") {
-    console.error(`Generated CSV is empty for ${formType} answers.`);
-    throw new Error(`No data available for ${formType} form answers.`);
-  }
+    console.log(`Generating CSV for ${formType} answers:`, answers);
+    const csv = generateCSV(answers, formType);
+    
+    if (csv === "No data available") {
+      console.error(`Generated CSV is empty for ${formType} answers.`);
+      throw new Error(`No data available for ${formType} form answers.`);
+    }
 
-  console.log("CSV generated successfully. Initiating download...");
-  downloadCSV(csv, `${formType}_form_answers.csv`);
-  console.log("Download initiated.");
-}, [formAnswers, generateCSV, downloadCSV]);
+    console.log("CSV generated successfully. Initiating download...");
+    downloadCSV(csv, `${formType}_form_answers.csv`);
+    console.log("Download initiated.");
+  }, [formAnswers, generateCSV, downloadCSV]);
 
-useEffect(() => {
+  useEffect(() => {
     const fetchProgramsData = async () => {
-        setIsLoading(true);
-        const fetchedPrograms = await fetchPrograms();
-        setPrograms(fetchedPrograms);
-        setIsLoading(false);
+      setIsLoading(true);
+      const fetchedPrograms = await fetchPrograms();
+      setPrograms(fetchedPrograms);
+      setIsLoading(false);
     };
 
     fetchProgramsData();
-}, [fetchPrograms]);
+  }, [fetchPrograms]);
 
-const filteredPrograms = programs.filter(program =>
+  const filteredPrograms = programs.filter(program =>
     program.name.toLowerCase().includes(searchTerm.toLowerCase())
-);
+  );
 
-const totalPages = Math.ceil(filteredPrograms.length / itemsPerPage);
-const startIndex = (currentPage - 1) * itemsPerPage;
-const endIndex = startIndex + itemsPerPage;
-const currentPrograms = filteredPrograms.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredPrograms.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPrograms = filteredPrograms.slice(startIndex, endIndex);
 
-const refreshPrograms = useCallback(async () => {
+  const refreshPrograms = useCallback(async () => {
     setIsLoading(true);
     const fetchedPrograms = await fetchPrograms();
     setPrograms(fetchedPrograms);
     setIsLoading(false);
-}, [fetchPrograms]);
+  }, [fetchPrograms]);
 
-return {
+  return {
     programs: currentPrograms,
     searchTerm,
     setSearchTerm,
@@ -422,5 +487,6 @@ return {
     downloadFormAnswers,
     formAnswers,
     setFormAnswers,
-};
+    generateCSV
+  };
 };
