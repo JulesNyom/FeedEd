@@ -41,7 +41,7 @@ const ResponseDetails: React.FC<{ responsesChaud: ResponseData; reponsesFroid: R
 }
 
 export default function Component() {
-  const { programs, searchTerm, setSearchTerm, currentPage, setCurrentPage, isLoading, error, totalPages, sendHotSurveys, sendColdSurveys, fetchFormAnswersByProgram, downloadFormAnswers, setFormAnswers } = useSurveyManagement()
+  const { programs, searchTerm, setSearchTerm, currentPage, setCurrentPage, error, totalPages, sendHotSurveys, sendColdSurveys, fetchFormAnswersByProgram, downloadFormAnswers, setFormAnswers } = useSurveyManagement()
   const [sendingSurvey, setSendingSurvey] = useState<{ [key: string]: boolean }>({})
   const [downloadingAnswers, setDownloadingAnswers] = useState<{ [key: string]: boolean }>({})
 
@@ -72,7 +72,6 @@ export default function Component() {
     }
   }
 
-  if (isLoading) return <div className="text-center mt-8">Loading...</div>
   if (error) return <div className="text-center mt-8 text-red-500">{error}</div>
 
   return (
