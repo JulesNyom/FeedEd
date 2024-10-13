@@ -394,7 +394,7 @@ export const useSurveyManagement = () => {
     console.log('CSV Rows before join:', csvRows); // Log all rows before joining
     return csvRows.join('\n');
   }, []);
-
+  
   const escapeCSVField = (field: string): string => {
     if (field.includes(',') || field.includes('\n') || field.includes('"')) {
       return `"${field.replace(/"/g, '""')}"`;

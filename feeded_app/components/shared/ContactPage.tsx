@@ -197,7 +197,7 @@ export default function Component() {
                       <Instagram className="h-6 w-6" />
                     </a>
                     <a
-                      href="#"
+                      href="https://www.linkedin.com/company/feeded/about/?viewAsMember=true"
                       className="text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110 group"
                       aria-label="LinkedIn">
                       <Linkedin className="h-6 w-6 transition-all duration-300 group-hover:rotate-[360deg] group-hover:text-blue-500" />

@@ -25,7 +25,7 @@ export default function Footer() {
               feeded.io@gmail.com
             </Link>
             <Link 
-              href="https://www.linkedin.com/in/jules-nyom-b21970160/" 
+              href="https://www.linkedin.com/company/feeded/about/?viewAsMember=true" 
               className="flex items-center text-primary hover:text-primary/80 transition-colors duration-300 group"
             >
               <Linkedin className="w-5 h-5 mr-2 group-hover:animate-bounce" />

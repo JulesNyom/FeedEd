@@ -70,7 +70,7 @@ export default function Header() {
                 >
                   <Link
                     href={item.href}
-                    className="text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium relative group"
+                    className="text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-semibold relative group"
                   >
                     {item.name}
                     <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
