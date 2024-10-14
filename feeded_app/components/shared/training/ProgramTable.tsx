@@ -136,13 +136,13 @@ export default function ProgramTable() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="container mx-auto p-4 sm:p-6 space-y-4"
+      className="container mx-auto p-4 sm:p-6 space-y-4 max-h-screen flex flex-col"
     >
       <motion.h1
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
-        className="text-xl sm:text-2xl font-bold mb-4"
+        className="text-xl sm:text-2xl font-bold mb-2"
       >
         Vos formations
       </motion.h1>
@@ -193,7 +193,7 @@ export default function ProgramTable() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.6, duration: 0.5 }}
-        className="overflow-hidden"
+        className="overflow-y-auto flex-shrink"
       >
         <TrainingProgramList
           programs={filteredPrograms}

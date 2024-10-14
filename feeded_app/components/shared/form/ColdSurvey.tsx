@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/firebase"; // Update this path if necessary
 
 interface Question {
   id: string;
@@ -105,6 +108,26 @@ const ColdSurvey: React.FC = () => {
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
   const [submitted, setSubmitted] = useState<boolean>(false);
+  const [displayName, setDisplayName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            setDisplayName(userDoc.data().displayName || null);
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      } else {
+        setDisplayName(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
@@ -165,12 +188,13 @@ const ColdSurvey: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-500 to-indigo-400 animate-gradient-x"></div>
       <div className="relative w-full max-w-7xl mx-auto px-4 py-8 flex flex-col flex-grow z-10">
         <motion.div
-          className="flex items-center"
+          className="flex flex-row items-center mb-8"
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}>
+          <p className="text-background text-base font-semibold mr-1 mt-2.5">{displayName}</p>
           <p className="text-background text-xs font-semibold mt-3">
-            En partenariat avec
+            en partenariat avec
           </p>
           <Link href="/" className="transition-transform hover:scale-105">
             <Image

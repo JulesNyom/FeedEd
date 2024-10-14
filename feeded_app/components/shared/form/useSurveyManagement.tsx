@@ -95,7 +95,7 @@ export const useSurveyManagement = () => {
     type: "success" | "error" | "info";
     message: string;
   } | null>(null);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
   const showAlert = useCallback(
     (type: "success" | "error" | "info", message: string) => {
@@ -425,7 +425,7 @@ export const useSurveyManagement = () => {
         );
       }
       if (sentCount === 0 && errorCount === 0) {
-        showAlert("info", "No new cold surveys to send.");
+        showAlert("info", "Aucune enquête à froid à envoyer.");
       }
     },
     [programs, sendSurveyEmail, updateStudentEmailStatus, showAlert]
@@ -645,8 +645,7 @@ export const useSurveyManagement = () => {
         console.error(`No ${formType} form answers available.`);
         showAlert(
           "error",
-          `No ${formType} form answers available for download.`
-        );
+          `Aucune réponse de formulaire ${formType} disponible pour le téléchargement.`);
         return;
       }
 
@@ -655,7 +654,7 @@ export const useSurveyManagement = () => {
 
       if (csv === "No data available") {
         console.error(`Generated CSV is empty for ${formType} answers.`);
-        showAlert("error", `No data available for ${formType} form answers.`);
+        showAlert("error", `Aucune donnée disponible pour le formulaire ${formType} .`);
         return;
       }
 
@@ -664,9 +663,9 @@ export const useSurveyManagement = () => {
       console.log("Download initiated.");
       showAlert(
         "success",
-        `${
+        `Les ${
           formType.charAt(0).toUpperCase() + formType.slice(1)
-        } form answers downloaded successfully.`
+        }  réponses ont été téléchargées avec succès.`
       );
     },
     [formAnswers, generateCSV, downloadCSV, showAlert]

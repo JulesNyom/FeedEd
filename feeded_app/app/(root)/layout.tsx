@@ -7,13 +7,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html>
-      <body>
     <div>
     <Header />
       <main>{children}</main>
     </div>
-    </body>
-    </html>
   )
 }

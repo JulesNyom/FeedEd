@@ -11,27 +11,28 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { SearchIcon, UsersIcon, FlameIcon, SnowflakeIcon, ChevronDownIcon, SendIcon, DownloadIcon, XIcon, CheckCircleIcon, AlertTriangleIcon } from "lucide-react"
-import { useSurveyManagement, Program, ResponseData } from "@/lib/useSurveyManagement"
+import { useSurveyManagement, Program, ResponseData } from "@/components/shared/form/useSurveyManagement"
+import ErrorPage from "@/app/not-found"
 
 const ResponseDetails: React.FC<{ responsesChaud: ResponseData; reponsesFroid: ResponseData }> = ({ responsesChaud, reponsesFroid }) => {
   const [showChaud, setShowChaud] = useState(true)
   const responses = showChaud ? responsesChaud : reponsesFroid
 
   return (
-    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="w-64 p-4 space-y-4">
+    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="w-full sm:w-64 p-4 space-y-4">
       <div className="flex items-center justify-between space-x-4">
-        <span className={`text-sm font-medium ${showChaud ? "text-orange-500" : "text-gray-500"}`}>À chaud</span>
+        <span className={`text-xs sm:text-sm font-medium ${showChaud ? "text-orange-500" : "text-gray-500"}`}>À chaud</span>
         <Switch checked={!showChaud} onCheckedChange={() => setShowChaud(!showChaud)} className="data-[state=checked]:bg-blue-500" />
-        <span className={`text-sm font-medium ${!showChaud ? "text-blue-500" : "text-gray-500"}`}>À froid</span>
+        <span className={`text-xs sm:text-sm font-medium ${!showChaud ? "text-blue-500" : "text-gray-500"}`}>À froid</span>
       </div>
       <AnimatePresence mode="wait">
         <motion.div key={showChaud ? "chaud" : "froid"} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.2 }} className="space-y-2">
-          <h3 className="font-semibold mb-2">{showChaud ? "Réponses à chaud" : "Réponses à froid"}</h3>
+          <h3 className="text-sm sm:text-base font-semibold mb-2">{showChaud ? "Réponses à chaud" : "Réponses à froid"}</h3>
           <div className="space-y-2">
             {Object.entries(responses).map(([key, value]) => (
-              <div key={key} className={`flex justify-between items-center p-2 rounded ${key === 'envoye' ? 'bg-green-100 dark:bg-green-900' : key === 'enAttente' ? 'bg-yellow-100 dark:bg-yellow-900' : 'bg-red-100 dark:bg-red-900'}`}>
-                <div className="text-sm">{key.charAt(0).toUpperCase() + key.slice(1)} :</div>
-                <div className="text-sm font-semibold">{value}</div>
+              <div key={key} className={`flex justify-between items-center p-2 rounded text-xs sm:text-sm ${key === 'envoye' ? 'bg-green-100 dark:bg-green-900' : key === 'enAttente' ? 'bg-yellow-100 dark:bg-yellow-900' : 'bg-red-100 dark:bg-red-900'}`}>
+                <div>{key.charAt(0).toUpperCase() + key.slice(1)} :</div>
+                <div className="font-semibold">{value}</div>
               </div>
             ))}
           </div>
@@ -111,15 +112,12 @@ export default function SurveyManagement() {
 
   if (error) {
     return (
-      <div className="text-center mt-8 text-red-500">
-        <h2 className="text-2xl font-bold mb-4">Error</h2>
-        <p>{error}</p>
-      </div>
+      <ErrorPage />
     )
   }
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="container mx-auto p-4 space-y-6">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="container mx-auto px-4 py-6 space-y-6">
       <AnimatePresence>
         {alert && (
           <motion.div
@@ -127,7 +125,7 @@ export default function SurveyManagement() {
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: 50, x: 50 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed bottom-4 right-4 z-50 w-80 sm:w-96"
+            className="fixed bottom-4 right-4 z-50 w-full max-w-sm"
           >
             <Alert
               variant={alert.type === 'success' ? 'default' : 'destructive'}
@@ -145,7 +143,7 @@ export default function SurveyManagement() {
                   <AlertTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">
                     {alert.type === 'success' ? 'Succès' : 'Erreur'}
                   </AlertTitle>
-                  <AlertDescription className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  <AlertDescription className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     {alert.message}
                   </AlertDescription>
                 </div>
@@ -164,7 +162,7 @@ export default function SurveyManagement() {
         )}
       </AnimatePresence>
 
-      <motion.h1 initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }} className="text-2xl font-bold">
+      <motion.h1 initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }} className="text-xl sm:text-2xl font-bold">
         Gestion des enquêtes
       </motion.h1>
       <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4, duration: 0.5 }} className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
@@ -174,15 +172,15 @@ export default function SurveyManagement() {
         </div>
         <div className="flex space-x-2 w-full sm:w-auto">
           <Link href="/hot">
-            <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl shadow-lg">
-              <FlameIcon className="h-4 w-4 mr-2" />
+            <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl shadow-lg text-xs sm:text-sm py-1 px-2 sm:py-2 sm:px-4">
+              <FlameIcon className="h-4 w-4 mr-1 sm:mr-2" />
               <span className="hidden sm:inline">Voir l&apos;enquête à chaud</span>
               <span className="sm:hidden">À chaud</span>
             </Button>
           </Link>
           <Link href="/cold">
-            <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-xl shadow-lg">
-              <SnowflakeIcon className="h-4 w-4 mr-2" />
+            <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-xl shadow-lg text-xs sm:text-sm py-1 px-2 sm:py-2 sm:px-4">
+              <SnowflakeIcon className="h-4 w-4 mr-1 sm:mr-2" />
               <span className="hidden sm:inline">Voir l&apos;enquête à froid</span>
               <span className="sm:hidden">À froid</span>
             </Button>
@@ -193,7 +191,7 @@ export default function SurveyManagement() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="min-w-[200px]">Formation</TableHead>
+              <TableHead>Formation</TableHead>
               <TableHead className="text-center">Apprenants</TableHead>
               <TableHead className="text-center">Statuts</TableHead>
               <TableHead className="text-center">Total à chaud</TableHead>
@@ -205,19 +203,19 @@ export default function SurveyManagement() {
           <TableBody>
             {programs.map((program: Program) => (
               <TableRow key={program.id}>
-                <TableCell className="font-medium">{program.name}</TableCell>
+                <TableCell className="font-medium text-xs sm:text-sm">{program.name}</TableCell>
                 <TableCell className="text-center">
                   <div className="flex items-center justify-center">
-                    <UsersIcon className="h-4 w-4 mr-2 text-gray-500" />
-                    {program.students.length}
+                    <UsersIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-gray-500" />
+                    <span className="text-xs sm:text-sm">{program.students.length}</span>
                   </div>
                 </TableCell>
                 <TableCell className="text-center">
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" size="sm" className="flex items-center justify-center">
-                        <span className="mr-2">Voir détails</span>
-                        <ChevronDownIcon className="h-4 w-4" />
+                      <Button variant="outline" size="sm" className="flex items-center justify-center text-xs sm:text-sm py-1 px-2 sm:py-2 sm:px-4">
+                        <span className="mr-1 sm:mr-2">Voir détails</span>
+                        <ChevronDownIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-fit p-0">
@@ -227,33 +225,33 @@ export default function SurveyManagement() {
                 </TableCell>
                 <TableCell className="text-center">
                   <div className="flex items-center justify-center">
-                    <FlameIcon className="h-4 w-4 mr-2 text-orange-500" />
-                    {calculateTotalResponses(program.reponsesChaud)}
+                    <FlameIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-orange-500" />
+                    <span className="text-xs sm:text-sm">{calculateTotalResponses(program.reponsesChaud)}</span>
                   </div>
                 </TableCell>
                 <TableCell className="text-center">
                   <div className="flex items-center justify-center">
-                    <SnowflakeIcon className="h-4 w-4 mr-2 text-blue-500" />
-                    {calculateTotalResponses(program.reponsesFroid)}
+                    <SnowflakeIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-blue-500" />
+                    <span className="text-xs sm:text-sm">{calculateTotalResponses(program.reponsesFroid)}</span>
                   </div>
+                
                 </TableCell>
                 <TableCell className="text-center">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" disabled={sendingSurvey[program.id]}>
+                      <Button variant="outline" size="sm" disabled={sendingSurvey[program.id]} className="text-xs sm:text-sm py-1 px-2 sm:py-2 sm:px-4">
                         Envoyer
-                        {sendingSurvey[program.id] ? <span className="animate-spin ml-2">⏳</span> : <SendIcon className="h-4 w-4 ml-2" />}
+                        {sendingSurvey[program.id] ? <span className="animate-spin ml-1 sm:ml-2">⏳</span> : <SendIcon className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleSendSurvey(program.id, 
-                      "hot")}>
-                        <FlameIcon className="h-4 w-4 mr-2 text-orange-500" />
-                        <span>Enquête à chaud</span>
+                      <DropdownMenuItem onClick={() => handleSendSurvey(program.id, "hot")}>
+                        <FlameIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-orange-500" />
+                        <span className="text-xs sm:text-sm">Enquête à chaud</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleSendSurvey(program.id, "cold")}>
-                        <SnowflakeIcon className="h-4 w-4 mr-2 text-blue-500" />
-                        <span>Enquête à froid</span>
+                        <SnowflakeIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-blue-500" />
+                        <span className="text-xs sm:text-sm">Enquête à froid</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -261,19 +259,19 @@ export default function SurveyManagement() {
                 <TableCell className="text-center">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" disabled={downloadingAnswers[program.id]}>
+                      <Button variant="outline" size="sm" disabled={downloadingAnswers[program.id]} className="text-xs sm:text-sm py-1 px-2 sm:py-2 sm:px-4">
                         Télécharger
-                        {downloadingAnswers[program.id] ? <span className="animate-spin ml-2">⏳</span> : <DownloadIcon className="h-4 w-4 ml-2" />}
+                        {downloadingAnswers[program.id] ? <span className="animate-spin ml-1 sm:ml-2">⏳</span> : <DownloadIcon className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => handleDownloadResponses(program.id, "hot")}>
-                        <FlameIcon className="h-4 w-4 mr-2 text-orange-500" />
-                        <span>Réponses à chaud</span>
+                        <FlameIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-orange-500" />
+                        <span className="text-xs sm:text-sm">Réponses à chaud</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleDownloadResponses(program.id, "cold")}>
-                        <SnowflakeIcon className="h-4 w-4 mr-2 text-blue-500" />
-                        <span>Réponses à froid</span>
+                        <SnowflakeIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-blue-500" />
+                        <span className="text-xs sm:text-sm">Réponses à froid</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -285,11 +283,11 @@ export default function SurveyManagement() {
       </motion.div>
       {totalPages > 1 && (
         <div className="flex justify-center items-center space-x-2 mt-4">
-          <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+          <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="text-xs sm:text-sm py-1 px-2 sm:py-2 sm:px-4">
             Previous
           </Button>
-          <span>{`Page ${currentPage} of ${totalPages}`}</span>
-          <Button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+          <span className="text-xs sm:text-sm">{`Page ${currentPage} of ${totalPages}`}</span>
+          <Button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="text-xs sm:text-sm py-1 px-2 sm:py-2 sm:px-4">
             Next
           </Button>
         </div>

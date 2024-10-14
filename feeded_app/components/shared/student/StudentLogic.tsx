@@ -50,7 +50,7 @@ export function useStudentManagement() {
   const [showForm, setShowForm] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const studentsPerPage = 5;
+  const studentsPerPage = 10;
 
   const filterStudents = useCallback(() => {
     console.log("Filtering students with search term:", searchTerm);

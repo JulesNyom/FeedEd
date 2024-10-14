@@ -32,7 +32,7 @@ export function TrainingProgramList({
   onDelete,
 }: TrainingProgramListProps) {
   const [currentPage, setCurrentPage] = useState(1)
-  const programsPerPage = 5
+  const programsPerPage = 20
 
   const indexOfLastProgram = currentPage * programsPerPage
   const indexOfFirstProgram = indexOfLastProgram - programsPerPage
@@ -54,7 +54,7 @@ export function TrainingProgramList({
       transition={{ duration: 0.5 }}
       className="space-y-4"
     >
-      <div className="rounded-lg border overflow-hidden">
+      <div className="rounded-lg">
         <Table>
           <TableHeader>
             <TableRow>

@@ -11,10 +11,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
       <AuthWrapper>
-        <body>{children}</body>
+        {children}
       </AuthWrapper>
-    </html>
   );
 }
