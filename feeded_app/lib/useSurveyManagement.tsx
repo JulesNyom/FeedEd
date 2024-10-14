@@ -81,7 +81,19 @@ export const useSurveyManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formAnswers, setFormAnswers] = useState<OrganizedFormAnswers | null>(null);
+  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const itemsPerPage = 5;
+
+  const showAlert = useCallback((type: 'success' | 'error', message: string) => {
+    setAlert({ type, message });
+    setTimeout(() => {
+      setAlert(null);
+    }, 5000);
+  }, []);
+
+  const hideAlert = useCallback(() => {
+    setAlert(null);
+  }, []);
 
   const fetchPrograms = useCallback(async () => {
     const user = auth.currentUser;
@@ -222,10 +234,14 @@ export const useSurveyManagement = () => {
     const program = programs.find(p => p.id === programId);
     if (!program) {
       console.error(`Program with id ${programId} not found`);
+      showAlert('error', `Program with id ${programId} not found`);
       return;
     }
 
     const updatedProgram = { ...program };
+    let sentCount = 0;
+    let errorCount = 0;
+
     for (const student of updatedProgram.students) {
       if (!student.hotEmailSent) {
         try {
@@ -233,24 +249,40 @@ export const useSurveyManagement = () => {
           await updateStudentEmailStatus(updatedProgram.id, student.id, 'hot');
           updatedProgram.reponsesChaud.envoye++;
           student.hotEmailSent = true;
+          sentCount++;
         } catch (error) {
           console.error(`Failed to send hot survey email to ${student.email}:`, error);
           updatedProgram.reponsesChaud.enAttente++;
+          errorCount++;
         }
       }
     }
 
     setPrograms(prevPrograms => prevPrograms.map(p => p.id === programId ? updatedProgram : p));
-  }, [programs, sendSurveyEmail, updateStudentEmailStatus]);
+
+    if (sentCount > 0) {
+      showAlert('success', `Successfully sent ${sentCount} hot survey${sentCount > 1 ? 's' : ''}.`);
+    }
+    if (errorCount > 0) {
+      showAlert('error', `Failed to send ${errorCount} hot survey${errorCount > 1 ? 's' : ''}.`);
+    }
+    if (sentCount === 0 && errorCount === 0) {
+      showAlert('info', 'No new hot surveys to send.');
+    }
+  }, [programs, sendSurveyEmail, updateStudentEmailStatus, showAlert]);
 
   const sendColdSurveys = useCallback(async (programId: string) => {
     const program = programs.find(p => p.id === programId);
     if (!program) {
       console.error(`Program with id ${programId} not found`);
+      showAlert('error', `Program with id ${programId} not found`);
       return;
     }
 
     const updatedProgram = { ...program };
+    let sentCount = 0;
+    let errorCount = 0;
+
     for (const student of updatedProgram.students) {
       if (!student.coldEmailSent) {
         try {
@@ -258,15 +290,27 @@ export const useSurveyManagement = () => {
           await updateStudentEmailStatus(updatedProgram.id, student.id, 'cold');
           updatedProgram.reponsesFroid.envoye++;
           student.coldEmailSent = true;
+          sentCount++;
         } catch (error) {
           console.error(`Failed to send cold survey email to ${student.email}:`, error);
           updatedProgram.reponsesFroid.enAttente++;
+          errorCount++;
         }
       }
     }
 
     setPrograms(prevPrograms => prevPrograms.map(p => p.id === programId ? updatedProgram : p));
-  }, [programs, sendSurveyEmail, updateStudentEmailStatus]);
+
+    if (sentCount > 0) {
+      showAlert('success', `Successfully sent ${sentCount} cold survey${sentCount > 1 ? 's' : ''}.`);
+    }
+    if (errorCount > 0) {
+      showAlert('error', `Failed to send ${errorCount} cold survey${errorCount > 1 ? 's' : ''}.`);
+    }
+    if (sentCount === 0 && errorCount === 0) {
+      showAlert('info', 'No new cold surveys to send.');
+    }
+  }, [programs, sendSurveyEmail, updateStudentEmailStatus, showAlert]);
 
   const fetchFormAnswersByProgram = useCallback(async (programId: string): Promise<OrganizedFormAnswers> => {
     console.log(`Starting fetchFormAnswersByProgram for programId: ${programId}`);
@@ -294,7 +338,7 @@ export const useSurveyManagement = () => {
       querySnapshot.forEach(doc => {
         console.log(`Processing document ${doc.id}`);
         const data = doc.data();
-        console.log("Raw document data:", data); // Log raw data for debugging
+        console.log("Raw document data:", data);
 
         const formAnswer: FormAnswer = {
           id: doc.id,
@@ -302,7 +346,7 @@ export const useSurveyManagement = () => {
           studentId: data.studentId,
           programId: data.programId,
           submittedAt: data.submittedAt.toDate(),
-          answers: data // Store all fields from the document
+          answers: data
         };
 
         if (formAnswer.formType === "hot") {
@@ -391,7 +435,7 @@ export const useSurveyManagement = () => {
       }
     }
 
-    console.log('CSV Rows before join:', csvRows); // Log all rows before joining
+    console.log('CSV Rows before join:', csvRows);
     return csvRows.join('\n');
   }, []);
   
@@ -421,14 +465,16 @@ export const useSurveyManagement = () => {
     
     if (!currentFormAnswers) {
       console.error("formAnswers is null. Please fetch the data first.");
-      throw new Error("No form answers available. Please fetch the data first.");
+      showAlert('error', "No form answers available. Please fetch the data first.");
+      return;
     }
 
     const answers = formType === "hot" ? currentFormAnswers.hot : currentFormAnswers.cold;
     
     if (answers.length === 0) {
       console.error(`No ${formType} form answers available.`);
-      throw new Error(`No ${formType} form answers available for download.`);
+      showAlert('error', `No ${formType} form answers available for download.`);
+      return;
     }
 
     console.log(`Generating CSV for ${formType} answers:`, answers);
@@ -436,13 +482,15 @@ export const useSurveyManagement = () => {
     
     if (csv === "No data available") {
       console.error(`Generated CSV is empty for ${formType} answers.`);
-      throw new Error(`No data available for ${formType} form answers.`);
+      showAlert('error', `No data available for ${formType} form answers.`);
+      return;
     }
 
     console.log("CSV generated successfully. Initiating download...");
     downloadCSV(csv, `${formType}_form_answers.csv`);
     console.log("Download initiated.");
-  }, [formAnswers, generateCSV, downloadCSV]);
+    showAlert('success', `${formType.charAt(0).toUpperCase() + formType.slice(1)} form answers downloaded successfully.`);
+  }, [formAnswers, generateCSV, downloadCSV, showAlert]);
 
   useEffect(() => {
     const fetchProgramsData = async () => {
@@ -487,6 +535,9 @@ export const useSurveyManagement = () => {
     downloadFormAnswers,
     formAnswers,
     setFormAnswers,
-    generateCSV
+    generateCSV,
+    alert,
+    showAlert,
+    hideAlert
   };
 };

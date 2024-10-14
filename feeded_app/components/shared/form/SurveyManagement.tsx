@@ -1,6 +1,6 @@
-'use client'
+"use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { SearchIcon, UsersIcon, FlameIcon, SnowflakeIcon, ChevronDownIcon, SendIcon, DownloadIcon } from "lucide-react"
 import { useSurveyManagement, Program, ResponseData } from "@/lib/useSurveyManagement"
 
@@ -40,8 +41,24 @@ const ResponseDetails: React.FC<{ responsesChaud: ResponseData; reponsesFroid: R
   )
 }
 
-export default function Component() {
-  const { programs, searchTerm, setSearchTerm, currentPage, setCurrentPage, error, totalPages, sendHotSurveys, sendColdSurveys, fetchFormAnswersByProgram, downloadFormAnswers, setFormAnswers } = useSurveyManagement()
+export default function SurveyManagement() {
+  const { 
+    programs, 
+    searchTerm, 
+    setSearchTerm, 
+    currentPage, 
+    setCurrentPage, 
+    error, 
+    totalPages, 
+    sendHotSurveys, 
+    sendColdSurveys, 
+    fetchFormAnswersByProgram, 
+    downloadFormAnswers, 
+    setFormAnswers,
+    alert,
+    hideAlert,
+    isLoading
+  } = useSurveyManagement()
   const [sendingSurvey, setSendingSurvey] = useState<{ [key: string]: boolean }>({})
   const [downloadingAnswers, setDownloadingAnswers] = useState<{ [key: string]: boolean }>({})
 
@@ -49,7 +66,6 @@ export default function Component() {
     setSendingSurvey((prev) => ({ ...prev, [programId]: true }))
     try {
       await (type === "hot" ? sendHotSurveys(programId) : sendColdSurveys(programId))
-      console.log(`Sent ${type} survey for program ${programId}`)
     } catch (error) {
       console.error(`Error sending ${type} survey for program ${programId}:`, error)
     } finally {
@@ -64,7 +80,6 @@ export default function Component() {
       setFormAnswers(fetchedAnswers)
       await new Promise((resolve) => setTimeout(resolve, 0))
       downloadFormAnswers(type, fetchedAnswers)
-      console.log(`Downloaded ${type} survey responses for program ${programId}`)
     } catch (error) {
       console.error(`Error downloading ${type} survey responses for program ${programId}:`, error)
     } finally {
@@ -72,15 +87,51 @@ export default function Component() {
     }
   }
 
-  if (error) return <div className="text-center mt-8 text-red-500">{error}</div>
+  const calculateTotalResponses = (responses: ResponseData) => {
+    return Object.values(responses).reduce((sum, value) => sum + value, 0)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center mt-8 text-red-500">
+        <h2 className="text-2xl font-bold mb-4">Error</h2>
+        <p>{error}</p>
+      </div>
+    )
+  }
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="container mx-auto p-4 space-y-6">
+      <AnimatePresence>
+        {alert && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Alert variant={alert.type === 'success' ? 'default' : 'destructive'}>
+              <AlertTitle>{alert.type === 'success' ? 'Success' : 'Error'}</AlertTitle>
+              <AlertDescription>{alert.message}</AlertDescription>
+              <Button className="ml-auto" onClick={hideAlert}>Dismiss</Button>
+            </Alert>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.h1 initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }} className="text-2xl font-bold">
         Gestion des enquêtes
       </motion.h1>
       <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4, duration: 0.5 }} className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
-        <div className="relative w-full sm:w-1/2">
+        <div className="relative w-full sm:w-64">
           <SearchIcon className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
           <Input type="text" placeholder="Rechercher une formation..." className="pl-8 w-full" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
@@ -88,14 +139,14 @@ export default function Component() {
           <Link href="/hot">
             <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl shadow-lg">
               <FlameIcon className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Voir l&lsquo;enquête à chaud</span>
+              <span className="hidden sm:inline">Voir l&apos;enquête à chaud</span>
               <span className="sm:hidden">À chaud</span>
             </Button>
           </Link>
           <Link href="/cold">
             <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-xl shadow-lg">
               <SnowflakeIcon className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Voir l&lsquo;enquête à froid</span>
+              <span className="hidden sm:inline">Voir l&apos;enquête à froid</span>
               <span className="sm:hidden">À froid</span>
             </Button>
           </Link>
@@ -108,6 +159,8 @@ export default function Component() {
               <TableHead className="min-w-[200px]">Formation</TableHead>
               <TableHead className="text-center">Apprenants</TableHead>
               <TableHead className="text-center">Statuts</TableHead>
+              <TableHead className="text-center">Total à chaud</TableHead>
+              <TableHead className="text-center">Total à froid</TableHead>
               <TableHead className="text-center">Envoyer</TableHead>
               <TableHead className="text-center">Télécharger</TableHead>
             </TableRow>
@@ -134,6 +187,18 @@ export default function Component() {
                       <ResponseDetails responsesChaud={program.reponsesChaud} reponsesFroid={program.reponsesFroid} />
                     </PopoverContent>
                   </Popover>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center">
+                    <FlameIcon className="h-4 w-4 mr-2 text-orange-500" />
+                    {calculateTotalResponses(program.reponsesChaud)}
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center">
+                    <SnowflakeIcon className="h-4 w-4 mr-2 text-blue-500" />
+                    {calculateTotalResponses(program.reponsesFroid)}
+                  </div>
                 </TableCell>
                 <TableCell className="text-center">
                   <DropdownMenu>

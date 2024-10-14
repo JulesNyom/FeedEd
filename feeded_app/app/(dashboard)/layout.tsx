@@ -16,11 +16,6 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <head>
-      <link rel="icon" href="/assets/icons/logo.svg" sizes="any" />
-      </head>
-      <body>
         <AuthWrapper>
           <div className="bg-background max-h-screen overflow-auto grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
             <Sidebar />
@@ -30,7 +25,5 @@ export default function DashboardLayout({
             </div>
           </div>
         </AuthWrapper>
-      </body>
-    </html>
   );
 }
