@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { SearchIcon, UsersIcon, FlameIcon, SnowflakeIcon, ChevronDownIcon, SendIcon, DownloadIcon } from "lucide-react"
+import { SearchIcon, UsersIcon, FlameIcon, SnowflakeIcon, ChevronDownIcon, SendIcon, DownloadIcon, XIcon, CheckCircleIcon, AlertTriangleIcon } from "lucide-react"
 import { useSurveyManagement, Program, ResponseData } from "@/lib/useSurveyManagement"
 
 const ResponseDetails: React.FC<{ responsesChaud: ResponseData; reponsesFroid: ResponseData }> = ({ responsesChaud, reponsesFroid }) => {
@@ -57,7 +57,6 @@ export default function SurveyManagement() {
     setFormAnswers,
     alert,
     hideAlert,
-    isLoading
   } = useSurveyManagement()
   const [sendingSurvey, setSendingSurvey] = useState<{ [key: string]: boolean }>({})
   const [downloadingAnswers, setDownloadingAnswers] = useState<{ [key: string]: boolean }>({})
@@ -87,17 +86,28 @@ export default function SurveyManagement() {
     }
   }
 
-  const calculateTotalResponses = (responses: ResponseData) => {
-    return Object.values(responses).reduce((sum, value) => sum + value, 0)
-  }
+  const calculateTotalResponses = (responses: ResponseData): number => {
+    if (!responses || typeof responses !== 'object') {
+      console.error('Invalid responses data:', responses);
+      return 0;
+    }
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
-      </div>
-    )
-  }
+    try {
+      const responseCounts = Object.values(responses);
+      const total = responseCounts.reduce((sum, count) => {
+        if (typeof count !== 'number') {
+          console.warn('Non-numeric count found:', count);
+          return sum;
+        }
+        return sum + count;
+      }, 0);
+
+      return total;
+    } catch (error) {
+      console.error('Error calculating total responses:', error);
+      return 0;
+    }
+  };
 
   if (error) {
     return (
@@ -113,15 +123,42 @@ export default function SurveyManagement() {
       <AnimatePresence>
         {alert && (
           <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: 50, x: 50 }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: 50, x: 50 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed bottom-4 right-4 z-50 w-80 sm:w-96"
           >
-            <Alert variant={alert.type === 'success' ? 'default' : 'destructive'}>
-              <AlertTitle>{alert.type === 'success' ? 'Success' : 'Error'}</AlertTitle>
-              <AlertDescription>{alert.message}</AlertDescription>
-              <Button className="ml-auto" onClick={hideAlert}>Dismiss</Button>
+            <Alert
+              variant={alert.type === 'success' ? 'default' : 'destructive'}
+              className="border-l-4 bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden"
+            >
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  {alert.type === 'success' ? (
+                    <CheckCircleIcon className="h-5 w-5 text-green-400" aria-hidden="true" />
+                  ) : (
+                    <AlertTriangleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+                  )}
+                </div>
+                <div className="ml-3 w-0 flex-1 pt-0.5">
+                  <AlertTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {alert.type === 'success' ? 'Succès' : 'Erreur'}
+                  </AlertTitle>
+                  <AlertDescription className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    {alert.message}
+                  </AlertDescription>
+                </div>
+                <div className="ml-4 flex-shrink-0 flex">
+                  <button
+                    className="bg-white dark:bg-gray-800 rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    onClick={hideAlert}
+                  >
+                    <span className="sr-only">Fermer</span>
+                    <XIcon className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
             </Alert>
           </motion.div>
         )}
@@ -209,7 +246,8 @@ export default function SurveyManagement() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleSendSurvey(program.id, "hot")}>
+                      <DropdownMenuItem onClick={() => handleSendSurvey(program.id, 
+                      "hot")}>
                         <FlameIcon className="h-4 w-4 mr-2 text-orange-500" />
                         <span>Enquête à chaud</span>
                       </DropdownMenuItem>
