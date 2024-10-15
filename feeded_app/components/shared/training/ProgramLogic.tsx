@@ -20,6 +20,7 @@ export function useProgramLogic() {
   const [editingProgram, setEditingProgram] = useState<TrainingProgram | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<StatusFilterType>("all")
+  const [programToDelete, setProgramToDelete] = useState<string | null>(null)
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -101,7 +102,13 @@ export function useProgramLogic() {
     }
   }
 
-  const handleDeleteProgram = async (id: string) => {
+  const handleDeleteProgram = (id: string) => {
+    setProgramToDelete(id)
+  }
+
+  const confirmDeleteProgram = async () => {
+    if (!programToDelete) return
+
     const user = auth.currentUser
     if (!user) {
       console.error("No authenticated user found")
@@ -109,11 +116,16 @@ export function useProgramLogic() {
     }
 
     try {
-      await deleteDoc(doc(db, `users/${user.uid}/programs`, id))
-      setPrograms(programs.filter(p => p.id !== id))
+      await deleteDoc(doc(db, `users/${user.uid}/programs`, programToDelete))
+      setPrograms(programs.filter(p => p.id !== programToDelete))
+      setProgramToDelete(null)
     } catch (error) {
       console.error("Error deleting document: ", error)
     }
+  }
+
+  const cancelDeleteProgram = () => {
+    setProgramToDelete(null)
   }
 
   return {
@@ -129,5 +141,8 @@ export function useProgramLogic() {
     setStatusFilter,
     handleSubmitProgram,
     handleDeleteProgram,
+    programToDelete,
+    confirmDeleteProgram,
+    cancelDeleteProgram,
   }
 }

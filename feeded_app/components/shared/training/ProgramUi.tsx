@@ -26,13 +26,14 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import {
   useProgramLogic,
   TrainingProgram,
   StatusFilterType,
-} from "./ProgramLogic"; // Updated import
+} from "./ProgramLogic";
 
 export default function ProgramUI() {
   const {
@@ -47,6 +48,9 @@ export default function ProgramUI() {
     setEditingProgram,
     handleSubmitProgram,
     handleDeleteProgram,
+    programToDelete,
+    confirmDeleteProgram,
+    cancelDeleteProgram,
   } = useProgramLogic();
 
   return (
@@ -127,6 +131,12 @@ export default function ProgramUI() {
           }}
           onSubmit={handleSubmitProgram}
           editingProgram={editingProgram}
+        />
+
+        <DeleteConfirmationDialog
+          isOpen={!!programToDelete}
+          onConfirm={confirmDeleteProgram}
+          onCancel={cancelDeleteProgram}
         />
       </div>
     </motion.div>
@@ -360,6 +370,42 @@ function TrainingProgramForm({
               : "Ajouter le programme"}
           </Button>
         </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface DeleteConfirmationDialogProps {
+  isOpen: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+function DeleteConfirmationDialog({
+  isOpen,
+  onConfirm,
+  onCancel,
+}: DeleteConfirmationDialogProps) {
+  return (
+    <Dialog open={isOpen} onOpenChange={onCancel}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Confirmer la suppression</DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          <p>Êtes-vous sûr de vouloir supprimer ce programme de formation ?</p>
+          <p className="text-sm text-gray-500 mt-2">
+            Cette action est irréversible.
+          </p>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onCancel}>
+            Annuler
+          </Button>
+          <Button variant="destructive" onClick={onConfirm}>
+            Supprimer
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
