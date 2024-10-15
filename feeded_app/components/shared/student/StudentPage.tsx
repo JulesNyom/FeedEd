@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { motion } from "framer-motion";
+import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,8 +32,6 @@ import {
   FileSpreadsheet,
   Edit,
   Trash2,
-  ChevronLeft,
-  ChevronRight,
   Mail,
   CheckCircle,
   AlertCircle,
@@ -56,7 +54,7 @@ interface Student {
   coldEmailSentDate?: Date;
 }
 
-export default function StudentManagementUI() {
+export default function Component() {
   const {
     filteredStudents,
     programs,
@@ -70,24 +68,8 @@ export default function StudentManagementUI() {
     showForm,
     setShowForm,
     editingStudent,
-    currentPage,
-    setCurrentPage,
-    studentsPerPage,
     exportToCSV,
   } = useStudentManagement();
-
-  const { currentStudents, totalPages } = useMemo(() => {
-    const indexOfLastStudent = currentPage * studentsPerPage;
-    const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-    const currentStudents = filteredStudents.slice(
-      indexOfFirstStudent,
-      indexOfLastStudent
-    );
-    return {
-      currentStudents,
-      totalPages: Math.ceil(filteredStudents.length / studentsPerPage),
-    };
-  }, [filteredStudents, currentPage, studentsPerPage]);
 
   const getFormStatusIcon = (
     status: "sent" | "responded" | "reminded" | "none"
@@ -212,139 +194,89 @@ export default function StudentManagementUI() {
           {error}
         </motion.div>
       )}
-
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.6, duration: 0.5 }}
-        className="overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="font-semibold">Prénom</TableHead>
-              <TableHead className="font-semibold">Nom</TableHead>
-              <TableHead className="font-semibold">Email</TableHead>
-              <TableHead className="font-semibold">Formation</TableHead>
-              <TableHead className="font-semibold">
-                Formulaire à chaud
-              </TableHead>
-              <TableHead className="font-semibold">
-                Formulaire à froid
-              </TableHead>
-              <TableHead className="font-semibold">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {currentStudents.map((student) => (
-              <TableRow key={student.id}>
-                <TableCell>{student.firstName}</TableCell>
-                <TableCell>{student.lastName}</TableCell>
-                <TableCell>{student.email}</TableCell>
-                <TableCell>
-                  {programs.find((p) => p.id === student.programId)?.name ||
-                    "N/A"}
-                </TableCell>
-                <TableCell>{renderFormStatus("hot", student)}</TableCell>
-                <TableCell>{renderFormStatus("cold", student)}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(student)}
-                        className="h-8 w-8 p-0">
-                        <Edit className="h-4 w-4" />
-                        <span className="sr-only">
-                          Modifier l&apos;étudiant
-                        </span>
-                      </Button>
-                    </motion.div>
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          if (
-                            window.confirm(
-                              `Êtes-vous sûr de vouloir supprimer ${student.firstName} ${student.lastName} ?`
-                            )
-                          ) {
-                            handleDelete(student.id, student.programId);
-                          }
-                        }}
-                        className="h-8 w-8 p-0">
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">
-                          Supprimer l&apos;étudiant
-                        </span>
-                      </Button>
-                    </motion.div>
-                  </div>
-                </TableCell>
+        <div className="max-h-[calc(100vh-15rem)] overflow-auto invisible-scrollbar group-hover:visible-scrollbar">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-semibold">Prénom</TableHead>
+                <TableHead className="font-semibold">Nom</TableHead>
+                <TableHead className="font-semibold">Email</TableHead>
+                <TableHead className="font-semibold">Formation</TableHead>
+                <TableHead className="font-semibold">
+                  Formulaire à chaud
+                </TableHead>
+                <TableHead className="font-semibold">
+                  Formulaire à froid
+                </TableHead>
+                <TableHead className="font-semibold">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </motion.div>
-
-      {totalPages > 1 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="flex flex-wrap justify-center items-center mt-4 space-x-2">
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={`${
-                currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-              } mb-2 sm:mb-0`}>
-              <ChevronLeft className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Précédente</span>
-              <span className="sm:hidden">Préc</span>
-            </Button>
-          </motion.div>
-          <div className="flex flex-wrap justify-center space-x-2 mb-2 sm:mb-0">
-            {[...Array(totalPages)].map((_, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}>
-                <Button
-                  variant={currentPage === i + 1 ? "default" : "outline"}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className="w-8 h-8 mb-2 sm:mb-0">
-                  {i + 1}
-                </Button>
-              </motion.div>
-            ))}
-          </div>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              variant="outline"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-              className={`${
-                currentPage === totalPages
-                  ? "opacity-50 cursor-not-allowed"
-                  : ""
-              } mb-2 sm:mb-0`}>
-              <span className="hidden sm:inline">Suivante</span>
-              <span className="sm:hidden">Suiv</span>
-              <ChevronRight className="h-4 w-4 ml-2" />
-            </Button>
-          </motion.div>
-        </motion.div>
-      )}
+            </TableHeader>
+            <TableBody>
+              <AnimatePresence>
+                {filteredStudents.map((student, index) => (
+                  <motion.tr
+                    key={student.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ delay: index * 0.05, duration: 0.3 }}
+                    className="border-b"
+                  >
+                    <TableCell>{student.firstName}</TableCell>
+                    <TableCell>{student.lastName}</TableCell>
+                    <TableCell>{student.email}</TableCell>
+                    <TableCell>
+                      {programs.find((p) => p.id === student.programId)?.name ||
+                        "N/A"}
+                    </TableCell>
+                    <TableCell>{renderFormStatus("hot", student)}</TableCell>
+                    <TableCell>{renderFormStatus("cold", student)}</TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(student)}
+                            className="h-8 w-8 p-0">
+                            <Edit className="h-4 w-4" />
+                            <span className="sr-only">
+                              Modifier l&apos;étudiant
+                            </span>
+                          </Button>
+                        </motion.div>
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  `Êtes-vous sûr de vouloir supprimer ${student.firstName} ${student.lastName} ?`
+                                )
+                              ) {
+                                handleDelete(student.id, student.programId);
+                              }
+                            }}
+                            className="h-8 w-8 p-0">
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">
+                              Supprimer l&apos;étudiant
+                            </span>
+                          </Button>
+                        </motion.div>
+                      </div>
+                    </TableCell>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
+            </TableBody>
+          </Table>
+        </div>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent>
@@ -456,6 +388,7 @@ export default function StudentManagementUI() {
               </Select>
             </div>
             <div className="space-y-2">
+              
               <Label>Formulaire à froid</Label>
               <div className="flex items-center space-x-2">
                 <input
@@ -466,6 +399,7 @@ export default function StudentManagementUI() {
                 />
                 <Label htmlFor="coldEmailSent">Email envoyé</Label>
               </div>
+              
               <Select
                 name="formStatusCold"
                 defaultValue={editingStudent?.formStatusCold || "none"}>

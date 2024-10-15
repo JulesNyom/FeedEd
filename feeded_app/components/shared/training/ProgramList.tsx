@@ -46,7 +46,7 @@ export function TrainingProgramList({
       transition={{ duration: 0.5 }}
       className="space-y-4"
     >
-      <div className="rounded-lg">
+      <div>
         <Table>
           <TableHeader>
             <TableRow>

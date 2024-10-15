@@ -85,7 +85,6 @@ export type OrganizedFormAnswers = {
 export const useSurveyManagement = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formAnswers, setFormAnswers] = useState<OrganizedFormAnswers | null>(
@@ -95,7 +94,6 @@ export const useSurveyManagement = () => {
     type: "success" | "error" | "info";
     message: string;
   } | null>(null);
-  const itemsPerPage = 10;
 
   const showAlert = useCallback(
     (type: "success" | "error" | "info", message: string) => {
@@ -645,7 +643,8 @@ export const useSurveyManagement = () => {
         console.error(`No ${formType} form answers available.`);
         showAlert(
           "error",
-          `Aucune réponse de formulaire ${formType} disponible pour le téléchargement.`);
+          `Aucune réponse de formulaire ${formType} disponible pour le téléchargement.`
+        );
         return;
       }
 
@@ -654,7 +653,10 @@ export const useSurveyManagement = () => {
 
       if (csv === "No data available") {
         console.error(`Generated CSV is empty for ${formType} answers.`);
-        showAlert("error", `Aucune donnée disponible pour le formulaire ${formType} .`);
+        showAlert(
+          "error",
+          `Aucune donnée disponible pour le formulaire ${formType} .`
+        );
         return;
       }
 
@@ -665,7 +667,7 @@ export const useSurveyManagement = () => {
         "success",
         `Les ${
           formType.charAt(0).toUpperCase() + formType.slice(1)
-        }  réponses ont été téléchargées avec succès.`
+        }  réponses ont été téléchargées avec succès.`
       );
     },
     [formAnswers, generateCSV, downloadCSV, showAlert]
@@ -686,11 +688,6 @@ export const useSurveyManagement = () => {
     program.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredPrograms.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentPrograms = filteredPrograms.slice(startIndex, endIndex);
-
   const refreshPrograms = useCallback(async () => {
     setIsLoading(true);
     const fetchedPrograms = await fetchPrograms();
@@ -699,14 +696,11 @@ export const useSurveyManagement = () => {
   }, [fetchPrograms]);
 
   return {
-    programs: currentPrograms,
+    programs: filteredPrograms,
     searchTerm,
     setSearchTerm,
-    currentPage,
-    setCurrentPage,
     isLoading,
     error,
-    totalPages,
     sendHotSurveys,
     sendColdSurveys,
     refreshPrograms,

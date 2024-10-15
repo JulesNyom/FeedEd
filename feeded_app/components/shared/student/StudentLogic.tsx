@@ -49,8 +49,6 @@ export function useStudentManagement() {
   const [updateTrigger, setUpdateTrigger] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const studentsPerPage = 10;
 
   const filterStudents = useCallback(() => {
     console.log("Filtering students with search term:", searchTerm);
@@ -381,9 +379,6 @@ export function useStudentManagement() {
     showForm,
     setShowForm,
     editingStudent,
-    currentPage,
-    setCurrentPage,
-    studentsPerPage,
     exportToCSV,
   };
 }
