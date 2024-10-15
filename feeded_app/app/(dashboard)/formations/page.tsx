@@ -1,9 +1,9 @@
 import React from "react";
-import ProgramTable from "@/components/shared/training/ProgramTable";
+import ProgramUI from "@/components/shared/training/ProgramUi";
 
 const page = () => {
   return (
-      <ProgramTable />
+      <ProgramUI />
   );
 };
 
