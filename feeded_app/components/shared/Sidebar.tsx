@@ -1,7 +1,4 @@
 'use client'
-
-import { Bell } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 import { SidebarNav } from "./SidebarNav"
@@ -28,14 +25,14 @@ export function Sidebar() {
               className="object-contain"
             />
           </Link>
-          <Button 
+          {/* <Button 
             variant="outline" 
             size="icon" 
             className="ml-auto h-9 w-9 rounded-full transition-all duration-200 hover:bg-primary hover:text-primary-foreground"
           >
             <Bell className="h-5 w-5" />
             <span className="sr-only">Toggle notifications</span>
-          </Button>
+          </Button> */}
         </div>
         <div className="flex-1 overflow-auto">
           <SidebarNav />

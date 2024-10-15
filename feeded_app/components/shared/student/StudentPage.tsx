@@ -386,7 +386,7 @@ export default function Component() {
               type="submit"
               className="w-full rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700">
               {editingStudent
-                ? "Mettre à jour l'apprenant"
+                ? "Mettre à jour  l'apprenant"
                 : "Ajouter un apprenant"}
             </Button>
           </form>
@@ -428,7 +428,7 @@ function DeleteConfirmationDialog({
           <DialogTitle>Confirmer la suppression</DialogTitle>
         </DialogHeader>
         <div className="py-4">
-          <p>Êtes-vous sûr de vouloir supprimer l&lsquo;étudiant {studentName} ?</p>
+          <p>Êtes-vous sûr de vouloir supprimer l&apos;étudiant {studentName} ?</p>
           <p className="text-sm text-gray-500 mt-2">
             Cette action est irréversible.
           </p>
