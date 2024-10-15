@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Table,
@@ -70,6 +71,8 @@ export default function Component() {
     editingStudent,
     exportToCSV,
   } = useStudentManagement();
+
+  const [studentToDelete, setStudentToDelete] = React.useState<Student | null>(null);
 
   const getFormStatusIcon = (
     status: "sent" | "responded" | "reminded" | "none"
@@ -253,15 +256,7 @@ export default function Component() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  `Êtes-vous sûr de vouloir supprimer ${student.firstName} ${student.lastName} ?`
-                                )
-                              ) {
-                                handleDelete(student.id, student.programId);
-                              }
-                            }}
+                            onClick={() => setStudentToDelete(student)}
                             className="h-8 w-8 p-0">
                             <Trash2 className="h-4 w-4" />
                             <span className="sr-only">
@@ -378,34 +373,7 @@ export default function Component() {
                 defaultValue={editingStudent?.formStatusHot || "none"}>
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionner un statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Non envoyé</SelectItem>
-                  <SelectItem value="sent">Envoyé</SelectItem>
-                  <SelectItem value="responded">Répondu</SelectItem>
-                  <SelectItem value="reminded">Rappelé</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              
-              <Label>Formulaire à froid</Label>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="coldEmailSent"
-                  name="coldEmailSent"
-                  defaultChecked={editingStudent?.coldEmailSent}
-                />
-                <Label htmlFor="coldEmailSent">Email envoyé</Label>
-              </div>
-              
-              <Select
-                name="formStatusCold"
-                defaultValue={editingStudent?.formStatusCold || "none"}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un statut" />
-                </SelectTrigger>
+                  </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Non envoyé</SelectItem>
                   <SelectItem value="sent">Envoyé</SelectItem>
@@ -424,6 +392,56 @@ export default function Component() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <DeleteConfirmationDialog
+        isOpen={!!studentToDelete}
+        onConfirm={() => {
+          if (studentToDelete) {
+            handleDelete(studentToDelete.id, studentToDelete.programId);
+            setStudentToDelete(null);
+          }
+        }}
+        onCancel={() => setStudentToDelete(null)}
+        studentName={studentToDelete ? `${studentToDelete.firstName} ${studentToDelete.lastName}` : ''}
+      />
     </motion.div>
+  );
+}
+
+interface DeleteConfirmationDialogProps {
+  isOpen: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+  studentName: string;
+}
+
+function DeleteConfirmationDialog({
+  isOpen,
+  onConfirm,
+  onCancel,
+  studentName,
+}: DeleteConfirmationDialogProps) {
+  return (
+    <Dialog open={isOpen} onOpenChange={onCancel}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Confirmer la suppression</DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          <p>Êtes-vous sûr de vouloir supprimer l&lsquo;étudiant {studentName} ?</p>
+          <p className="text-sm text-gray-500 mt-2">
+            Cette action est irréversible.
+          </p>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onCancel}>
+            Annuler
+          </Button>
+          <Button variant="destructive" onClick={onConfirm}>
+            Supprimer
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
