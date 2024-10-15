@@ -29,7 +29,7 @@ export function Topbar(): JSX.Element {
   const pathname = usePathname()
 
   return (
-    <header className="flex h-[70px] items-center gap-4 border-b bg-background px-4 lg:h-[70px] lg:px-6">
+    <header className="flex h-[70px] items-center gap-4 border-b bg-background px-6 lg:h-[70px] lg:px-4">
       <Sheet>
         <SheetTrigger asChild>
           <Button variant="outline" size="icon" className="shrink-0 md:hidden">

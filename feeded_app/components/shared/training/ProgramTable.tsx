@@ -136,81 +136,85 @@ export default function ProgramTable() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="container mx-auto p-4 sm:p-6 space-y-4 max-h-screen flex flex-col"
+      className="container mx-auto min-h-screen flex flex-col"
     >
-      <motion.h1
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-        className="text-xl sm:text-2xl font-bold mb-2"
-      >
-        Vos formations
-      </motion.h1>
+      <div className="p-4 sm:p-6 space-y-4 flex flex-col flex-grow">
+        <motion.h1
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="text-xl sm:text-2xl font-bold mb-4"
+        >
+          Vos formations
+        </motion.h1>
 
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
-        className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4"
-      >
-        <div className="relative w-full">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            type="text"
-            placeholder="Rechercher une formation..."
-            className="pl-8 w-full"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="flex space-x-2 w-fit sm:w-auto">
-          <Select
-            value={statusFilter}
-            onValueChange={(value: StatusFilterType) => setStatusFilter(value)}
-          >
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Filtrer par statut" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous les statuts</SelectItem>
-              <SelectItem value="A venir">À venir</SelectItem>
-              <SelectItem value="En cours">En cours</SelectItem>
-              <SelectItem value="Terminé">Terminé</SelectItem>
-            </SelectContent>
-          </Select>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              onClick={() => setShowForm(true)}
-              className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-xl shadow-lg"
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4"
+        >
+          <div className="relative w-full">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="text"
+              placeholder="Rechercher une formation..."
+              className="pl-8 w-full"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="flex space-x-2 w-fit sm:w-auto">
+            <Select
+              value={statusFilter}
+              onValueChange={(value: StatusFilterType) => setStatusFilter(value)}
             >
-              Ajouter une formation
-            </Button>
-          </motion.div>
-        </div>
-      </motion.div>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Filtrer par statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="A venir">À venir</SelectItem>
+                <SelectItem value="En cours">En cours</SelectItem>
+                <SelectItem value="Terminé">Terminé</SelectItem>
+              </SelectContent>
+            </Select>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={() => setShowForm(true)}
+                className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-xl shadow-lg"
+              >
+                Ajouter une formation
+              </Button>
+            </motion.div>
+          </div>
+        </motion.div>
 
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.6, duration: 0.5 }}
-        className="overflow-y-auto flex-shrink"
-      >
-        <TrainingProgramList
-          programs={filteredPrograms}
-          onEdit={setEditingProgram}
-          onDelete={handleDeleteProgram}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+          className="flex-grow overflow-hidden max-h-[calc(100vh-15rem)] group"
+        >
+          <div className="h-full overflow-auto invisible-scrollbar group-hover:visible-scrollbar">
+            <TrainingProgramList
+              programs={filteredPrograms}
+              onEdit={setEditingProgram}
+              onDelete={handleDeleteProgram}
+            />
+          </div>
+        </motion.div>
+
+        <TrainingProgramForm
+          show={showForm || !!editingProgram}
+          onClose={() => {
+            setShowForm(false)
+            setEditingProgram(null)
+          }}
+          onSubmit={handleSubmitProgram}
+          editingProgram={editingProgram}
         />
-      </motion.div>
-
-      <TrainingProgramForm
-        show={showForm || !!editingProgram}
-        onClose={() => {
-          setShowForm(false)
-          setEditingProgram(null)
-        }}
-        onSubmit={handleSubmitProgram}
-        editingProgram={editingProgram}
-      />
+      </div>
     </motion.div>
   )
 }

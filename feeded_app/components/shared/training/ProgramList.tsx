@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Users, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
+import { Users, Edit, Trash2 } from "lucide-react"
 
 interface TrainingProgram {
   id: string
@@ -31,14 +31,6 @@ export function TrainingProgramList({
   onEdit,
   onDelete,
 }: TrainingProgramListProps) {
-  const [currentPage, setCurrentPage] = useState(1)
-  const programsPerPage = 20
-
-  const indexOfLastProgram = currentPage * programsPerPage
-  const indexOfFirstProgram = indexOfLastProgram - programsPerPage
-  const currentPrograms = programs.slice(indexOfFirstProgram, indexOfLastProgram)
-  const totalPages = Math.ceil(programs.length / programsPerPage)
-
   const isLongProgram = (startDate: string, endDate: string) => {
     const start = new Date(startDate)
     const end = new Date(endDate)
@@ -68,7 +60,7 @@ export function TrainingProgramList({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentPrograms.map((program) => (
+            {programs.map((program) => (
               <TableRow key={program.id}>
                 <TableCell className="font-medium">{program.name}</TableCell>
                 <TableCell>
@@ -130,52 +122,6 @@ export function TrainingProgramList({
           </TableBody>
         </Table>
       </div>
-      {totalPages > 1 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="flex flex-wrap justify-center items-center mt-4 space-x-2"
-        >
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={`${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''} mb-2 sm:mb-0`}
-            >
-              <ChevronLeft className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Précédente</span>
-              <span className="sm:hidden">Préc</span>
-            </Button>
-          </motion.div>
-          <div className="flex flex-wrap justify-center space-x-2 mb-2 sm:mb-0">
-            {[...Array(totalPages)].map((_, i) => (
-              <motion.div key={i} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  variant={currentPage === i + 1 ? "default" : "outline"}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className="w-8 h-8 mb-2 sm:mb-0"
-                >
-                  {i + 1}
-                </Button>
-              </motion.div>
-            ))}
-          </div>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className={`${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''} mb-2 sm:mb-0`}
-            >
-              <span className="hidden sm:inline">Suivante</span>
-              <span className="sm:hidden">Suiv</span>
-              <ChevronRight className="h-4 w-4 ml-2" />
-            </Button>
-          </motion.div>
-        </motion.div>
-      )}
     </motion.div>
   )
 }
