@@ -105,7 +105,7 @@ export default function PricingPage() {
           <div>
             <h3 className="text-lg font-medium text-gray-900">Quelle est votre politique de remboursement ?</h3>
             <p className="mt-2 text-base text-gray-500">
-              Nous offrons une garantie de remboursement de 30 jours. Si vous n'êtes pas satisfait de notre produit, vous pouvez demander un remboursement complet dans les 30 premiers jours de votre abonnement.
+              Nous offrons une garantie de remboursement de 30 jours. Si vous n&lsquo;êtes pas satisfait de notre produit, vous pouvez demander un remboursement complet dans les 30 premiers jours de votre abonnement.
             </p>
           </div>
         </div>
@@ -114,7 +114,7 @@ export default function PricingPage() {
       <div className="mt-16 border-t border-gray-200 pt-16 text-center">
         <h2 className="text-3xl font-extrabold text-gray-900">Vous avez encore des questions ?</h2>
         <p className="mt-4 text-lg text-gray-500">
-          Nous sommes là pour vous aider. Contactez notre équipe de support pour obtenir de l'aide.
+          Nous sommes là pour vous aider. Contactez notre équipe de support pour obtenir de l&lsquo;aide.
         </p>
         <Button className="mt-6" variant="outline">
           Contacter le support
