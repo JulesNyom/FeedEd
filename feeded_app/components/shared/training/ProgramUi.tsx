@@ -4,7 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -103,6 +103,7 @@ export default function ProgramUI() {
               <Button
                 onClick={() => setShowForm(true)}
                 className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-xl shadow-lg">
+                  <Plus className="mr-2 h-5 w-5" /> 
                 Ajouter une formation
               </Button>
             </motion.div>
