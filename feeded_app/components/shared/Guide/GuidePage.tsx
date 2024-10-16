@@ -9,7 +9,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { BookOpen, Users, Mail, ChevronRight } from "lucide-react";
-import Link from "next/link";
 import { motion } from "framer-motion";
 
 const steps = [
@@ -23,7 +22,7 @@ const steps = [
     icon: <Users className="h-8 w-8 text-primary" />,
     title: "Ajoutez vos apprenants",
     description:
-      "Ensuite, ajoutez vos apprenants à la formation. Pour l'instant, vous pouvez les ajouter manuellement en renseignant leurs emails. Bientôt, vous pourrez importer une liste en masse pour gagner du temps !",
+      "Ensuite, ajoutez vos apprenants à la formation. Pour l'instant, vous pouvez les ajouter manuellement en renseignant leurs emails. Bientôt, vous pourrez importer vos fichiers Excel pour gagner du temps !",
   },
   {
     icon: <Mail className="h-8 w-8 text-primary" />,
@@ -47,12 +46,12 @@ const faqItems = [
   {
     question: "Puis-je personnaliser les questions de feedback ?",
     answer:
-      "Actuellement, nous utilisons un questionnaire standardisé pour assurer la cohérence des résultats. Mais nous sommes à l'écoute ! N'hésitez pas à nous faire part de vos suggestions pour l'avenir.",
+      "Actuellement, nous utilisons des questionnaires standardisés pour assurer la cohérence des résultats. Mais nous sommes à l'écoute ! N'hésitez pas à nous faire part de vos suggestions pour l'avenir.",
   },
   {
     question: "Comment puis-je analyser les résultats ?",
     answer:
-      "Nous vous proposons des outils d'analyse intégrés qui vous permettent de visualiser les tendances et d'exporter les données. Vous pourrez facilement identifier les points forts et les axes d'amélioration de vos formations.",
+      "Nous vous proposons une visualisation intégré de vos données, ainsi que la possibilité d'analyser les tendances et d'exporter les données. Vous pourrez facilement identifier les points forts et les axes d'amélioration de vos formations.",
   },
 ];
 

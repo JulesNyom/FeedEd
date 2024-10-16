@@ -179,7 +179,7 @@ export default function Dashboard() {
           transition={{ duration: 0.5 }}
           className="text-3xl font-bold mb-8"
         >
-          Bienvenue, {currentUser.displayName || currentUser.email}
+          Vue d&lsquo;ensemble
         </motion.h1>
         
         <div className="mb-6">
@@ -214,7 +214,7 @@ export default function Dashboard() {
                     <h2 className="text-lg font-semibold">{card.title}</h2>
                     <card.icon className="w-6 h-6 text-primary" />
                   </div>
-                  <p className="text-3xl font-bold">{card.value}</p>
+                  <p className="text-2xl font-bold">{card.value}</p>
                   <motion.p 
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: hoveredCard === index ? 1 : 0, height: hoveredCard === index ? 'auto' : 0 }}
