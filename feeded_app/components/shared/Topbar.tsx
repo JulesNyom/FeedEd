@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import UserButton from "@/components/shared/UserButton"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import {
   Menu,
   Home,
@@ -45,6 +45,7 @@ export function Topbar(): JSX.Element {
     photoURL: '',
     createdAt: '',
   })
+  const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
     if (currentUser && userDataObj) {
@@ -58,13 +59,45 @@ export function Topbar(): JSX.Element {
   }, [currentUser, userDataObj])
 
   return (
-    <header className="flex h-[70px] items-center gap-4 border-b bg-background px-6 lg:h-[70px] lg:px-4">
-      <Sheet>
+    <motion.header
+      initial={{ opacity: 0, y: -50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex h-[70px] items-center gap-4 border-b bg-background px-6 lg:h-[70px] lg:px-4"
+    >
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <Button variant="outline" size="icon" className="shrink-0 md:hidden">
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle navigation menu</span>
-          </Button>
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <Button variant="outline" size="icon" className="shrink-0 md:hidden">
+              <AnimatePresence mode="wait">
+                {isOpen ? (
+                  <motion.div
+                    key="close"
+                    initial={{ rotate: 0 }}
+                    animate={{ rotate: 90 }}
+                    exit={{ rotate: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Menu className="h-5 w-5" />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="open"
+                    initial={{ rotate: 90 }}
+                    animate={{ rotate: 0 }}
+                    exit={{ rotate: 90 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Menu className="h-5 w-5" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <span className="sr-only">Toggle navigation menu</span>
+            </Button>
+          </motion.div>
         </SheetTrigger>
         <SheetContent side="left" className="flex w-[300px] min-h-screen flex-col p-0">
           <div className="border-b px-6 py-2">
@@ -126,11 +159,22 @@ export function Topbar(): JSX.Element {
         </SheetContent>
       </Sheet>
       <div className="flex w-full flex-1 items-center justify-between xs:">
-        <div className="text-lg font-semibold">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="text-lg font-semibold"
+        >
           Bienvenue, {utilisateur.displayName || 'Utilisateur'}
-        </div>
-        <UserButton />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          <UserButton />
+        </motion.div>
       </div>
-    </header>
+    </motion.header>
   )
 }
