@@ -1,14 +1,13 @@
 "use client"
 
 import { useState } from 'react'
-import Link from "next/link"
 import Image from "next/image"
-import { ArrowRight, Mail, CheckCircle } from "lucide-react"
+import { Mail, CheckCircle } from "lucide-react"
 import { motion } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/hooks/use-toast"
-import { db } from '@/firebase' // Import db from your Firebase file
+import { db } from '@/firebase' 
 import { collection, addDoc } from 'firebase/firestore'
 import {
   Dialog,
@@ -102,12 +101,7 @@ export default function VerticalHero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.8 }}
         >
-          <Button asChild size="lg" variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-50 transition-colors duration-300">
-            <Link href="/guide">
-              En savoir plus
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
-          </Button>
+        
         </motion.div>
       </div>
 
