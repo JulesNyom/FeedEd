@@ -58,7 +58,7 @@ export default function StorySection() {
       id: 3,
       title: "Transformer l'expérience",
       description: "Optimiser l'expérience de formation pour tous les acteurs",
-      image: "/assets/images/impact.webp",
+      image: "/assets/images/impact.jpeg",
     },
   ]
 

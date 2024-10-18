@@ -7,7 +7,9 @@ const Page = () => {
   return (
     <div className="flex flex-col">
         <HeroSection />
+        <div className="mt-[-82px]">
         <StorySection />
+        </div>
         <Footer />
     </div>
   );
